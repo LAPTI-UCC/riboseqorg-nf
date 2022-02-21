@@ -168,3 +168,6 @@ gradle.properties
 .launch.classpath
 plugins-prod
 sandbox
+
+# exclude all contents of the data folder 
+data/*
