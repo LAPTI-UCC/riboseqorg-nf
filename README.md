@@ -20,8 +20,9 @@
 
 ## Requirements 
   
-  - Biopython 
-  - Pandas 
+  - <a href="https://pypi.org/project/biopython/" > Biopython <a>
+  - <a href="https://pypi.org/project/pandas/"> Pandas <a>
+  - <a href="https://pypi.org/project/validators/"> Validators <a>
   
   
   #
