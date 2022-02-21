@@ -20,8 +20,9 @@
 
 ## Requirements 
   
-  - Biopython 
-  - Pandas 
+  - <a href="https://pypi.org/project/biopython/" > Biopython <a>
+  - <a href="https://pypi.org/project/pandas/"> Pandas <a>
+  - <a href="https://pypi.org/project/validators/"> Validators <a>
   
   
   #
@@ -53,7 +54,7 @@
   
   In this stage we use nextflow to process the fetched reads following the schema below
   
-  ![Alt Text](https://github.com/JackCurragh/riboseq_data_processing/blob/main/pipeline.drawio.png)
+  ![Deptiction of the data processing pipeline](https://github.com/JackCurragh/riboseq_data_processing/blob/main/images/pipeline.drawio.png)
 ## 5. Upload to GWIPS and TRIPS
   
   This stage uses the metadata to upload the processed files to the web resources in an automated fashion
