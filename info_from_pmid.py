@@ -74,6 +74,8 @@ def get_info_from_medline(query):
             elif "FAU" in line[0] and info_dict['authors'] != None:
                 name = entry.split(',')
                 info_dict['authors'] += ' '.join(name[1:]) + " " + name[0] + ", "
-            
-    info_dict['authors'] = info_dict['authors'][:-2]
+    try:        
+        info_dict['authors'] = info_dict['authors'][:-2]
+    except:
+        info_dict['authors'] = info_dict['authors']
     return info_dict
