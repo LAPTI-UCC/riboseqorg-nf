@@ -4,9 +4,10 @@ import pandas as pd
 
 def get_geo_results_as_df(accession):
     '''
-    Given an accession (GEO SRA or ENA) return the search results from GEO as a pandas data frame. 
+    Given an accession (GEO SRA or ENA) return the search results from sra run info as a pandas data frame. 
     '''
     s = subprocess.check_output(f'esearch -db sra -query {accession} | efetch -format runinfo -mode text', stderr=subprocess.STDOUT, shell=True)
+    print(s)
     arr = []
     for i in str(s).split('\\n')[:-1]:
         arr.append(i.split(','))

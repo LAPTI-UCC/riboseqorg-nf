@@ -1,6 +1,8 @@
 from email import header
-import subprocess
+from numpy import False_
 import pandas as pd
+import subprocess
+
   
 
 def get_sra_run_info_as_df(srp):
@@ -54,25 +56,30 @@ def superset_row_to_outfile_name(row):
     return outfile
 
 
-def download_sra_run_table(superset_path, datadir, num_samples=1, specific_GSEs=[]):
+def download_sra_run_table(superset_path, datadir, num_samples=1, specific_GSEs=[], sep=','):
     '''
     download the sra run table for either a random srp or a specified list of srps 
     '''
     
-    superset = pd.read_csv(superset_path, sep="\t")
+    superset = pd.read_csv(superset_path, sep=sep, header=0)
     if datadir[-1] != "/":
         datadir = datadir + "/"
 
-    if not specific_GSE:
+    if not specific_GSEs:
         srps = superset.sample(num_samples)
     else:
-        srps = superset[superset.Accession in specific_GSEs]
+        srps = superset[superset.Accession.isin(specific_GSEs)]
 
 
     for idx, row in srps.iterrows():
         outfile = superset_row_to_outfile_name(row)
         sra_runs = get_sra_run_info_as_df(row['SRA'])
-        run_table_to_csv(sra_runs, datadir + outfile + "_sraRunInfo.csv")
-    
+        run_table_to_csv(sra_runs, datadir + '/' + outfile + "_sraRunInfo.csv")
+
+
+download_sra_run_table('/home/jack/projects/riboseq_data_processing/data/ribosome_profiling_superset.csv', 
+        '/home/jack/projects/riboseq_data_processing/data',
+        specific_GSEs=['GSE156796']
+        )
 
 
