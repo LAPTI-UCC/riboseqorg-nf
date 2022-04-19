@@ -22,7 +22,7 @@ def get_parser():
     '''
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--operation", choices=['add', 'remove', 'update'])
+    parser.add_argument("--operation", choices=['add', 'remove', 'update', 'set_primary_organism'])
 
     parser.add_argument("-o", help="Organism name. This is used as dictionary key for future reference", type=str) 
     parser.add_argument("-r", help="Path to rRNA bowtie indexes", type=str) 
@@ -31,7 +31,9 @@ def get_parser():
     parser.add_argument("-f", help="Path to genome fasta file", type=str) 
     parser.add_argument("-s", help="Path to annotation inventory sqlite (default .annotation_inventory.sqlite)", type=str, default="annotation_inventory.sqlite") 
     parser.add_argument("-c", help="Path to chromosome sizes corresponding to genome fasta (-g)", type=str) 
-    
+
+    parser.add_argument("--scientific", help="Scientific name of the organism you want to set. Goes with '--operation ", type=str)
+  
     return parser
 
 
@@ -57,7 +59,7 @@ def handle_chrom_sizes(fasta_path):
     '''
     if not os.path.isabs(args.f):
         dir_path = os.path.dirname(os.path.abspath(args.f))
-        chrom_sizes_path = dir_path + f"/{args.f}.chrom_sizes"
+        chrom_sizes_path = dir_path + f"{args.f}.chrom_sizes"
 
     else:
         chrom_sizes_path = f"{args.f}.chrom_sizes"
@@ -136,6 +138,26 @@ def update_organim(organism, db="annotation_inventory.sqlite", **kwargs):
         raise Exception(f"{organism} isn't in the inventory. Maybe it is spelled differently?")
 
 
+def set_primary_organism(organism, scientific, db='annotation_inventory.sqlite'):
+    '''
+    Set the primary organism for the given scientific name. (ie. 'Homo sapiens' primary organism 'human_hg19_gencode25')
+    '''
+    
+    connection = sqlite3.connect(db)
+    cursor = get_db_curosor(connection)
+
+    organism_results = cursor.execute(f"SELECT COUNT(*) FROM annotation_inventory where organism='{organism}'").fetchall()[0][0]
+    if organism_results < 1:
+        raise Exception("This organism is not in the annotation inventory. Please add (using --operation add) first")
+
+    scientific_results = cursor.execute(f"SELECT COUNT(*) FROM primary_organism where scientific_name='{scientific}'").fetchall()[0][0]
+    if scientific_results < 1:
+        cursor.execute(f"INSERT INTO primary_organism VALUES('{scientific}', '{organism}') ")
+    else:
+        cursor.execute(f"UPDATE primary_organism SET organism='{organism}")
+
+    connection.commit()
+    connection.close()
 
 def run(args):
     '''
@@ -181,6 +203,18 @@ def run(args):
             items_to_update.pop(item)
             
         update_organim(organism=args.o, db=args.s, **items_to_update)
+    
+    elif args.operation == 'set_primary_organism':
+        required = ['o', 'scientific']
+
+        for i in required:
+            if not vars(args)[i]:
+                raise Exception(f"Missing required argument: -{i}")
+
+        set_primary_organism(organism=args.o, db=args.s, scientific=args.scientific)
+    
+    else:
+        raise Exception(f"Invalid operation: {args.operation}")
 
 
 def run_prompted(args, db='annotation_inventory.sqlite'):
@@ -189,8 +223,8 @@ def run_prompted(args, db='annotation_inventory.sqlite'):
     '''
     print("-"*90)
     args.operation = input("Which operation would you like to perform on the database? ('add', 'remove' or 'update'): ").strip(' ')
-    if args.operation not in ['add', 'remove', 'update']:
-        raise Exception("invalid opetion. Must be ('add', 'remove' or 'update')")
+    if args.operation not in ['add', 'remove', 'update', 'set_primary_organim']:
+        raise Exception("invalid opetion. Must be ('add', 'remove', 'update' or 'set_primary_organim')")
     
     print("-"*90)
     if args.operation == 'add':
@@ -218,7 +252,7 @@ def run_prompted(args, db='annotation_inventory.sqlite'):
     elif args.operation == "update":
         required = ['o']
         options = ['r','t','g','f','c']
-        args.o = input("What is the name of the organism you want to add? Be specific: ").strip(' ')
+        args.o = input("What is the name of the organism you want to update? Be specific: ").strip(' ')
         print("-"*90)
         args.r = input("What is the path to the bowtie rRNA indices?: ").strip(' ')
         print("-"*90)
@@ -230,6 +264,13 @@ def run_prompted(args, db='annotation_inventory.sqlite'):
         print("-"*90)
         args.c = input("What is the path to the genomes chromosome sizes file?: ").strip(' ')
         print("-"*90)
+
+    elif args.operation == "set_primary_organim":
+        args.o = input("What is the name of the organism you want to set? Be specific: ").strip(' ')
+        print("-"*90)
+        args.scientific = input("What is the scientific name of the organism you want to set? eg. 'Homo sapiens': ").strip(' ')
+        print("-"*90)
+
     run(args)
 
 

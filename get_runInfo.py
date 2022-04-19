@@ -2,6 +2,7 @@ from email import header
 from numpy import False_
 import pandas as pd
 import subprocess
+import os
 
   
 
@@ -74,12 +75,13 @@ def download_sra_run_table(superset_path, datadir, num_samples=1, specific_GSEs=
     for idx, row in srps.iterrows():
         outfile = superset_row_to_outfile_name(row)
         sra_runs = get_sra_run_info_as_df(row['SRA'])
-        run_table_to_csv(sra_runs, datadir + '/' + outfile + "_sraRunInfo.csv")
+        os.makedirs(datadir + '/' + outfile)
+        run_table_to_csv(sra_runs, f"{datadir}/{outfile}/{outfile}_sraRunInfo.csv")
 
 
 download_sra_run_table('/home/jack/projects/riboseq_data_processing/data/ribosome_profiling_superset.csv', 
         '/home/jack/projects/riboseq_data_processing/data',
-        specific_GSEs=['GSE156796']
+        specific_GSEs=['GSE136940']
         )
 
 

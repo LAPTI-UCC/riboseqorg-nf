@@ -1,8 +1,52 @@
+from logging import raiseExceptions
 import pandas as pd
 import subprocess
 import os
 import sqlite3
 import argparse
+from copy import copy
+
+
+
+def get_study_structure(runInfo_path):
+    '''
+    From the organism names in the run into column ScientificNames create subdirectories
+    for each sub-study (ie. a study that uses just one organism.)
+    Also return the list of paths to the RunInfos that are put in these directories 
+    '''
+    runInfo_paths = []
+
+    study_dir = os.path.dirname(runInfo_path)
+
+    runInfo_file_name = os.path.basename(runInfo_path)
+    runInfo_file_name_parts = runInfo_file_name.split('_')
+    keep = [runInfo_file_name_parts[0]] 
+    for part in runInfo_file_name_parts:
+        if 'GSE' in part or 'SRP' in part: 
+            keep.append(part)
+
+    keep.append(runInfo_file_name_parts[-1])
+
+    runInfo = pd.read_csv(runInfo_path)
+    if runInfo['ScientificName'].nunique() == 1:
+        runInfo_paths.append(runInfo_path)
+
+    else:
+        for i in runInfo['ScientificName'].unique():
+            new_runInfo = runInfo[runInfo['ScientificName'] == i]
+            organism_name = '_'.join(i.split(' '))
+
+            new_runInfo_namelist = copy(keep)
+            new_runInfo_namelist.insert(1, organism_name)
+            new_runInfo_filename = '_'.join(new_runInfo_namelist)
+            new_study_dir = study_dir + '/' + new_runInfo_filename.strip('_sraRunInfo.csv')
+            if not os.path.exists(new_study_dir):
+                os.makedirs(new_study_dir)
+
+            new_runInfo.to_csv(f"{new_study_dir}/{new_runInfo_filename}" )
+            runInfo_paths.append(f"{new_study_dir}/{new_runInfo_filename}")
+
+    return runInfo_paths
 
 def download_files_from_SRA(runInfo_path, outdir):
     '''
@@ -70,6 +114,26 @@ def merge_adapter_reports(fastq_dir):
             final_report.write(f"adapter{idx+1}\t{adapter}\n")
 
 
+def get_annotation_organism(path, db='annotation_inventory.sqlite'):
+    '''
+    Look at the run into file at the given path and find the scientific 
+    name of the organism  to which these runs apply.
+    Check the annotation inventory for the 'organism' name that applies
+    '''
+    runInfo = pd.read_csv(path)
+    scientific_name = runInfo['ScientificName'].unique()[0]
+
+    connection = sqlite3.connect(db)
+    cursor = connection.cursor()
+    result = cursor.execute(f"SELECT organism FROM primary_organism WHERE scientific_name = '{scientific_name}';").fetchall()
+    
+    if len(result) > 0:
+        return result[0][0]
+    elif len(result) == 0:
+        return Exception(f"""\tERROR: There is no primary organism assigned for {scientific_name}.\n
+         Add one using annnotation inventory managers --operation set_primary_organism
+         """)
+
 
 def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips=False, skip_trips=False, annotations_inventory_sqlite='annotation_inventory.sqlite'):
     '''
@@ -90,7 +154,9 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
 
     with open(adapter_report_path, 'r') as adapter_report:
         lines = adapter_report.readlines()
-        if len(lines) <= 2:
+        if len(lines) == 0:
+            parameter_dict["adapter1"], parameter_dict["adapter2"] = "", ""
+        elif len(lines) <= 2:
             parameter_dict["adapter1"] = lines[0].split("\t")[1].strip('\n')
             parameter_dict["adapter2"] = lines[1].split("\t")[1].strip('\n')
 
@@ -107,29 +173,35 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
     with open(yaml_outpath, 'w') as yaml:
         for line in parameter_order:
             if type(parameter_dict[line]) is str:
-                yaml.write(f'{line} \t:\t "{parameter_dict[line]}"')
+                yaml.write(f'{line} \t:\t "{parameter_dict[line]}"\n')
 
             elif type(parameter_dict[line]) is bool:
-                yaml.write(f'{line} \t:\t {str(parameter_dict[line]).lower()}')
+                yaml.write(f'{line} \t:\t {str(parameter_dict[line]).lower()}\n')
 
 
 
-def run_project_setup(run_info):
+def run_project_setup(run_info, db='annotation_inventory.sqlite'):
     '''
     given a sra run info file for a study, run the necessary data fetching and setup. 
     '''
-    study_dir = os.path.dirname(run_info)
-    download_files_from_SRA(run_info, f'{study_dir}/sra')
-    sra_to_fastq(study_dir)
 
-    find_adapters(f'{study_dir}/fastq')
-    merge_adapter_reports(study_dir+'/fastq')
+    runInfo_paths = get_study_structure(run_info)
+    for path in runInfo_paths:
+        print('-'*90, '\n')
 
-    '''
-    The remaining task here is to find the organisms used in the run info and to find the organism name in the database. ]]
-    I will also need to split studies with multiple organisms into different study dirs
-    '''
-    write_paramters_yaml('human_hg19_gencode25', study_dir + '/fastq/final_adapter_report', study_dir + 'parameters.yaml')
+        study_dir = os.path.dirname(path)
+
+        download_files_from_SRA(path, f'{study_dir}/sra')
+        sra_to_fastq(study_dir)
+
+        find_adapters(f'{study_dir}/fastq')
+        merge_adapter_reports(study_dir+'/fastq')
+        try:
+            annotation_inventory_organism = get_annotation_organism(path, db='annotation_inventory.sqlite')
+            write_paramters_yaml(annotation_inventory_organism, study_dir + '/fastq/final_adapter_report.tsv', study_dir + '/parameters.yaml')
+        except:
+            print(annotation_inventory_organism)
+            continue
 
 
 if __name__ == '__main__':
@@ -140,6 +212,5 @@ if __name__ == '__main__':
     parser.add_argument("-r", help="runInfo file for this study from SRA")
 
     args = parser.parse_args()
-    print(args.r)
-    run_project_setup(args.r)
+    run_project_setup(args.r, db=args.s)
 

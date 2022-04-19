@@ -6,5 +6,5 @@ genome_index : "/data1/pipeline/annotations/gwips/homo_sapiens/hg38/hg38_bowtie_
 genome_fasta : "/data1/pipeline/annotations/gwips/homo_sapiens/hg38/hg38.fa"
 annotation_sqlite : "/data1/pipeline/annotations/trips/homo_sapiens/homo_sapiens.Gencode_v25.sqlite"
 chrom_sizes_file : "/data1/pipeline/annotations/gwips/homo_sapiens/hg38.chrom.sizes"
-skip_trips : true
-skip_gwips : false
+skip_trips : "True"
+skip_gwips : "False"
