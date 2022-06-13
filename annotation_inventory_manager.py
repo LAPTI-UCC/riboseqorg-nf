@@ -228,7 +228,7 @@ def run_prompted(args, db='annotation_inventory.sqlite'):
     
     print("-"*90)
     if args.operation == 'add':
-        required = ['o', 'r','t','g','f']
+        required = ['o', 'r','t','g','f', 's']
         options = ['c']
 
         args.o = input("What is the name of the organism you want to add? Be specific: ").strip(' ')
@@ -241,6 +241,8 @@ def run_prompted(args, db='annotation_inventory.sqlite'):
         print("-"*90)
         args.f = input("What is the path to the genome fasta file?: ").strip(' ')
         print("-"*90)
+        args.s = input("What is the path to the trips annotation file?: ").strip(' ')
+
 
 
     elif args.operation == "remove":
@@ -251,7 +253,7 @@ def run_prompted(args, db='annotation_inventory.sqlite'):
 
     elif args.operation == "update":
         required = ['o']
-        options = ['r','t','g','f','c']
+        options = ['r','t','g','f','c', 's']
         args.o = input("What is the name of the organism you want to update? Be specific: ").strip(' ')
         print("-"*90)
         args.r = input("What is the path to the bowtie rRNA indices?: ").strip(' ')
@@ -264,6 +266,9 @@ def run_prompted(args, db='annotation_inventory.sqlite'):
         print("-"*90)
         args.c = input("What is the path to the genomes chromosome sizes file?: ").strip(' ')
         print("-"*90)
+        args.s = input("What is the path to the trips annotation file?: ").strip(' ')
+
+        
 
     elif args.operation == "set_primary_organim":
         args.o = input("What is the name of the organism you want to set? Be specific: ").strip(' ')
