@@ -16,26 +16,7 @@ process sra_to_fastq {
 	"""
 }
 
-/* THE OUTPUT OF THE ABOVE PROCESS WAS IN TWO CHANNELS (FFC1 & FFC2). HOW DO I SPECIFY MULTIPLE OUTPUTS IN DSL2?*/
-/* Technically, DSL2 should have the "automatic channel forking" that should be able to do exactly this. No need 
-for declarations using an INTO statement */
-
-process fastqc_on_raw {
-	publishDir 'fastqc_on_raw', mode: 'copy'
-	
-	input:
-	file raw_fastq /* from fastq_files_channel1 */ /* THAT IS TO SAY, FFC1 */
-
-	output:
-	file '*_fastqc.{zip,html}' /* into raw_fastqc_dir */
-
-	"""
-	fastqc -q $raw_fastq 
-	"""
-}
-
-/* Technically, this process should take the output of sra_to_fastq without me needing to specify the output 
-channels before (automatic forking) */
+/* Moving the process to remove adapters upstream in the pipeline  */
 
 process clip_fastq {
         
@@ -55,6 +36,42 @@ process clip_fastq {
 		cutadapt --minimum-length=25 -a $params.adapter1 -o $raw_fastq"_clipped.fastq" $raw_fastq
 		"""
 }
+
+/* ORIGINALLY THE BELOW PROCESS WAS NAMED "fastqc_on_raw". It has been updated for consistency, considering we are
+using fastqc on clipped sequences in this new version -> new name is fastqc_on_clipped */
+
+process fastqc_on_clipped {
+	publishDir 'fastqc_on_clipped', mode: 'copy'
+	
+	input:
+	file clipped_fastq /* from fastq_files_channel1 */ /* THAT IS TO SAY, FFC1 */
+
+	output:
+	file '*_fastqc.{zip,html}' /* into raw_fastqc_dir */
+
+	"""
+	fastqc -q $raw_fastq 
+	"""
+}
+
+/* HERE IS THE NEW PROCESS THAT EXECUTES MULTIQC ON THE FASTQC FILES */
+
+process multiqc_on_fastq {
+
+	input:
+	/* should specify the directory? above there is a publishDir thing */
+	file ('fastqc/*')
+
+	output:
+	file "multiqc_report.html"
+	file "multiqc_output_data"
+
+	/* script to execute fastqc*/
+	"""
+	multiqc .
+	"""
+}
+
 
 /* I really hope this works as intended */
 
@@ -78,18 +95,7 @@ process rRNA_mapping {
 
 process transcriptome_mapping {
 	publishDir 'trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
-
-	input:    
-	file less_rrna_fastq /* from fastq_less_rRNA */
-
-	output:
-	file "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sams  /* USE AN EMIT COMMAND HERE?*/
-	file "${less_rrna_fastq.baseName}_trips_alignment_stats.txt", emit: mRNA_alignment_stats
-
-	"""
-	bowtie -p 8 --norc -a -m 100 -l 25 -n 2  -S  -x $params.transcriptome_index -q ${less_rrna_fastq} ${less_rrna_fastq.baseName}_transcriptome.sam  > ${less_rrna_fastq.baseName}_trips_alignment_stats.txt 2>&1
-	"""
-} 
+_
 
 process transcriptome_sam_to_bam {
 	input:
@@ -196,9 +202,11 @@ process coveragebed_to_bigwig {
 
 workflow {
     sra_data = Channel.fromPath(params.sra_files)   /*simple: I assign the input data*/
-    sra_to_fastq(sra_data)			/* First process*/
-	fastqc_on_raw(sra_to_fastq.out)			/* Second process: uses the output of the first, speificied between () */
-	clip_fastq(sra_to_fastq.out) /* This uses the output of the first process as well */
+    sra_to_fastq(sra_data)
+    clip_fastq(sra_to_fastq.out)
+	fastqc_on_clipped(clip_fastq.out)
+    multiqc_on_fastq(fastqc_on_clipped.out)		
+ /* This uses the output of the first process as well */
 	rRNA_mapping(clip_fastq.out)
     /* IF STATEMENT #1 */
     if (params.skip_trips == false) {
@@ -218,3 +226,9 @@ workflow {
 /* UPDATE 11/06/2022 - The first draft of the DSL2 pipeline is ready. 
 Next step is to read it again to be sure the processes are correctly chained.
 Following that, I need to install the programs required (bowtie, others?) to run it */
+
+
+/* TO DO: check name of the input fastqc_on_raw (version 2) or clip_fastq (in both versions)
+to see whether input and output names are correct or not. */
+
+/* In this update, fastqc_on_raw has become fastqc_on_clipped for consistency */
