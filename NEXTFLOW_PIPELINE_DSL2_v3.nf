@@ -1,4 +1,4 @@
-/* V0: first attemp in converting the original pipeline to a DSL2 one
+/* V3: DSL2, multiqc added, minor bug fixes
 */
 
 params.sra_files = "./sra/*.sra"
