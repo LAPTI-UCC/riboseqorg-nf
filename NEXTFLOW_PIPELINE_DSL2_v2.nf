@@ -145,8 +145,8 @@ process genome_mapping {
    	file less_rrna_fastq /* from fastq_less_rRNA */
 
     output:
-    file "${less_rrna_fastq.baseName}_genome.sam", emit: genome_sams /* into genome_sams */
-    file "${less_rrna_fastq.baseName}_gwips_alignment_stats.txt", emit: gwips_alignment_stats/* into gwips_alignment_stats */
+    path "${less_rrna_fastq.baseName}_genome.sam", emit: genome_sams /* into genome_sams */
+    path "${less_rrna_fastq.baseName}_gwips_alignment_stats.txt", emit: gwips_alignment_stats/* into gwips_alignment_stats */
 
     """
 	bowtie -p 8 -m 1 -n 2 --seedlen 25 -S -x ${params.genome_index} -q ${less_rrna_fastq} -S ${less_rrna_fastq.baseName}_genome.sam  >> ${less_rrna_fastq.baseName}_gwips_alignment_stats.txt 2>&1
@@ -159,8 +159,8 @@ process genome_sam_to_bed {
 	file genome_sam /* from genome_sams */
 
     output:
-    file "${genome_sam.baseName}.sorted.cov", emit: coverage_beds /* into coverage_beds */
-	file "${genome_sam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /* into sorted_beds */
+    path "${genome_sam.baseName}.sorted.cov", emit: coverage_beds /* into coverage_beds */
+	path "${genome_sam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /* into sorted_beds */
     	
     """
     samtools view -@ 8 -b -S ${genome_sam.baseName}.sam -o ${genome_sam.baseName}.bam
