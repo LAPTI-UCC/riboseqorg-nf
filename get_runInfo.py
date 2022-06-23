@@ -79,9 +79,9 @@ def download_sra_run_table(superset_path, datadir, num_samples=1, specific_GSEs=
         run_table_to_csv(sra_runs, f"{datadir}/{outfile}/{outfile}_sraRunInfo.csv")
 
 
-download_sra_run_table('/home/jack/projects/riboseq_data_processing/data/ribosome_profiling_superset.csv', 
-        '/home/jack/projects/riboseq_data_processing/data',
-        specific_GSEs=['GSE136940']
+download_sra_run_table('data/ribosome_profiling_superset.csv', 
+        'data',
+        specific_GSEs=['GSE97384']
         )
 
 

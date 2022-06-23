@@ -52,7 +52,6 @@ def download_files_from_SRA(runInfo_path, outdir):
     '''
     download all runs to a specifc output dir
     '''
-    print("Downloading from SRA")
     runInfo = pd.read_csv(runInfo_path, header=0)
 
     if outdir[-1] != "/":
@@ -75,7 +74,7 @@ def sra_to_fastq(study_dir):
         absolute_path = sra_dir + '/' + i
         
         if not os.path.isfile(study_dir + '/fastq/' + i + '.fastq'):
-            subprocess.run(['fasterq-dump', absolute_path, '-O', study_dir+'/fastq'])
+            subprocess.run(f"fasterq-dump {absolute_path} -O {study_dir}/fastq", check=True, capture_output=True, shell=True)
 
 
 def find_adapters(fastq_dir):
