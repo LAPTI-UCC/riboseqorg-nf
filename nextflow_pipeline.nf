@@ -1,9 +1,11 @@
 #!/usr/bin/env nextflow
 
-params.sra_files = "./sra/*.sra"
+nextflow.enable.dsl=1 
+params.sra_files = "sra/*.sra"
 
 sra_files_ch = Channel.fromPath(params.sra_files)
 
+println(params.skip_gwips)
 process sra_to_fastq {
 
 	input:
@@ -12,7 +14,7 @@ process sra_to_fastq {
 	output:
 	file '*.fastq' into fastq_files_channel1,fastq_files_channel2
 
-	"""
+	"""	
 	fastq-dump $sra_files 
 	"""
 }

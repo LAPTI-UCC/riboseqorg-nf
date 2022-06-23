@@ -14,17 +14,22 @@ def rev_comp(adapter):
     return adapter.upper()
 
 
-def check_adapter(adapter, fastq_path, verbose=False):
+def get_number_of_reads(fastq_path):
     '''
-    For a given adapter sequence check for its presence in the given FASTQ file 
+    return the number of reads in the fastq file (num lines / 4)
     '''
     fastq_lines_output = subprocess.check_output(
-        "wc -l {0}".format(fastq_path), shell=True
+        f"wc -l {fastq_path}", shell=True
     )
     fastq_lines = float(fastq_lines_output.split()[0])
     number_of_reads = fastq_lines/4
+    return number_of_reads
 
 
+def check_adapter(adapter, fastq_path, number_of_reads, verbose=False):
+    '''
+    For a given adapter sequence check for its presence in the given FASTQ file 
+    '''
     adapter_count_raw = subprocess.check_output(
         "head -2000000 {0} | sed -n '2~4p' > test.fastq ; agrep -c1 \"{1}\" test.fastq ; rm test.fastq".format(
             fastq_path, adapter
@@ -35,6 +40,7 @@ def check_adapter(adapter, fastq_path, verbose=False):
     adapter_count = float(adapter_count_raw.decode('utf-8').strip('\n'))
 
     percentage_contamination = float((adapter_count / number_of_reads) * 100)
+
     if percentage_contamination >= (0.05):
         return True
     else:
@@ -47,15 +53,16 @@ def get_adapters(fastq_path, adapter_sequences, verbose=False):
     '''
 
     found_adapters ={'forward': [], 'reverse': []}
+    number_of_reads = get_number_of_reads(fastq_path)
 
     for adapter in adapter_sequences:
-        verdict = check_adapter(adapter, fastq_path, verbose=verbose)
+        verdict = check_adapter(adapter, fastq_path, number_of_reads, verbose=verbose)
         if verdict:
             found_adapters['forward'].append(adapter)
 
         else:
             adapter = rev_comp(adapter)
-            verdict = check_adapter(adapter, fastq_path, verbose=verbose)
+            verdict = check_adapter(adapter, fastq_path, number_of_reads, verbose=verbose)
             if verdict:
                 found_adapters['reverse'].append(adapter)
 

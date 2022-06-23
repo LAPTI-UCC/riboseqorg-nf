@@ -60,7 +60,7 @@ def download_files_from_SRA(runInfo_path, outdir):
     for idx, row in runInfo.iterrows():
         filename = row['download_path'].split('/')[-1]
         if not os.path.isfile(outdir + filename):
-            subprocess.run(['wget', row['download_path'], '-P', outdir])
+            subprocess.run(f"prefetch {row['Run']} --output-directory {outdir}", check=True, capture_output=True, shell=True)
 
 
 def sra_to_fastq(study_dir):
