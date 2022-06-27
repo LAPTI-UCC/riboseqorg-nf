@@ -215,10 +215,10 @@ workflow {
     sra_data = Channel.fromPath(params.sra_files)   /*simple: I assign the input data*/
     sra_to_fastq(sra_data)
     clip_fastq(sra_to_fastq.out)
-	fastqc_on_clipped(clip_fastq.out)
-    multiqc_on_fastq(fastqc_on_clipped.out)		
- /* This uses the output of the first process as well */
 	rRNA_mapping(clip_fastq.out)
+	fastqc_on_clipped(rRNA_mapping.out.fastq_less_rRNA)
+    multiqc_on_fastq(fastqc_on_clipped.out)		
+
     /* IF STATEMENT #1 */
     if (params.skip_trips == false) {
         transcriptome_mapping(rRNA_mapping.out.fastq_less_rRNA)
@@ -234,12 +234,8 @@ workflow {
     }
 }
 
-/* UPDATE 11/06/2022 - The first draft of the DSL2 pipeline is ready. 
-Next step is to read it again to be sure the processes are correctly chained.
-Following that, I need to install the programs required (bowtie, others?) to run it */
-
-
 /* TO DO: check name of the input fastqc_on_raw (version 2) or clip_fastq (in both versions)
 to see whether input and output names are correct or not. */
 
-/* In this update, fastqc_on_raw has become fastqc_on_clipped for consistency */
+/* In this update, I moved the Quality Assesment steps (fastqc and multiqc) AFTER the removal of rRNAs.
+This way the quality assessment steps are done on the completely pre-processed reads. */
