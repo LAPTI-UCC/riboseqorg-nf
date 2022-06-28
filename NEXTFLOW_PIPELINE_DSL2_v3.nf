@@ -56,7 +56,7 @@ process rRNA_mapping {
 }
 
 /* ORIGINALLY THE BELOW PROCESS WAS NAMED "fastqc_on_raw". It has been updated for consistency, considering we are
-using fastqc on clipped sequences in this new version -> new name is fastqc_on_clipped */
+using fastqc on processed reads in this new version (sequences with no adapters and no rRNAs)-> new name is fastqc_on_processed */
 
 process fastqc_on_processed {
 	publishDir 'fastqc_on_processed', mode: 'copy'
