@@ -1,6 +1,10 @@
 /* V3: DSL2, multiqc added, minor bug fixes
 */
 
+/* -------------------
+PRE-PROCESSING BRANCH
+--------------------- */
+
 params.sra_files = "./sra/*.sra"
 
 process sra_to_fastq {
@@ -84,10 +88,11 @@ process multiqc_on_fastq {
 	"""
 }
 
-/* END OF PRE-PROCESSING */
 
+/* -------------------------
+TRANSCRIPTOME MAPPING BRANCH
+---------------------------- */
 
-/* TRANSCRIPTOME MAPPING BRANCH*/
 
 process transcriptome_mapping {
 	publishDir 'trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
@@ -131,7 +136,9 @@ process bam_to_sqlite {
 }
 
 
-/* GENOME MAPPING BRANCH */
+/* --------------------
+GENOME MAPPING BRANCH 
+----------------------*/
 
 
 	
