@@ -16,8 +16,6 @@ process sra_to_fastq {
 	"""
 }
 
-/* Moving the process to remove adapters upstream in the pipeline  */
-
 process clip_fastq {
         
         input:
@@ -37,24 +35,38 @@ process clip_fastq {
 		"""
 }
 
+process rRNA_mapping {
+	publishDir 'less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
+	publishDir 'rRNA_alignment_stats', mode: 'copy', pattern: '*_rRNA_stats.txt'
+
+	input: 
+	file clipped_fastq /* from clipped_fastq_channel */
+
+	output:
+	path "${clipped_fastq.baseName}_rRNA_stats.txt" , emit: rRNA_stats
+	path "${clipped_fastq.baseName}_less_rRNA.fastq", emit: fastq_less_rRNA
+
+	"""
+	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -q ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fastq > ${clipped_fastq.baseName}_rRNA_stats.txt 2>&1
+	"""
+}
+
 /* ORIGINALLY THE BELOW PROCESS WAS NAMED "fastqc_on_raw". It has been updated for consistency, considering we are
 using fastqc on clipped sequences in this new version -> new name is fastqc_on_clipped */
 
-process fastqc_on_clipped {
-	publishDir 'fastqc_on_clipped', mode: 'copy'
+process fastqc_on_processed {
+	publishDir 'fastqc_on_processed', mode: 'copy'
 	
 	input:
-	file clipped_fastq /* from fastq_files_channel1 */ /* THAT IS TO SAY, FFC1 */
+	file processed_fastq /*should I call it fastq_less_rRNA instrad? doesn't change a thing technically, but yh,know*/
 
 	output:
 	file '*_fastqc.{zip,html}' /* into raw_fastqc_dir */
 
 	"""
-	fastqc -q $raw_fastq 
+	fastqc -q $processed_fastq
 	"""
 }
-
-/* HERE IS THE NEW PROCESS THAT EXECUTES MULTIQC ON THE FASTQC FILES */
 
 process multiqc_on_fastq {
 
@@ -72,26 +84,10 @@ process multiqc_on_fastq {
 	"""
 }
 
+/* END OF PRE-PROCESSING */
 
-/* I really hope this works as intended */
 
-process rRNA_mapping {
-	publishDir 'less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
-	publishDir 'rRNA_alignment_stats', mode: 'copy', pattern: '*_rRNA_stats.txt'
-
-	input: 
-	file clipped_fastq /* from clipped_fastq_channel */
-
-	output:
-	path "${clipped_fastq.baseName}_rRNA_stats.txt" , emit: rRNA_stats
-	path "${clipped_fastq.baseName}_less_rRNA.fastq", emit: fastq_less_rRNA
-
-	"""
-	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -q ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fastq > ${clipped_fastq.baseName}_rRNA_stats.txt 2>&1
-	"""
-}
-
-/* Here are the processes called in the first IF statement*/
+/* TRANSCRIPTOME MAPPING BRANCH*/
 
 process transcriptome_mapping {
 	publishDir 'trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
@@ -135,7 +131,7 @@ process bam_to_sqlite {
 }
 
 
-/* Here are the processes called in the second IF statement */
+/* GENOME MAPPING BRANCH */
 
 
 	
@@ -216,8 +212,8 @@ workflow {
     sra_to_fastq(sra_data)
     clip_fastq(sra_to_fastq.out)
 	rRNA_mapping(clip_fastq.out)
-	fastqc_on_clipped(rRNA_mapping.out.fastq_less_rRNA)
-    multiqc_on_fastq(fastqc_on_clipped.out)		
+	fastqc_on_processed(rRNA_mapping.out.fastq_less_rRNA)
+    multiqc_on_fastq(fastqc_on_processed.out)		
 
     /* IF STATEMENT #1 */
     if (params.skip_trips == false) {
