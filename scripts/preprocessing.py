@@ -209,7 +209,7 @@ def run_project_setup(run_info, db='annotation_inventory.sqlite'):
         find_adapters(f'{study_dir}/fastq')
         merge_adapter_reports(study_dir+'/fastq')
         annotation_inventory_organism = get_annotation_organism(path, db)
-        write_paramters_yaml(annotation_inventory_organism, study_dir + '/fastq/final_adapter_report.fa', study_dir + '/parameters.yaml')
+        write_paramters_yaml(annotation_inventory_organism, study_dir + '/fastq/final_adapter_report.fa', study_dir + '/parameters.yaml', annotations_inventory_sqlite=db)
         
 
 
@@ -221,5 +221,6 @@ if __name__ == '__main__':
     parser.add_argument("-r", help="runInfo file for this study from SRA")
 
     args = parser.parse_args()
+    print(args.s)
     run_project_setup(args.r, db=args.s)
 
