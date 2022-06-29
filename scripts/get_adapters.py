@@ -1,6 +1,5 @@
 import sys
 import subprocess
-from subprocess import PIPE
 
 
 def rev_comp(adapter):
@@ -31,15 +30,14 @@ def check_adapter(adapter, fastq_path, number_of_reads=2000000, verbose=False):
     For a given adapter sequence check for its presence in the given FASTQ file 
     '''
     if fastq_path.split('.')[-1] == 'gz':
-        adapter_count_raw = subprocess.check_output(
+        adapter_count_raw = subprocess.run(
             f"gzip -cd {fastq_path} | head -{number_of_reads} | sed -n '2~4p' | agrep -c1 \"{adapter}\"",
-            shell=True, check=True, stdout=PIPE, stderr=PIPE,
-        )
+            shell=True, check=True, stdout=subprocess.PIPE).stdout
+
     elif fastq_path.split('.')[-1] == 'fastq' or fastq_path.split('.')[-1] == 'fq':
-        adapter_count_raw = subprocess.check_output(
+        adapter_count_raw = subprocess.run(
             f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' | agrep -c1 \"{adapter}\"",
-            shell=True, check=True, stdout=PIPE, stderr=PIPE,
-        )
+            shell=True, check=True, stdout=subprocess.PIPE).stdout
 
     adapter_count = float(adapter_count_raw.decode('utf-8').strip('\n'))
 
