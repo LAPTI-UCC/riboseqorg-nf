@@ -1,5 +1,4 @@
-adapter1   : "AAAAAAAAAAAA"
-adapter2   :
+adapter_fasta : "/data1/pipeline/annotations/example_adapter_fasta.fa"
 rRNA_index : "/data1/pipeline/annotations/rRNA_indexes/hg38_human_rRNA/rRNA_indexes/hg38rRNA"
 transcriptome_index : "/data1/pipeline/annotations/trips/homo_sapiens/homo_sapiens_transcriptome_bowtie_indices/gencode_v25_human"
 genome_index : "/data1/pipeline/annotations/gwips/homo_sapiens/hg38/hg38_bowtie_indexes/hg38"

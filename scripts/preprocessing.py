@@ -108,7 +108,7 @@ def find_adapters(fastq_dir):
             absolute_path = fastq_dir + '/' + i
             if not os.path.isfile(absolute_path + '_adapter_report.tsv'):
                 print("Finding Adapters: ", absolute_path)
-                subprocess.run(['python', '/home/jack/projects/riboseq_data_processing/scripts/get_adapters.py', absolute_path])
+                subprocess.run(['python', 'scripts/get_adapters.py', absolute_path])
 
 
 def merge_adapter_reports(fastq_dir):
