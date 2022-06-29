@@ -1,5 +1,6 @@
 import sys
 import subprocess
+from subprocess import PIPE
 
 
 def rev_comp(adapter):
@@ -37,7 +38,7 @@ def check_adapter(adapter, fastq_path, number_of_reads=2000000, verbose=False):
     elif fastq_path.split('.')[-1] == 'fastq' or fastq_path.split('.')[-1] == 'fq':
         adapter_count_raw = subprocess.check_output(
             f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' | agrep -c1 \"{adapter}\"",
-            shell=True, check=True, capture_output=True,
+            shell=True, check=True, stdout=PIPE, stderr=PIPE,
         )
 
     adapter_count = float(adapter_count_raw.decode('utf-8').strip('\n'))
