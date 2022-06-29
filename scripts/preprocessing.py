@@ -5,6 +5,7 @@ import os
 import sqlite3
 import argparse
 from copy import copy
+import json
 
 
 
@@ -77,6 +78,25 @@ def sra_to_fastq(study_dir):
             subprocess.run(f"fasterq-dump {absolute_path} -O {study_dir}/fastq", check=True, capture_output=True, shell=True)
 
 
+def ffq_fetch_fastq(runInfo_path, outdir):
+    '''
+    using the ffq package get the download link for the SRA run on ENA. 
+    Then fetch the fastq file using wget 
+    '''
+    runInfo = pd.read_csv(runInfo_path, header=0)
+
+    if outdir[-1] != "/":
+        outdir = outdir + "/"
+
+    for idx, row in runInfo.iterrows():
+        ffq_stdout = subprocess.run(f"ffq --ftp {row['Run']} | jq -r .[]", check=True, capture_output=True, shell=True)
+        ffq_metadata_dict = json.loads(ffq_stdout.stdout.decode())
+        if not os.path.exists(outdir):
+            os.makedirs(outdir)
+        if not os.path.isfile(outdir + ffq_metadata_dict['filename']):
+            subprocess.run(f"wget {ffq_metadata_dict['url']} -P {outdir} ", check=True, capture_output=True, shell=True)
+
+
 def find_adapters(fastq_dir):
     '''
     check fastq files to see what adapters are present.
@@ -84,11 +104,11 @@ def find_adapters(fastq_dir):
     print("Finding Adapters")
     dir_list = os.listdir(fastq_dir)
     for i in dir_list:
-        if i.endswith('.fastq'):
+        if i.endswith('.fastq') or i.endswith('fastq.gz'):
             absolute_path = fastq_dir + '/' + i
             if not os.path.isfile(absolute_path + '_adapter_report.tsv'):
                 print("Finding Adapters: ", absolute_path)
-                subprocess.run(['python', '/home/jack/projects/riboseq_data_processing/get_adapters.py', absolute_path])
+                subprocess.run(['python', '/home/jack/projects/riboseq_data_processing/scripts/get_adapters.py', absolute_path])
 
 
 def merge_adapter_reports(fastq_dir):
@@ -101,7 +121,7 @@ def merge_adapter_reports(fastq_dir):
 
     dir_list = os.listdir(fastq_dir)
     for i in dir_list:
-        if i.endswith('.fastq_adapter_report.tsv'):
+        if i.endswith('adapter_report.tsv'):
             absolute_path = fastq_dir + '/' + i
             with open(absolute_path, 'r') as report:
                 lines = report.readlines()
@@ -109,9 +129,9 @@ def merge_adapter_reports(fastq_dir):
                     adapter = line.split('\t')[1].strip('\n')
                     if adapter not in all_adapters: all_adapters.append(adapter)
     
-    with open(fastq_dir + '/final_adapter_report.tsv', 'w') as final_report:
+    with open(fastq_dir + '/final_adapter_report.fa', 'w') as final_report:
         for idx, adapter in enumerate(all_adapters):
-            final_report.write(f"adapter{idx+1}\t{adapter}\n")
+            final_report.write(f">adapter{idx+1}\n{adapter}\n")
 
 
 def get_annotation_organism(path, db='annotation_inventory.sqlite'):
@@ -141,8 +161,7 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
     '''
     print('Writing YAML')
     parameter_dict = {'skip_trips':skip_trips, 'skip_gwips':skip_gwips}
-    parameter_order = ["adapter1",
-                    "adapter2",
+    parameter_order = ["adapter_fasta",
                     "rRNA_index",
                     "transcriptome_index",
                     "genome_index",
@@ -152,13 +171,6 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
                     "skip_trips",
                     "skip_gwips"]
 
-    with open(adapter_report_path, 'r') as adapter_report:
-        lines = adapter_report.readlines()
-        if len(lines) == 0:
-            parameter_dict["adapter1"], parameter_dict["adapter2"] = "", ""
-        elif len(lines) <= 2:
-            parameter_dict["adapter1"] = lines[0].split("\t")[1].strip('\n')
-            parameter_dict["adapter2"] = lines[1].split("\t")[1].strip('\n')
 
 
     connection = sqlite3.connect("{}".format(annotations_inventory_sqlite))
@@ -167,7 +179,9 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
         f"SELECT * FROM annotation_inventory WHERE organism == '{organism}'"
     ).fetchall()[0]
 
-    for i in zip(parameter_order[2:-2], reference_details[1:]):
+    parameter_dict['adapter_fasta'] = adapter_report_path
+
+    for i in zip(parameter_order[1:-2], reference_details[1:]):
         parameter_dict[i[0]] = i[1]
 
     with open(yaml_outpath, 'w') as yaml:
@@ -191,16 +205,14 @@ def run_project_setup(run_info, db='annotation_inventory.sqlite'):
 
         study_dir = os.path.dirname(path)
 
-        download_files_from_SRA(path, f'{study_dir}/sra')
-        sra_to_fastq(study_dir)
-
+        ffq_fetch_fastq(path, f'{study_dir}/fastq')
         find_adapters(f'{study_dir}/fastq')
         merge_adapter_reports(study_dir+'/fastq')
         try:
             annotation_inventory_organism = get_annotation_organism(path, db='annotation_inventory.sqlite')
-            write_paramters_yaml(annotation_inventory_organism, study_dir + '/fastq/final_adapter_report.tsv', study_dir + '/parameters.yaml')
+            write_paramters_yaml(annotation_inventory_organism, study_dir + '/fastq/final_adapter_report.fa', study_dir + '/parameters.yaml')
         except:
-            print(annotation_inventory_organism)
+            print(f"Error writing paramaters.yaml for '{annotation_inventory_organism}'")
             continue
 
 
