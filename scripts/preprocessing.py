@@ -208,7 +208,7 @@ def run_project_setup(run_info, db='annotation_inventory.sqlite'):
         ffq_fetch_fastq(path, f'{study_dir}/fastq')
         find_adapters(f'{study_dir}/fastq')
         merge_adapter_reports(study_dir+'/fastq')
-        annotation_inventory_organism = get_annotation_organism(path, db='annotation_inventory.sqlite')
+        annotation_inventory_organism = get_annotation_organism(path, db)
         write_paramters_yaml(annotation_inventory_organism, study_dir + '/fastq/final_adapter_report.fa', study_dir + '/parameters.yaml')
         
 
