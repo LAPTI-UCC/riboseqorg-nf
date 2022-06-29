@@ -208,12 +208,9 @@ def run_project_setup(run_info, db='annotation_inventory.sqlite'):
         ffq_fetch_fastq(path, f'{study_dir}/fastq')
         find_adapters(f'{study_dir}/fastq')
         merge_adapter_reports(study_dir+'/fastq')
-        try:
-            annotation_inventory_organism = get_annotation_organism(path, db='annotation_inventory.sqlite')
-            write_paramters_yaml(annotation_inventory_organism, study_dir + '/fastq/final_adapter_report.fa', study_dir + '/parameters.yaml')
-        except:
-            print(f"Error writing paramaters.yaml for '{annotation_inventory_organism}'")
-            continue
+        annotation_inventory_organism = get_annotation_organism(path, db='annotation_inventory.sqlite')
+        write_paramters_yaml(annotation_inventory_organism, study_dir + '/fastq/final_adapter_report.fa', study_dir + '/parameters.yaml')
+        
 
 
 if __name__ == '__main__':
