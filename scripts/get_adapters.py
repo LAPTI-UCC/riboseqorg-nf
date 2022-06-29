@@ -31,12 +31,12 @@ def check_adapter(adapter, fastq_path, number_of_reads=2000000, verbose=False):
     '''
     if fastq_path.split('.')[-1] == 'gz':
         adapter_count_raw = subprocess.check_output(
-            f"gzip -cd {fastq_path} | head -{number_of_reads} | sed -n '2~4p' > test.fastq ; agrep -c1 \"{adapter}\" test.fastq ; rm test.fastq",
+            f"gzip -cd {fastq_path} | head -{number_of_reads} | sed -n '2~4p' | agrep -c1 \"{adapter}\"",
             shell=True,
         )
     elif fastq_path.split('.')[-1] == 'fastq' or fastq_path.split('.')[-1] == 'fq':
         adapter_count_raw = subprocess.check_output(
-            f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' > test.fastq ; agrep -c1 \"{adapter}\" test.fastq ; rm test.fastq",
+            f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' | agrep -c1 \"{adapter}\"",
             shell=True,
         )
 
