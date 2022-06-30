@@ -19,9 +19,9 @@ process clip_fastq {
     file '*_clipped.fastq' /* into clipped_fastq_channel  */
 	
 	script: 
-	/* There was an if statement here, referring to two adapter paratmeters. Since we are using a file now, I deleted that line of code.*/
+	/* STUDY CUTADAPT SO THAT YOU CAN READ ADAPTERS FROM A FILE. Test 1 -> inputting the assigned variable to the path" */
 	"""
-    cutadapt --minimum-length=25 -a "file:adapters.fa;min_overlap=5;noindels" -o $raw_fastq"_clipped.fastq" $raw_fastq
+    cutadapt --minimum-length=25 -a "file:$params.adapter_fasta" -o $raw_fastq"_clipped.fastq" $raw_fastq
     """
 }
 
