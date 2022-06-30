@@ -8,7 +8,7 @@ PRE-PROCESSING BRANCH
 
 /*VERY provisional -> I am literally copy and pasting the full path to the file. Ideally, this should be done from terminal when calling nextflow*/
 
-params.fastq_files = "./data/2019_Homo_sapiens_GSE125114_SRP179636/fastq/*.fastq"
+params.fastq_files = "./data/2019_Homo_sapiens_GSE125114_SRP179636/fastq/*.fastq.gz"
 
 process clip_fastq {
         
@@ -191,11 +191,6 @@ process coveragebed_to_bigwig {
 	bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.coverage.bw
 	"""
 }
-
-
-
-
-
 
 
 /* THE WORKFLOW BLOCK: It specifies the order of the processes and where outputs are used as inputs*/
