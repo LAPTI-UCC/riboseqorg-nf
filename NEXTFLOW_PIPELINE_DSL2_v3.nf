@@ -22,22 +22,20 @@ process sra_to_fastq {
 
 process clip_fastq {
         
-        input:
-        file raw_fastq /* from fastq_files_channel2 */
+    input:
+    file raw_fastq /* from fastq_files_channel2 */
 
-        output:
-        file '*_clipped.fastq' /* into clipped_fastq_channel  */
+    output:
+    file '*_clipped.fastq' /* into clipped_fastq_channel  */
 	
-	script:
-	if( params.adapter1 && params.adapter2)
-        	"""
-        	cutadapt --minimum-length=25 -a $params.adapter1 -a $params.adapter2 -o $raw_fastq"_clipped.fastq" $raw_fastq
-        	"""
-	else
-       		"""
-		cutadapt --minimum-length=25 -a $params.adapter1 -o $raw_fastq"_clipped.fastq" $raw_fastq
-		"""
+	script: 
+	/* There was an if statement here, referring to two adapter paratmeters. Since we are using a file now, I deleted that line of code.*/
+	"""
+    cutadapt --minimum-length=25 -a "file:adapters.fa;min_overlap=5;noindels" -o $raw_fastq"_clipped.fastq" $raw_fastq
+    """
 }
+
+cutadapt -a 
 
 process rRNA_mapping {
 	publishDir 'less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
@@ -236,9 +234,3 @@ workflow {
         coveragebed_to_bigwig(genome_sam_to_bed.out.coverage_beds)
     }
 }
-
-/* TO DO: check name of the input fastqc_on_raw (version 2) or clip_fastq (in both versions)
-to see whether input and output names are correct or not. */
-
-/* In this update, I moved the Quality Assesment steps (fastqc and multiqc) AFTER the removal of rRNAs.
-This way the quality assessment steps are done on the completely pre-processed reads. */
