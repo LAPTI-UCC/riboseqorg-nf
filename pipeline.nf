@@ -1,29 +1,18 @@
-/* V3: DSL2, multiqc added, minor bug fixes
+/* THE pipeline 
 */
 
 /* -------------------
 PRE-PROCESSING BRANCH
 --------------------- */
 
-params.sra_files = "./sra/*.sra"
+/* OLD LINE OF CODE params.sra_files = "./sra/*.sra"  */
 
-process sra_to_fastq {
-
-	input:
-	file sra_files /*from sra_files_ch*/
-
-	output:
-	file '*.fastq' /*into fastq_files_channel1,fastq_files_channel2*/
-
-	"""
-	fastq-dump $sra_files 
-	"""
-}
+params.fastq_files = ./fastq/*.fastq
 
 process clip_fastq {
         
     input:
-    file raw_fastq /* from fastq_files_channel2 */
+    file raw_fastq 
 
     output:
     file '*_clipped.fastq' /* into clipped_fastq_channel  */
@@ -34,8 +23,6 @@ process clip_fastq {
     cutadapt --minimum-length=25 -a "file:adapters.fa;min_overlap=5;noindels" -o $raw_fastq"_clipped.fastq" $raw_fastq
     """
 }
-
-cutadapt -a 
 
 process rRNA_mapping {
 	publishDir 'less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
@@ -213,9 +200,8 @@ process coveragebed_to_bigwig {
 /* THE WORKFLOW BLOCK: It specifies the order of the processes and where outputs are used as inputs*/
 
 workflow {
-    sra_data = Channel.fromPath(params.sra_files)   /*simple: I assign the input data*/
-    sra_to_fastq(sra_data)
-    clip_fastq(sra_to_fastq.out)
+    fastq_data = Channel.fromPath(params.fastq_files) /* Assign the fastq files in a folder to fastq_data */
+    clip_fastq(fastq_data)   /* Uses fastq_data and clips away the adapters */
 	rRNA_mapping(clip_fastq.out)
 	fastqc_on_processed(rRNA_mapping.out.fastq_less_rRNA)
     multiqc_on_fastq(fastqc_on_processed.out)		
@@ -233,14 +219,4 @@ workflow {
         bed_to_bigwig(genome_sam_to_bed.out.sorted_beds)
         coveragebed_to_bigwig(genome_sam_to_bed.out.coverage_beds)
     }
-<<<<<<< HEAD:NEXTFLOW_PIPELINE_DSL2_v3.nf
 }
-=======
-}
-
-/* TO DO: check name of the input fastqc_on_raw (version 2) or clip_fastq (in both versions)
-to see whether input and output names are correct or not. */
-
-/* In this update, I moved the Quality Assesment steps (fastqc and multiqc) AFTER the removal of rRNAs.
-This way the quality assessment steps are done on the completely pre-processed reads. */
->>>>>>> d76f7f8cb848305f1b504c687247b444d8575cfc:pipeline.nf
