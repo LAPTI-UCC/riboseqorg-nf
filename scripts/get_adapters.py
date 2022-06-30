@@ -2,7 +2,6 @@ import sys
 import subprocess
 
 
-
 def rev_comp(adapter):
     '''
     Return the reverse complimnet of a provided nucleotide adapter sequence 
@@ -22,20 +21,24 @@ def get_number_of_reads(fastq_path):
         f"wc -l {fastq_path}", shell=True
     )
     fastq_lines = float(fastq_lines_output.split()[0])
-    number_of_reads = fastq_lines/4
+    number_of_reads = int(round(fastq_lines/4, 0))
     return number_of_reads
 
 
-def check_adapter(adapter, fastq_path, number_of_reads, verbose=False):
+def check_adapter(adapter, fastq_path, number_of_reads=2000000, verbose=False):
     '''
     For a given adapter sequence check for its presence in the given FASTQ file 
     '''
-    adapter_count_raw = subprocess.check_output(
-        "head -2000000 {0} | sed -n '2~4p' > test.fastq ; agrep -c1 \"{1}\" test.fastq ; rm test.fastq".format(
-            fastq_path, adapter
-        ),
-        shell=True,
-    )
+    if fastq_path.split('.')[-1] == 'gz': 
+        adapter_count_raw = subprocess.check_output(
+            f"gzip -cd {fastq_path} | head -{number_of_reads} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq; rm ~/test.fq",
+            shell=True, 
+        )
+    elif fastq_path.split('.')[-1] == 'fastq' or fastq_path.split('.')[-1] == 'fq':
+        adapter_count_raw = subprocess.check_output(
+            f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq; rm ~/test.fq",
+            shell=True,
+        )
 
     adapter_count = float(adapter_count_raw.decode('utf-8').strip('\n'))
 
@@ -51,7 +54,6 @@ def get_adapters(fastq_path, adapter_sequences, verbose=False):
     '''
     Given a list of know adapters check if each (or its reverse compliment) is found in the fastq file for which the path was provided
     '''
-
     found_adapters ={'forward': [], 'reverse': []}
     number_of_reads = get_number_of_reads(fastq_path)
 
@@ -67,8 +69,7 @@ def get_adapters(fastq_path, adapter_sequences, verbose=False):
                 found_adapters['reverse'].append(adapter)
 
     return found_adapters
-
-    
+  
 
 def write_adapter_report(found_adapters, outfile_path):
     '''
@@ -79,8 +80,6 @@ def write_adapter_report(found_adapters, outfile_path):
         for direction in found_adapters:
             for adapter in found_adapters[direction]:
                 outfile.write(f'{direction}\t{adapter}\n')
-
-
 
 
 if __name__ == '__main__':

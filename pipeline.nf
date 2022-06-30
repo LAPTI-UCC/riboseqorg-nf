@@ -1,5 +1,9 @@
-/* V0: first attemp in converting the original pipeline to a DSL2 one
+/* V3: DSL2, multiqc added, minor bug fixes
 */
+
+/* -------------------
+PRE-PROCESSING BRANCH
+--------------------- */
 
 params.sra_files = "./sra/*.sra"
 
@@ -16,45 +20,55 @@ process sra_to_fastq {
 	"""
 }
 
-/* Moving the process to remove adapters upstream in the pipeline  */
-
 process clip_fastq {
         
-        input:
-        file raw_fastq /* from fastq_files_channel2 */
+    input:
+    file raw_fastq /* from fastq_files_channel2 */
 
-        output:
-        file '*_clipped.fastq' /* into clipped_fastq_channel  */
+    output:
+    file '*_clipped.fastq' /* into clipped_fastq_channel  */
 	
-	script:
-	if( params.adapter1 && params.adapter2)
-        	"""
-        	cutadapt --minimum-length=25 -a $params.adapter1 -a $params.adapter2 -o $raw_fastq"_clipped.fastq" $raw_fastq
-        	"""
-	else
-       		"""
-		cutadapt --minimum-length=25 -a $params.adapter1 -o $raw_fastq"_clipped.fastq" $raw_fastq
-		"""
+	script: 
+	/* There was an if statement here, referring to two adapter paratmeters. Since we are using a file now, I deleted that line of code.*/
+	"""
+    cutadapt --minimum-length=25 -a "file:adapters.fa;min_overlap=5;noindels" -o $raw_fastq"_clipped.fastq" $raw_fastq
+    """
+}
+
+cutadapt -a 
+
+process rRNA_mapping {
+	publishDir 'less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
+	publishDir 'rRNA_alignment_stats', mode: 'copy', pattern: '*_rRNA_stats.txt'
+
+	input: 
+	file clipped_fastq /* from clipped_fastq_channel */
+
+	output:
+	path "${clipped_fastq.baseName}_rRNA_stats.txt" , emit: rRNA_stats
+	path "${clipped_fastq.baseName}_less_rRNA.fastq", emit: fastq_less_rRNA
+
+	"""
+	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -q ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fastq > ${clipped_fastq.baseName}_rRNA_stats.txt 2>&1
+	"""
 }
 
 /* ORIGINALLY THE BELOW PROCESS WAS NAMED "fastqc_on_raw". It has been updated for consistency, considering we are
-using fastqc on clipped sequences in this new version -> new name is fastqc_on_clipped */
+using fastqc on processed reads in this new version (sequences with no adapters and no rRNAs)-> new name is fastqc_on_processed */
 
-process fastqc_on_clipped {
-	publishDir 'fastqc_on_clipped', mode: 'copy'
+process fastqc_on_processed {
+	publishDir 'fastqc_on_processed', mode: 'copy'
 	
 	input:
-	file clipped_fastq /* from fastq_files_channel1 */ /* THAT IS TO SAY, FFC1 */
+	file processed_fastq /*should I call it fastq_less_rRNA instrad? doesn't change a thing technically, but yh,know*/
 
 	output:
 	file '*_fastqc.{zip,html}' /* into raw_fastqc_dir */
 
 	"""
-	fastqc -q $raw_fastq 
+	fastqc -q $processed_fastq
 	"""
 }
-
-/* HERE IS THE NEW PROCESS THAT EXECUTES MULTIQC ON THE FASTQC FILES */
 
 process multiqc_on_fastq {
 
@@ -73,25 +87,10 @@ process multiqc_on_fastq {
 }
 
 
-/* I really hope this works as intended */
+/* -------------------------
+TRANSCRIPTOME MAPPING BRANCH
+---------------------------- */
 
-process rRNA_mapping {
-	publishDir 'less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
-	publishDir 'rRNA_alignment_stats', mode: 'copy', pattern: '*_rRNA_stats.txt'
-
-	input: 
-	file clipped_fastq /* from clipped_fastq_channel */
-
-	output:
-	path "${clipped_fastq.baseName}_rRNA_stats.txt" , emit: rRNA_stats
-	path "${clipped_fastq.baseName}_less_rRNA.fastq", emit: fastq_less_rRNA
-
-	"""
-	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -q ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fastq > ${clipped_fastq.baseName}_rRNA_stats.txt 2>&1
-	"""
-}
-
-/* Here are the processes called in the first IF statement*/
 
 process transcriptome_mapping {
 	publishDir 'trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
@@ -100,8 +99,8 @@ process transcriptome_mapping {
 	file less_rrna_fastq /* from fastq_less_rRNA */
 
 	output:
-	file "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sams  /* USE AN EMIT COMMAND HERE?*/
-	file "${less_rrna_fastq.baseName}_trips_alignment_stats.txt", emit: mRNA_alignment_stats
+	path "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sams  /* USE AN EMIT COMMAND HERE?*/
+	path "${less_rrna_fastq.baseName}_trips_alignment_stats.txt", emit: mRNA_alignment_stats
 
 	"""
 	bowtie -p 8 --norc -a -m 100 -l 25 -n 2  -S  -x $params.transcriptome_index -q ${less_rrna_fastq} ${less_rrna_fastq.baseName}_transcriptome.sam  > ${less_rrna_fastq.baseName}_trips_alignment_stats.txt 2>&1
@@ -135,7 +134,9 @@ process bam_to_sqlite {
 }
 
 
-/* Here are the processes called in the second IF statement */
+/* --------------------
+GENOME MAPPING BRANCH 
+----------------------*/
 
 
 	
@@ -215,10 +216,10 @@ workflow {
     sra_data = Channel.fromPath(params.sra_files)   /*simple: I assign the input data*/
     sra_to_fastq(sra_data)
     clip_fastq(sra_to_fastq.out)
-	fastqc_on_clipped(clip_fastq.out)
-    multiqc_on_fastq(fastqc_on_clipped.out)		
- /* This uses the output of the first process as well */
 	rRNA_mapping(clip_fastq.out)
+	fastqc_on_processed(rRNA_mapping.out.fastq_less_rRNA)
+    multiqc_on_fastq(fastqc_on_processed.out)		
+
     /* IF STATEMENT #1 */
     if (params.skip_trips == false) {
         transcriptome_mapping(rRNA_mapping.out.fastq_less_rRNA)
@@ -232,14 +233,14 @@ workflow {
         bed_to_bigwig(genome_sam_to_bed.out.sorted_beds)
         coveragebed_to_bigwig(genome_sam_to_bed.out.coverage_beds)
     }
+<<<<<<< HEAD:NEXTFLOW_PIPELINE_DSL2_v3.nf
 }
-
-/* UPDATE 11/06/2022 - The first draft of the DSL2 pipeline is ready. 
-Next step is to read it again to be sure the processes are correctly chained.
-Following that, I need to install the programs required (bowtie, others?) to run it */
-
+=======
+}
 
 /* TO DO: check name of the input fastqc_on_raw (version 2) or clip_fastq (in both versions)
 to see whether input and output names are correct or not. */
 
-/* In this update, fastqc_on_raw has become fastqc_on_clipped for consistency */
+/* In this update, I moved the Quality Assesment steps (fastqc and multiqc) AFTER the removal of rRNAs.
+This way the quality assessment steps are done on the completely pre-processed reads. */
+>>>>>>> d76f7f8cb848305f1b504c687247b444d8575cfc:pipeline.nf
