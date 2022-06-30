@@ -1,6 +1,6 @@
 /* THE pipeline */
 
- /* OLD LINE OF CODE params.sra_files = "./sra/*.sra"  */
+/* OLD LINE OF CODE params.sra_files = "./sra/*.sra" */
 
 /* -------------------
 PRE-PROCESSING BRANCH
@@ -8,7 +8,7 @@ PRE-PROCESSING BRANCH
 
 /*VERY provisional -> I am literally copy and pasting the full path to the file. Ideally, this should be done from terminal when calling nextflow*/
 
-params.fastq_files = ./data/2019_Homo_sapiens_GSE125114_SRP179636/fastq/*.fastq
+params.fastq_files = "./data/2019_Homo_sapiens_GSE125114_SRP179636/fastq/*.fastq"
 
 process clip_fastq {
         
