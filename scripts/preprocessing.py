@@ -187,10 +187,10 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
     with open(yaml_outpath, 'w') as yaml:
         for line in parameter_order:
             if type(parameter_dict[line]) is str:
-                yaml.write(f'{line} \t:\t "{parameter_dict[line]}"\n')
+                yaml.write(f'{line} : "{parameter_dict[line]}"\n')
 
             elif type(parameter_dict[line]) is bool:
-                yaml.write(f'{line} \t:\t {str(parameter_dict[line]).lower()}\n')
+                yaml.write(f'{line} : {str(parameter_dict[line]).lower()}\n')
 
 
 
