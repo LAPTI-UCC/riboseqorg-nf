@@ -9,6 +9,7 @@ PRE-PROCESSING BRANCH
 /*VERY provisional -> I am literally copy and pasting the full path to the file. Ideally, this should be done from terminal when calling nextflow*/
 
 params.fastq_files = "./data/2019_Homo_sapiens_GSE125114_SRP179636/fastq/*.fastq.gz"
+project_dir = projectDir  /*specify a new variable, the project directory */
 
 process clip_fastq {
         
@@ -117,7 +118,7 @@ process bam_to_sqlite {
 	file "*.sqlite" /* into sqlite_ch */
 
 	"""
-	bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
+	python $project_dir/scripts/bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
 	"""
 }
 
