@@ -66,7 +66,7 @@ process multiqc_on_fastq {
 
 	output:
 	file "multiqc_report.html"
-	file "multiqc_output_data"
+	/* file "multiqc_output_data" */
 
 	/* script to execute fastqc*/
 	"""
