@@ -70,7 +70,7 @@ process multiqc_on_fastq {
 
 	/* script to execute fastqc*/
 	"""
-	multiqc .
+	multiqc ./fastqc
 	"""
 }
 
