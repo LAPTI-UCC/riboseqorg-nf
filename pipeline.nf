@@ -118,7 +118,7 @@ process bam_to_sqlite {
 	file "*.sqlite" /* into sqlite_ch */
 
 	"""
-	python3.8 $project_dir/scripts/bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
+	python3 $project_dir/scripts/bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
 	"""
 }
 
@@ -156,7 +156,7 @@ process genome_sam_to_bed {
     samtools sort -m 1G -@ 8 ${genome_sam.baseName}.bam > ${genome_sam.baseName}.bam_sorted
 	samtools index ${genome_sam.baseName}.bam_sorted
 
-	python3.8 bam_to_bed.py ${genome_sam.baseName}.bam_sorted 15  $params.genome_fasta
+	python3 $project_dir/scripts/bam_to_bed.py ${genome_sam.baseName}.bam_sorted 15  $params.genome_fasta
 
 	sort -k1,1 -k2,2n ${genome_sam.baseName}.bam_sorted.bed > ${genome_sam.baseName}.bam_sorted.sorted.bed
 	bedtools genomecov -ibam ${genome_sam.baseName}.bam_sorted -g $params.chrom_sizes_file -bg > ${genome_sam.baseName}.cov
