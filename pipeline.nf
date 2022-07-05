@@ -118,7 +118,7 @@ process bam_to_sqlite {
 	file "*.sqlite" /* into sqlite_ch */
 
 	"""
-	python $project_dir/scripts/bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
+	python3.8 $project_dir/scripts/bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
 	"""
 }
 
