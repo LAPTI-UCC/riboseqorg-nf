@@ -175,7 +175,7 @@ process bed_to_bigwig {
 	file "*.bw"  /* into bigwigs */
 
 	"""
-	bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.bw
+	$project_dir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.bw
 	"""
 }
 
@@ -190,7 +190,7 @@ process coveragebed_to_bigwig {
     file "*.bw"  /* into cov_bigwigs */
 
 	"""
-	bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.coverage.bw
+	$project_dir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.coverage.bw
 	"""
 }
 
