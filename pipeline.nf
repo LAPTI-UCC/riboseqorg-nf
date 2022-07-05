@@ -155,7 +155,9 @@ process genome_sam_to_bed {
     samtools view -@ 8 -b -S ${genome_sam.baseName}.sam -o ${genome_sam.baseName}.bam
     samtools sort -m 1G -@ 8 ${genome_sam.baseName}.bam > ${genome_sam.baseName}.bam_sorted
 	samtools index ${genome_sam.baseName}.bam_sorted
-	bam_to_bed.py ${genome_sam.baseName}.bam_sorted 15  $params.genome_fasta
+
+	python3.8 bam_to_bed.py ${genome_sam.baseName}.bam_sorted 15  $params.genome_fasta
+
 	sort -k1,1 -k2,2n ${genome_sam.baseName}.bam_sorted.bed > ${genome_sam.baseName}.bam_sorted.sorted.bed
 	bedtools genomecov -ibam ${genome_sam.baseName}.bam_sorted -g $params.chrom_sizes_file -bg > ${genome_sam.baseName}.cov
 	sort -k1,1 -k2,2n ${genome_sam.baseName}.cov > ${genome_sam.baseName}.sorted.cov
