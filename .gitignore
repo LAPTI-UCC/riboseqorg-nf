@@ -172,3 +172,13 @@ sandbox
 # exclude all contents of the data folder 
 data/*
 ribopipe_scripts/*
+
+*alignment_stats.txt
+bigwigs/*
+fastqc_on_processed/*
+gwips_alignment_stats/*
+less_rRNA_fastq_files/*
+rRNA_alignment_stats/*
+scripts/*
+bedGraphToBigWig/*
+trips_alignment_stats/*
