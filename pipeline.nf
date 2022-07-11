@@ -34,8 +34,8 @@ process rRNA_mapping {
 	file clipped_fastq /* from clipped_fastq_channel */
 
 	output:
-	path "${params.study_dir}/${clipped_fastq.baseName}_rRNA_stats.txt" , emit: rRNA_stats
-	path "${params.study_dir}/${clipped_fastq.baseName}_less_rRNA.fastq", emit: fastq_less_rRNA
+	path "${clipped_fastq.baseName}_rRNA_stats.txt" , emit: rRNA_stats
+	path "${clipped_fastq.baseName}_less_rRNA.fastq", emit: fastq_less_rRNA
 
 	"""
 	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -q ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fastq > ${clipped_fastq.baseName}_rRNA_stats.txt 2>&1
