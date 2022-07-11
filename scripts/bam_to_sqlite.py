@@ -159,6 +159,7 @@ def processor(process_chunk, master_read_dict, transcriptome_info_dict,master_di
 					master_read_dict[tran]["ambig"][readlen] = {pos:1}
 	return ambiguously_mapped_reads
 
+
 def get_mismatch_pos(md_tag,pos,readlen,master_read_dict,tran,readseq):
 	nucs = ["A","T","G","C"]
 	mismatches = {}
@@ -249,7 +250,9 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_offset_dict = {"fiveprime":{}, "threeprime":{}}
 	master_metagene_stop_dict = {"fiveprime":{}, "threeprime":{}}
 
+	pysam.set_verbosity(0)
 	infile = pysam.Samfile(bam_filepath, "rb")
+
 	header = infile.header["HD"]
 	unsorted = False
 	if "SO" in header:
@@ -361,8 +364,8 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	print ("Creating metagenes, triplet periodicity plots, etc.")
 	for tran in master_read_dict:
 		try:
-			cds_start = transcriptome_info_dict[tran]["cds_start"]
-			cds_stop = transcriptome_info_dict[tran]["cds_stop"]
+			cds_start = int(0 if transcriptome_info_dict[tran]["cds_start"] is None else transcriptome_info_dict[tran]["cds_start"])
+			cds_stop = int(0 if transcriptome_info_dict[tran]["cds_stop"] is None else transcriptome_info_dict[tran]["cds_stop"])
 		except:
 			continue
 
@@ -465,6 +468,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 				final_offsets[primetype]["read_scores"][readlen] = master_trip_dict[primetype][readlen]["score"]
 			else:
 				 final_offsets[primetype]["read_scores"][readlen] = 0.0
+
 	master_read_dict["offsets"] = final_offsets
 	master_read_dict["trip_periodicity"] = master_trip_dict
 	master_read_dict["desc"] = "Null"
