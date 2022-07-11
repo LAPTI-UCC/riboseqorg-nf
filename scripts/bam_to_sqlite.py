@@ -362,6 +362,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 		del master_read_dict["read_name"]
 	print ("BAM file processed")
 	print ("Creating metagenes, triplet periodicity plots, etc.")
+	print(master_read_dict.keys())
 	for tran in master_read_dict:
 		try:
 			cds_start = int(0 if transcriptome_info_dict[tran]["cds_start"] is None else transcriptome_info_dict[tran]["cds_start"])
