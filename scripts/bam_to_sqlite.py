@@ -367,9 +367,9 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 		try:
 			cds_start = int(0 if transcriptome_info_dict[tran]["cds_start"] is None else transcriptome_info_dict[tran]["cds_start"])
 			cds_stop = int(0 if transcriptome_info_dict[tran]["cds_stop"] is None else transcriptome_info_dict[tran]["cds_stop"])
-			print(type(cds_start))
+			# print(tran, type(cds_start))
 		except:
-			print("Exception: ", tran)
+			# print("Exception: ", tran)
 			continue
 
 		tranlen = transcriptome_info_dict[tran]["length"]
