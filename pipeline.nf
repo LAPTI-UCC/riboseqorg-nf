@@ -46,7 +46,7 @@ process rRNA_mapping {
 using fastqc on processed reads in this new version (sequences with no adapters and no rRNAs)-> new name is fastqc_on_processed */
 
 process fastqc_on_processed {
-	publishDir 'fastqc_on_processed', mode: 'copy'
+	publishDir '${params.study_dir}/fastqc', mode: 'copy'
 	
 	input:
 	file processed_fastq /*should I call it fastq_less_rRNA instrad? doesn't change a thing technically, but yh,know*/
@@ -60,18 +60,17 @@ process fastqc_on_processed {
 }
 
 process multiqc_on_fastq {
+	publishDir '${params.study_dir}/multiqc', mode: 'copy'
 
 	input:
-	/* should specify the directory? above there is a publishDir thing */
 	file ('fastqc/*')
 
 	output:
 	file "multiqc_report.html"
-	/* file "multiqc_output_data" */
-
-	/* script to execute fastqc*/
+	
+	/* To run multiqc, you just need to specify the folder where the fastqc files are */
 	"""
-	multiqc ./fastqc
+	multiqc $params.study_dir/fastqc
 	"""
 }
 
@@ -82,7 +81,7 @@ TRANSCRIPTOME MAPPING BRANCH
 
 
 process transcriptome_mapping {
-	publishDir 'trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
+	publishDir '${params.study_dir}/trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
 
 	input:    
 	file less_rrna_fastq /* from fastq_less_rRNA */
@@ -101,7 +100,7 @@ process transcriptome_sam_to_bam {
 	file transcriptome_sam /* from transcriptome_sams */
 
 	output:
-	file "${transcriptome_sam.baseName}.bam_sorted" /* into sorted_bams */
+	file "${transcriptome_sam.baseName}.bam_sorted" /* into sorted_bams */  /* <--- THE BAM FILE IS PRODUCED HERE */
 
 	"""
 	samtools view -@ 8 -b -S ${transcriptome_sam.baseName}.sam -o ${transcriptome_sam.baseName}.bam
@@ -110,7 +109,7 @@ process transcriptome_sam_to_bam {
 }
 
 process bam_to_sqlite {
-	publishDir 'sqlites', mode: 'copy', pattern: '*.sqlite'
+	publishDir '${params.study_dir}/sqlites', mode: 'copy', pattern: '*.sqlite'
 	input:
 	file sorted_bam /* from sorted_bams */
 
@@ -127,9 +126,8 @@ process bam_to_sqlite {
 GENOME MAPPING BRANCH 
 ----------------------*/
 
-	
 process genome_mapping {
-	publishDir 'gwips_alignment_stats', mode: 'copy', pattern: '*_gwips_alignment_stats.txt'
+	publishDir '${params.study_dir}/gwips_alignment_stats', mode: 'copy', pattern: '*_gwips_alignment_stats.txt'
     input:
    	file less_rrna_fastq /* from fastq_less_rRNA */
 
@@ -166,7 +164,7 @@ process genome_sam_to_bed {
 
 
 process bed_to_bigwig {
-	publishDir 'bigwigs', mode: 'copy', pattern: '*.bw'
+	publishDir '${params.study_dir}/bigwigs', mode: 'copy', pattern: '*.bw'
 
 	input:
 	file bedfile /* from sorted_beds */
@@ -181,7 +179,7 @@ process bed_to_bigwig {
 
 
 process coveragebed_to_bigwig {
-	publishDir 'bigwigs', mode: 'copy', pattern: '*.bw'
+	publishDir '${params.study_dir}/bigwigs', mode: 'copy', pattern: '*.bw'
 
 	input:
     file bedfile /* from coverage_beds */
