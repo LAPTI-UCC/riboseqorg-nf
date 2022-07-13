@@ -10,7 +10,7 @@ PRE-PROCESSING BRANCH
 
 params.fastq_files = "./data/2019_Homo_sapiens_GSE125114_SRP179636/fastq/*.fastq.gz"
 project_dir = projectDir  /*specify a new variable, the project directory */
-study = $params.study
+study = "$params.study"
 
 process clip_fastq {
         
