@@ -505,6 +505,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_read_dict["ambiguous_threeprime_totals"] = {}
 	print ("calculating transcript counts")
 	for tran in master_read_dict:
+		print(tran)
 		if tran in transcriptome_info_dict:
 			five_total = 0
 			cds_total = 0
