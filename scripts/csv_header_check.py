@@ -1,21 +1,21 @@
-import csv
-from hashlib import new
-from ssl import HAS_NEVER_CHECK_COMMON_NAME
-from unicodedata import name
-from attr import has
 import pandas as pd
 import numpy as np
 import sys
 
-# Loads the .csv, given as an argument to the script in the terminal, as a dataframe (df)
 def load_csv(path):
-    
+    '''
+    Loads the .csv, given as an argument to the script in the terminal, as a dataframe (df).
+    '''
+
     df = pd.read_csv(path)
     
     return(df)
 
-#Checks whether the .csv file already has an header with the labels required or not.
+
 def header_check(df):
+    '''
+    Checks whether the .csv file already has an header with the labels required or not.
+    '''
     
     has_header = True
     df_columns = list(df.columns)
@@ -26,9 +26,12 @@ def header_check(df):
             
     return has_header
 
-# Checks if the columns in the .csv file without header are in the usual order (the one displayed by RUnInfo.csv files) or not.
+
 def check_col_order(df):
-    
+    '''
+    Checks if the columns in the .csv file without header are in the usual order (the one displayed by RUnInfo.csv files) or not.
+    '''
+
     first_check = df.iat[0,1] # SRR value. Must start with SRR.
     second_check = df.iat[0,10] # Download path. Must start with "https://".
     third_check =df.iat[0,29] # Must be a string.
@@ -57,9 +60,11 @@ def check_col_order(df):
     return (formatted)
 
 
-# Assigns column names to a headless .csv, assuming the columns follow the usual order ((the one displayed by RUnInfo.csv files).
 def assign_all_col_names(df):
-    
+    '''
+    Assigns column names to a headless .csv, assuming the columns follow the usual order ((the one displayed by RUnInfo.csv files).
+    '''
+
     runInfo_colnames = ['Unnamed: 0', 'Run', 'ReleaseDate', 'LoadDate', 'spots', 'bases',
     'spots_with_mates', 'avgLength', 'size_MB', 'AssemblyName',
     'download_path', 'Experiment', 'LibraryName', 'LibraryStrategy',
@@ -75,22 +80,23 @@ def assign_all_col_names(df):
     
     return (df)
 
-# Assigns temporary names (BLNK#) to the columns
+ 
 def assing_blank_names(df):
-    
-    runInfo_blnk_colnames = ["BLNK0",'BLNK1', 'BLNK2', 'BLNK3', 'BLNK4', 'BLNK5', 'BLNK6', 'BLNK7', 
-    'BLNK8', 'BLNK9', 'BLNK10', 'BLNK11', 'BLNK12', 'BLNK13', 'BLNK14', 'BLNK15', 'BLNK16', 
-    'BLNK17', 'BLNK18', 'BLNK19', 'BLNK20', 'BLNK21', 'BLNK22', 'BLNK23', 'BLNK24', 'BLNK25',
-    'BLNK26', 'BLNK27', 'BLNK28', 'BLNK29', 'BLNK30', 'BLNK31', 'BLNK32', 'BLNK33', 'BLNK34', 
-    'BLNK35', 'BLNK36', 'BLNK37', 'BLNK38', 'BLNK39', 'BLNK40', 'BLNK41', 'BLNK42', 'BLNK43',
-    'BLNK44', 'BLNK45', 'BLNK46', 'BLNK47']
+    '''
+    Assigns temporary names (BLNK#) to the columns.
+    '''
+
+    runInfo_blnk_colnames = ["BLNK"+str(x) for x in range(48)]
     df.columns = runInfo_blnk_colnames
     
     return (df)
 
-# Checks the columns in the df for the 4 columns of interest (Run, Submission, ScientificName and download_path) and assings them the correct label.
+
 def find_and_rename_columns_needed(df):
-    
+    '''
+    Checks the columns in the df for the 4 columns of interest (Run, Submission, ScientificName and download_path) and assings them the correct label.
+    '''
+
     SRR = False
     SRA = False
     Donwload_path = False
@@ -138,9 +144,12 @@ def find_and_rename_columns_needed(df):
         
     return (df)
 
-# Saves the df as a new .csv file <previous name> + "_with_header.csv"
+
 def save_with_new_name(df):
-    
+    '''
+    Saves the df as a new .csv file <previous name> + "_with_header.csv"
+    '''
+
     csv_file = sys.argv[1]
     name_as_list = csv_file.split(".")
     new_name = name_as_list[0] + "_with_header.csv"
@@ -152,16 +161,18 @@ def save_with_new_name(df):
 # First checks whether the loaded csv has an header or not. If yes, the file is returned with the new name.
 # If not, checks whether the columns are in the "usual" order displayed by RunInfo.csv files or not.
 # If yes, the header with all names is attached. If not, only the 4 columns of interest are labelled.
-# In both cases, the output is a new .csv file. 
-df = load_csv(sys.argv[1])
-if header_check == True:
-    df = save_with_new_name(df)
-    print(header_check)
-else:
-    if check_col_order(df):
-        df = assign_all_col_names(df)
+# In both cases, the output is a new .csv file.
+# 
+if __name__ == "__main__":
+    df = load_csv(sys.argv[1])
+    if header_check == True:
         df = save_with_new_name(df)
-    elif not check_col_order(df):
-        df = assing_blank_names(df)
-        df = find_and_rename_columns_needed(df)
-        df = save_with_new_name(df)
+        print(header_check)
+    else:
+        if check_col_order(df):
+            df = assign_all_col_names(df)
+            df = save_with_new_name(df)
+        elif not check_col_order(df):
+            df = assing_blank_names(df)
+            df = find_and_rename_columns_needed(df)
+            df = save_with_new_name(df)
