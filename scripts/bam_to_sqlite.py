@@ -542,13 +542,16 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 				else:
 					offset = 15
 				for pos in master_read_dict[tran]["ambig"][readlen]:
-					real_pos = pos+offset
-					if real_pos <cds_start:
-						ambig_five_total += master_read_dict[tran]["ambig"][readlen][pos]
-					elif real_pos >=cds_start and real_pos <= cds_stop:
-						ambig_cds_total += master_read_dict[tran]["ambig"][readlen][pos]
-					elif real_pos > cds_stop:
+					if cds_start is None or cds_stop is None:
 						ambig_three_total += master_read_dict[tran]["ambig"][readlen][pos]
+					else:
+						real_pos = pos+offset
+						if real_pos < cds_start:
+							ambig_five_total += master_read_dict[tran]["ambig"][readlen][pos]
+						elif real_pos >=cds_start and real_pos <= cds_stop:
+							ambig_cds_total += master_read_dict[tran]["ambig"][readlen][pos]
+						elif real_pos > cds_stop:
+							ambig_three_total += master_read_dict[tran]["ambig"][readlen][pos]
 
 			master_read_dict["ambiguous_all_totals"][tran] = five_total+cds_total+three_total+ambig_five_total+ambig_cds_total+ambig_three_total
 			master_read_dict["ambiguous_fiveprime_totals"][tran] = five_total+ambig_five_total
