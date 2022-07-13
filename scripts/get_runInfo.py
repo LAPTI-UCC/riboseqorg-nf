@@ -1,8 +1,7 @@
-from email import header
-from numpy import False_
 import pandas as pd
 import subprocess
 import os
+import sys 
 
   
 
@@ -78,10 +77,18 @@ def download_sra_run_table(superset_path, datadir, num_samples=1, specific_GSEs=
         os.makedirs(datadir + '/' + outfile)
         run_table_to_csv(sra_runs, f"{datadir}/{outfile}/{outfile}_sraRunInfo.csv")
 
+if __name__ == '__main__':
+    path_to_superset = sys.argv[1]
+    path_to_datadir = sys.argv[2]
+    gse_to_fetch = sys.argv[3]
+    download_sra_run_table(path_to_superset, path_to_datadir, [gse_to_fetch])
 
-download_sra_run_table('data/ribosome_profiling_superset.csv', 
-        'data',
-        specific_GSEs=['GSE97384']
-        )
+    # I have left this script handling one GSE at a time. However, If we want to do multiple at the 
+    # same time we only need to parse the input list into a python list for it to work as specific_GSEs already takes a list
+
+    # download_sra_run_table('data/ribosome_profiling_superset.csv', 
+    #         'data',
+    #         specific_GSEs=['GSE97384']
+    #         )
 
 
