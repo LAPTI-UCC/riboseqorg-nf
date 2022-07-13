@@ -27,8 +27,8 @@ process clip_fastq {
 }
 
 process rRNA_mapping {
-	publishDir '${params.study_dir}/less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
-	publishDir '${params.study_dir}/rRNA_alignment_stats', mode: 'copy', pattern: '*_rRNA_stats.txt'
+	publishDir path: '${params.study_dir}/less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
+	publishDir path: '${params.study_dir}/rRNA_alignment_stats', mode: 'copy', pattern: '*_rRNA_stats.txt'
 
 	input: 
 	file clipped_fastq /* from clipped_fastq_channel */
