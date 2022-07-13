@@ -27,8 +27,8 @@ process clip_fastq {
 }
 
 process rRNA_mapping {
-	publishDir path: '${params.study_dir}/less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq'
-	publishDir path: '${params.study_dir}/rRNA_alignment_stats', mode: 'copy', pattern: '*_rRNA_stats.txt'
+	publishDir ('${params.study_dir}/less_rRNA_fastq_files', mode: 'copy', pattern: '*_less_rRNA.fastq')
+	publishDir ('${params.study_dir}/rRNA_alignment_stats', mode: 'copy', pattern: '*_rRNA_stats.txt')
 
 	input: 
 	file clipped_fastq /* from clipped_fastq_channel */
@@ -46,7 +46,7 @@ process rRNA_mapping {
 using fastqc on processed reads in this new version (sequences with no adapters and no rRNAs)-> new name is fastqc_on_processed */
 
 process fastqc_on_processed {
-	publishDir '${params.study_dir}/fastqc', mode: 'copy'
+	publishDir ('${params.study_dir}/fastqc', mode: 'copy')
 	
 	input:
 	file processed_fastq /*should I call it fastq_less_rRNA instrad? doesn't change a thing technically, but yh,know*/
@@ -60,7 +60,7 @@ process fastqc_on_processed {
 }
 
 process multiqc_on_fastq {
-	publishDir '${params.study_dir}/multiqc', mode: 'copy'
+	publishDir ('${params.study_dir}/multiqc', mode: 'copy')
 
 	input:
 	file ('fastqc/*')
@@ -81,7 +81,7 @@ TRANSCRIPTOME MAPPING BRANCH
 
 
 process transcriptome_mapping {
-	publishDir '${params.study_dir}/trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
+	publishDir ('${params.study_dir}/trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt') 
 
 	input:    
 	file less_rrna_fastq /* from fastq_less_rRNA */
