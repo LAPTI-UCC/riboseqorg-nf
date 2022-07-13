@@ -7,12 +7,14 @@ import pandas as pd
 import numpy as np
 import sys
 
+# Loads the .csv, given as an argument to the script in the terminal, as a dataframe (df)
 def load_csv(path):
     
     df = pd.read_csv(path)
     
     return(df)
 
+#Checks whether the .csv file already has an header with the labels required or not.
 def header_check(df):
     
     has_header = True
@@ -24,6 +26,7 @@ def header_check(df):
             
     return has_header
 
+# Checks if the columns in the .csv file without header are in the usual order (the one displayed by RUnInfo.csv files) or not.
 def check_col_order(df):
     
     first_check = df.iat[0,1] # SRR value. Must start with SRR.
@@ -53,6 +56,8 @@ def check_col_order(df):
         
     return (formatted)
 
+
+# Assigns column names to a headless .csv, assuming the columns follow the usual order ((the one displayed by RUnInfo.csv files).
 def assign_all_col_names(df):
     
     runInfo_colnames = ['Unnamed: 0', 'Run', 'ReleaseDate', 'LoadDate', 'spots', 'bases',
@@ -70,6 +75,7 @@ def assign_all_col_names(df):
     
     return (df)
 
+# Assigns temporary names (BLNK#) to the columns
 def assing_blank_names(df):
     
     runInfo_blnk_colnames = ["BLNK0",'BLNK1', 'BLNK2', 'BLNK3', 'BLNK4', 'BLNK5', 'BLNK6', 'BLNK7', 
@@ -82,6 +88,7 @@ def assing_blank_names(df):
     
     return (df)
 
+# Checks the columns in the df for the 4 columns of interest (Run, Submission, ScientificName and download_path) and assings them the correct label.
 def find_and_rename_columns_needed(df):
     
     SRR = False
@@ -131,6 +138,7 @@ def find_and_rename_columns_needed(df):
         
     return (df)
 
+# Saves the df as a new .csv file <previous name> + "_with_header.csv"
 def save_with_new_name(df):
     
     csv_file = sys.argv[1]
@@ -140,6 +148,11 @@ def save_with_new_name(df):
     
     return
 
+
+# First checks whether the loaded csv has an header or not. If yes, the file is returned with the new name.
+# If not, checks whether the columns are in the "usual" order displayed by RunInfo.csv files or not.
+# If yes, the header with all names is attached. If not, only the 4 columns of interest are labelled.
+# In both cases, the output is a new .csv file. 
 df = load_csv(sys.argv[1])
 if header_check == True:
     df = save_with_new_name(df)
