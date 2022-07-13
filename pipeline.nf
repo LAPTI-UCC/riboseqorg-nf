@@ -81,7 +81,7 @@ TRANSCRIPTOME MAPPING BRANCH
 
 
 process transcriptome_mapping {
-	publishDir '${params.study_dir}/trips_alignment_stats', mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
+	publishDir "$params.study_dir/trips_alignment_stats", mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
 
 	input:    
 	file less_rrna_fastq /* from fastq_less_rRNA */
@@ -109,7 +109,7 @@ process transcriptome_sam_to_bam {
 }
 
 process bam_to_sqlite {
-	publishDir '${params.study_dir}/sqlites', mode: 'copy', pattern: '*.sqlite'
+	publishDir "$params.study_dir/sqlites", mode: 'copy', pattern: '*.sqlite'
 	input:
 	file sorted_bam /* from sorted_bams */
 
@@ -127,7 +127,7 @@ GENOME MAPPING BRANCH
 ----------------------*/
 
 process genome_mapping {
-	publishDir '${params.study_dir}/gwips_alignment_stats', mode: 'copy', pattern: '*_gwips_alignment_stats.txt'
+	publishDir "$params.study_dir/gwips_alignment_stats", mode: 'copy', pattern: '*_gwips_alignment_stats.txt'
     input:
    	file less_rrna_fastq /* from fastq_less_rRNA */
 
@@ -164,7 +164,7 @@ process genome_sam_to_bed {
 
 
 process bed_to_bigwig {
-	publishDir '${params.study_dir}/bigwigs', mode: 'copy', pattern: '*.bw'
+	publishDir "$params.study_dir/bigwigs", mode: 'copy', pattern: '*.bw'
 
 	input:
 	file bedfile /* from sorted_beds */
@@ -179,7 +179,7 @@ process bed_to_bigwig {
 
 
 process coveragebed_to_bigwig {
-	publishDir '${params.study_dir}/bigwigs', mode: 'copy', pattern: '*.bw'
+	publishDir "$params.study_dir/bigwigs", mode: 'copy', pattern: '*.bw'
 
 	input:
     file bedfile /* from coverage_beds */
