@@ -355,21 +355,20 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_dict["total_bam_lines"] = total_bam_lines
 	master_dict["mapped_reads"] = mapped_reads
 	master_dict["unmapped_reads"] = unmapped_reads
-	master_read_dict["unmapped_reads"] = unmapped_reads
 	master_dict["ambiguously_mapped_reads"] = ambiguously_mapped_reads
 	
 	if "read_name" in master_read_dict:
 		del master_read_dict["read_name"]
 	print ("BAM file processed")
 	print ("Creating metagenes, triplet periodicity plots, etc.")
-	print(master_read_dict.keys())
+
 	for tran in master_read_dict:
 		try:
 			cds_start = int(0 if transcriptome_info_dict[tran]["cds_start"] is None else transcriptome_info_dict[tran]["cds_start"])
 			cds_stop = int(0 if transcriptome_info_dict[tran]["cds_stop"] is None else transcriptome_info_dict[tran]["cds_stop"])
 			# print(tran, type(cds_start))
 		except:
-			# print("Exception: ", tran)
+			print("Exception: ", tran)
 			continue
 
 		tranlen = transcriptome_info_dict[tran]["length"]
@@ -470,8 +469,10 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 			if readlen in  master_trip_dict[primetype]: 
 				final_offsets[primetype]["read_scores"][readlen] = master_trip_dict[primetype][readlen]["score"]
 			else:
-				 final_offsets[primetype]["read_scores"][readlen] = 0.0
+				final_offsets[primetype]["read_scores"][readlen] = 0.0
 
+
+	master_read_dict["unmapped_reads"] = unmapped_reads
 	master_read_dict["offsets"] = final_offsets
 	master_read_dict["trip_periodicity"] = master_trip_dict
 	master_read_dict["desc"] = "Null"
