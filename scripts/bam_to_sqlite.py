@@ -355,21 +355,20 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_dict["total_bam_lines"] = total_bam_lines
 	master_dict["mapped_reads"] = mapped_reads
 	master_dict["unmapped_reads"] = unmapped_reads
-	master_read_dict["unmapped_reads"] = unmapped_reads
 	master_dict["ambiguously_mapped_reads"] = ambiguously_mapped_reads
 	
 	if "read_name" in master_read_dict:
 		del master_read_dict["read_name"]
 	print ("BAM file processed")
 	print ("Creating metagenes, triplet periodicity plots, etc.")
-	print(master_read_dict.keys())
+
 	for tran in master_read_dict:
 		try:
 			cds_start = int(0 if transcriptome_info_dict[tran]["cds_start"] is None else transcriptome_info_dict[tran]["cds_start"])
 			cds_stop = int(0 if transcriptome_info_dict[tran]["cds_stop"] is None else transcriptome_info_dict[tran]["cds_stop"])
 			# print(tran, type(cds_start))
 		except:
-			# print("Exception: ", tran)
+			print("Exception: ", tran)
 			continue
 
 		tranlen = transcriptome_info_dict[tran]["length"]
@@ -470,8 +469,10 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 			if readlen in  master_trip_dict[primetype]: 
 				final_offsets[primetype]["read_scores"][readlen] = master_trip_dict[primetype][readlen]["score"]
 			else:
-				 final_offsets[primetype]["read_scores"][readlen] = 0.0
+				final_offsets[primetype]["read_scores"][readlen] = 0.0
 
+
+	master_read_dict["unmapped_reads"] = unmapped_reads
 	master_read_dict["offsets"] = final_offsets
 	master_read_dict["trip_periodicity"] = master_trip_dict
 	master_read_dict["desc"] = "Null"
@@ -515,6 +516,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 
 			cds_start = transcriptome_info_dict[tran]["cds_start"]
 			cds_stop = transcriptome_info_dict[tran]["cds_stop"]
+
 			for readlen in master_read_dict[tran]["unambig"]:
 				if readlen in final_offsets["fiveprime"]["offsets"]:
 					offset = final_offsets["fiveprime"]["offsets"][readlen]
@@ -522,12 +524,15 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 					offset = 15
 				for pos in master_read_dict[tran]["unambig"][readlen]:
 					real_pos = pos+offset
-					if real_pos <cds_start:
-						five_total += master_read_dict[tran]["unambig"][readlen][pos]
-					elif real_pos >=cds_start and real_pos <= cds_stop:
-						cds_total += master_read_dict[tran]["unambig"][readlen][pos]
-					elif real_pos > cds_stop:
+					if cds_start is None or cds_stop is None:
 						three_total += master_read_dict[tran]["unambig"][readlen][pos]
+					else:
+						if real_pos <cds_start:
+							five_total += master_read_dict[tran]["unambig"][readlen][pos]
+						elif real_pos >=cds_start and real_pos <= cds_stop:
+							cds_total += master_read_dict[tran]["unambig"][readlen][pos]
+						elif real_pos > cds_stop:
+							three_total += master_read_dict[tran]["unambig"][readlen][pos]
 			master_read_dict["unambiguous_all_totals"][tran] = five_total+cds_total+three_total
 			master_read_dict["unambiguous_fiveprime_totals"][tran] = five_total
 			master_read_dict["unambiguous_cds_totals"][tran] = cds_total
@@ -539,18 +544,22 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 				else:
 					offset = 15
 				for pos in master_read_dict[tran]["ambig"][readlen]:
-					real_pos = pos+offset
-					if real_pos <cds_start:
-						ambig_five_total += master_read_dict[tran]["ambig"][readlen][pos]
-					elif real_pos >=cds_start and real_pos <= cds_stop:
-						ambig_cds_total += master_read_dict[tran]["ambig"][readlen][pos]
-					elif real_pos > cds_stop:
+					if cds_start is None or cds_stop is None:
 						ambig_three_total += master_read_dict[tran]["ambig"][readlen][pos]
+					else:
+						real_pos = pos+offset
+						if real_pos < cds_start:
+							ambig_five_total += master_read_dict[tran]["ambig"][readlen][pos]
+						elif real_pos >=cds_start and real_pos <= cds_stop:
+							ambig_cds_total += master_read_dict[tran]["ambig"][readlen][pos]
+						elif real_pos > cds_stop:
+							ambig_three_total += master_read_dict[tran]["ambig"][readlen][pos]
 
 			master_read_dict["ambiguous_all_totals"][tran] = five_total+cds_total+three_total+ambig_five_total+ambig_cds_total+ambig_three_total
 			master_read_dict["ambiguous_fiveprime_totals"][tran] = five_total+ambig_five_total
 			master_read_dict["ambiguous_cds_totals"][tran] = cds_total+ambig_cds_total
 			master_read_dict["ambiguous_threeprime_totals"][tran] = three_total+ambig_three_total
+
 	print ("Writing out to sqlite file")
 	sqlite_db = SqliteDict(outputfile,autocommit=False)
 	for key in master_read_dict:
