@@ -1,8 +1,10 @@
 import pandas as pd
 import subprocess
 import os
-import sys 
+import argparse
 
+from yaml import parse 
+from csv_header_check import check_and_assign_header
   
 
 def get_sra_run_info_as_df(srp):
@@ -75,20 +77,28 @@ def download_sra_run_table(superset_path, datadir, num_samples=1, specific_GSEs=
         outfile = superset_row_to_outfile_name(row)
         sra_runs = get_sra_run_info_as_df(row['SRA'])
         os.makedirs(datadir + '/' + outfile)
-        run_table_to_csv(sra_runs, f"{datadir}/{outfile}/{outfile}_sraRunInfo.csv")
+        sra_runs_w_header = check_and_assign_header(sra_runs)
+        run_table_to_csv(sra_runs_w_header, f"{datadir}/{outfile}/{outfile}_sraRunInfo.csv")
 
 if __name__ == '__main__':
-    path_to_superset = sys.argv[1]
-    path_to_datadir = sys.argv[2]
-    gse_to_fetch = sys.argv[3]
-    download_sra_run_table(path_to_superset, path_to_datadir, [gse_to_fetch])
 
-    # I have left this script handling one GSE at a time. However, If we want to do multiple at the 
-    # same time we only need to parse the input list into a python list for it to work as specific_GSEs already takes a list
+    parser = argparse.ArgumentParser(description="")
+    # Originally path_to_superset = sys.argv[1]
+    parser.add_argument("path_to_superset", type = str, help = "The path to the ribosome_profiling_superset.csv") 
+
+    # Originally path_to_datadir = sys.argv[2]
+    parser.add_argument("path_to_datadir", type = str, help = "The folder where the data is" )
+
+    # Originally gse_to_fetch = sys.argv[3]
+    parser.add_argument("gse_to_fetch", type = str, help = "The specific GSE to fetch (es.GSE97384)")
+
+    args = parser.parse_args()
+
+    download_sra_run_table(args.path_to_superset, args.path_to_datadir, [args.gse_to_fetch])
+
 
     # download_sra_run_table('data/ribosome_profiling_superset.csv', 
     #         'data',
     #         specific_GSEs=['GSE97384']
     #         )
-
 
