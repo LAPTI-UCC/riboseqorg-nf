@@ -1,6 +1,6 @@
+import argparse
+from importlib.resources import path
 import pandas as pd
-import numpy as np
-import sys
 
 def load_csv(path):
     '''
@@ -33,7 +33,7 @@ def check_col_order(df):
     '''
 
     first_check = df.iat[0,1] # SRR value. Must start with SRR.
-    second_check = df.iat[0,10] # Download path. Must start with "https://".
+    second_check = df.iat[0,10] # Download path . Must start with "https://".
     third_check =df.iat[0,29] # Must be a string.
     
     # First check: 
@@ -145,34 +145,43 @@ def find_and_rename_columns_needed(df):
     return (df)
 
 
-def save_with_new_name(df):
+def save_with_new_name(df, csv_file_path):
     '''
     Saves the df as a new .csv file <previous name> + "_with_header.csv"
     '''
-
-    csv_file = sys.argv[1]
-    name_as_list = csv_file.split(".")
-    new_name = name_as_list[0] + "_with_header.csv"
+    old_name = csv_file_path.replace(".csv", "")
+    new_name = old_name + "_with_header.csv"
     df.to_csv(new_name, index=False)
     
     return
 
+def check_and_assign_header(df):
 
-# First checks whether the loaded csv has an header or not. If yes, the file is returned with the new name.
-# If not, checks whether the columns are in the "usual" order displayed by RunInfo.csv files or not.
-# If yes, the header with all names is attached. If not, only the 4 columns of interest are labelled.
-# In both cases, the output is a new .csv file.
-# 
-if __name__ == "__main__":
-    df = load_csv(sys.argv[1])
+    '''
+    INPUT: a pandas dataframe.
+    First checks whether the df has an header or not. If yes, the df is returned.
+    If not, checks whether the columns are in the "usual" order displayed by RunInfo.csv files or not.
+    If yes, the header with all names is attached. If not, only the 4 columns of interest are labelled.
+    In both cases, the output is a df with header.
+    '''
+
     if header_check == True:
-        df = save_with_new_name(df)
-        print(header_check)
+        return df
     else:
         if check_col_order(df):
             df = assign_all_col_names(df)
-            df = save_with_new_name(df)
+            return df
         elif not check_col_order(df):
             df = assing_blank_names(df)
             df = find_and_rename_columns_needed(df)
-            df = save_with_new_name(df)
+            return df
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Lorem Ipsum")
+    parser.add_argument("Path", type = str, help = "Path to the location of the '*RunInfo.csv' file")
+    args = parser.parse_args()
+
+    df = load_csv(args.Path)
+    df = check_and_assign_header(df) 
+    save_with_new_name(df, args.Path) 
