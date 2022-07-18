@@ -2,12 +2,28 @@ import argparse
 from importlib.resources import path
 import pandas as pd
 
+
+def csv_header_check(path_to_csv):
+    '''
+    Check a SRA run info csv for presence of header. 
+    '''
+    f = open(path_to_csv, 'r').readline()
+    if f.find('SRR') == -1:
+        return True
+    else: 
+        return False
+
+
 def load_csv(path):
     '''
     Loads the .csv, given as an argument to the script in the terminal, as a dataframe (df).
     '''
-
-    df = pd.read_csv(path)
+    if csv_header_check(path):
+        column_names = pd.read_csv(path, nrows=1, sep='\t').columns
+        df = pd.read_csv(path, skiprows=1, header=None)
+        df.columns = column_names
+    else:
+        df = pd.read_csv(path)
     
     return(df)
 
@@ -86,7 +102,7 @@ def assing_blank_names(df):
     Assigns temporary names (BLNK#) to the columns.
     '''
 
-    runInfo_blnk_colnames = ["BLNK"+str(x) for x in range(48)]
+    runInfo_blnk_colnames = ["BLNK"+str(x) for x in range(len(df.columns))]
     df.columns = runInfo_blnk_colnames
     
     return (df)
@@ -104,7 +120,7 @@ def find_and_rename_columns_needed(df):
     
   # Assign names to columns of interest, if present in the df.
 
-    for each in range(0,48):
+    for each in range(0, len(df.columns)):
         df_cell = df.iat[0,each]
         co_name = df.columns[each]
         if type(df_cell) == str:
@@ -155,6 +171,7 @@ def save_with_new_name(df, csv_file_path):
     
     return
 
+
 def check_and_assign_header(df):
 
     '''
@@ -177,6 +194,18 @@ def check_and_assign_header(df):
             return df
 
 
+def check_and_assign_header_from_file(path_to_sra_run_info):
+    '''
+    Load the run info file and check header same as check_and_assign_header above
+    '''
+    df = load_csv(path_to_sra_run_info)
+    print(df.shape)
+
+    df = check_and_assign_header(df) 
+    save_with_new_name(df, path_to_sra_run_info) 
+
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Lorem Ipsum")
     parser.add_argument("Path", type = str, help = "Path to the location of the '*RunInfo.csv' file")
@@ -185,3 +214,10 @@ if __name__ == "__main__":
     df = load_csv(args.Path)
     df = check_and_assign_header(df) 
     save_with_new_name(df, args.Path) 
+
+
+'''
+This script does not work because the file is not a csv. 
+The header is \\t delimited and the body is comma delimited. 
+
+'''
