@@ -18,9 +18,13 @@ def load_csv(path):
     Loads the .csv, given as an argument to the script in the terminal, as a dataframe (df).
     '''
     if csv_header_check(path):
-        column_names = pd.read_csv(path, nrows=1, sep='\t').columns
-        df = pd.read_csv(path, skiprows=1, header=None)
-        df.columns = column_names
+        f = open(path, 'r').readline()
+        if f.find('\t') != -1:
+            column_names = pd.read_csv(path, nrows=1, sep='\t').columns
+            df = pd.read_csv(path, skiprows=1, header=None)
+            df.columns = column_names
+        else:
+            df = pd.read_csv(path)
     else:
         df = pd.read_csv(path)
     
@@ -198,8 +202,6 @@ def check_and_assign_header_from_file(path_to_sra_run_info):
     Load the run info file and check header same as check_and_assign_header above
     '''
     df = load_csv(path_to_sra_run_info)
-    print(df.shape)
-
     df = check_and_assign_header(df) 
     save_with_new_name(df, path_to_sra_run_info) 
 

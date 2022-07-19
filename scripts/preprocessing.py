@@ -203,8 +203,6 @@ def run_project_setup(run_info, db='annotation_inventory.sqlite'):
 
     runInfo_paths = get_study_structure(run_info)
     for path in runInfo_paths:
-        print('-'*90, '\n')
-
         study_dir = os.path.dirname(path)
 
         ffq_fetch_fastq(path, f'{study_dir}/fastq')
