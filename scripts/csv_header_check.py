@@ -2,6 +2,7 @@ import argparse
 import pandas as pd
 
 
+
 def csv_header_check(path_to_csv):
     '''
     Check a SRA run info csv for presence of header. 
