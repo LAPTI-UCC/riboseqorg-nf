@@ -25,7 +25,7 @@ def load_csv(path):
             df = pd.read_csv(path, skiprows=1, header=None)
             df.columns = column_names
         else:
-            df = pd.read_csv(path)
+            df = pd.read_csv(path, header=0)
     else:
         df = pd.read_csv(path)
     
@@ -43,7 +43,7 @@ def header_check(df):
     for each in needed_columns:
         if each not in df_columns:
             has_header = False
-            
+
     return has_header
 
 
@@ -186,7 +186,7 @@ def check_and_assign_header(df):
     In both cases, the output is a df with header.
     '''
 
-    if header_check == True:
+    if header_check(df) == True:
         return df
     else:
         if check_col_order(df):
@@ -217,9 +217,3 @@ if __name__ == "__main__":
     df = check_and_assign_header(df) 
     save_with_new_name(df, args.Path) 
 
-
-'''
-This script does not work because the file is not a csv. 
-The header is \\t delimited and the body is comma delimited. 
-
-'''
