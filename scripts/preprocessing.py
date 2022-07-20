@@ -181,7 +181,7 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
     ).fetchall()[0]
 
     parameter_dict['adapter_fasta'] = adapter_report_path
-    parameter_dict['study_dir'] = '/'.join(adapter_report_path.split('/')[:-2])
+    parameter_dict['project_dir'] = '/'.join(adapter_report_path.split('/')[:-2])
 
     for i in zip(parameter_order[1:-2], reference_details[1:]):
         parameter_dict[i[0]] = i[1]
@@ -203,8 +203,6 @@ def run_project_setup(run_info, db='annotation_inventory.sqlite'):
 
     runInfo_paths = get_study_structure(run_info)
     for path in runInfo_paths:
-        print('-'*90, '\n')
-
         study_dir = os.path.dirname(path)
 
         ffq_fetch_fastq(path, f'{study_dir}/fastq')
@@ -223,6 +221,5 @@ if __name__ == '__main__':
     parser.add_argument("-r", help="runInfo file for this study from SRA")
 
     args = parser.parse_args()
-    print(args.s)
     run_project_setup(args.r, db=args.s)
 
