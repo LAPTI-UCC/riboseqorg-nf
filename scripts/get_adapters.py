@@ -1,4 +1,4 @@
-import sys
+import argparse
 import subprocess
 
 
@@ -83,8 +83,14 @@ def write_adapter_report(found_adapters, outfile_path):
 
 
 if __name__ == '__main__':
-    fastq_path = sys.argv[1]
-    path_list = fastq_path.split('/')
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-q", help="path to fastq file")
+    parser.add_argument("-o", help="output path for the report")
+
+    args = parser.parse_args()
+
+    path_list = args.q.split('/')
     fastq_dir = '/'.join(path_list[:-1])
     fastq_filename = path_list[-1]
 
@@ -111,7 +117,7 @@ if __name__ == '__main__':
     ]
 
 
-    found_adapters = get_adapters(fastq_path=fastq_path, adapter_sequences=adapter_sequences)
+    found_adapters = get_adapters(fastq_path=args.q, adapter_sequences=adapter_sequences)
 
-    report_path = f'{fastq_dir}/{fastq_filename}_adapter_report.tsv'
+    report_path = args.o
     write_adapter_report(found_adapters, report_path)

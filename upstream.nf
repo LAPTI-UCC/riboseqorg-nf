@@ -7,23 +7,54 @@ project_dir = projectDir
 
 process GET_RUN_INFO {
 
-input:
-val GSE
+    input:
+        val GSE
 
-output:
-file "${GSE}_sraRunInfo.csv"
+    output:
+        file "${GSE}_sraRunInfo.csv"
 
-script:
-"""
-python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_superset} $project_dir${params.data_folder} $GSE $GSE"_sraRunInfo.csv"
-"""
+    script:
+        """
+        python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_superset} $project_dir${params.data_folder} $GSE $GSE"_sraRunInfo.csv"
+        """
+}
+
+
+process GET_FASTQ {
+
+    input:
+        file sraRunInfo
+
+    output:
+        file '*.fastq.gz'
+
+    script:
+        """
+        python3 $project_dir/scripts/ffq_fetch_fastq.py $sraRunInfo ./
+        """
+}
+
+
+process FIND_ADAPTERS {
+
+    input:
+        file raw_fastq
+
+    output:
+        file adapter_report.fa
+
+    script:
+        """
+        python3 $project_dir/scripts/get_adapters.py $raw_fastq $adapter_report.fa
+        """
 }
 
 
 workflow {
 GSE_inputs = Channel.of("GSE158141")  /* a GSE I want to test. Another candidate is GSE152556*/
 GET_RUN_INFO(GSE_inputs)
-GET_RUN_INFO.out.view()
+GET_FASTQ(GET_RUN_INFO.out)
+FIND_ADAPTERS(GET_FASTQ.out)
 }
 
 
