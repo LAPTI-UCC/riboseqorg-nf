@@ -92,7 +92,7 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
     GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out)
     individual_runInfos = Channel.fromPath(params.study_dir/individual_runInfos)
-    GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out)
+    GET_FASTQ(individual_runInfos.out)
     FIND_ADAPTERS(GET_FASTQ.out)
     WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
