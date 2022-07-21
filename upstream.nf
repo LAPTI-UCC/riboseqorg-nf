@@ -86,19 +86,12 @@ process WRITE_PARAMTERS_YAML {
 
 
 workflow {
-<<<<<<< HEAD
-GSE_inputs = Channel.of("GSE158141")  /* a GSE I want to test. Another candidate is GSE152556*/
-GET_RUN_INFO(GSE_inputs)
-GET_FASTQ(GET_RUN_INFO.out)
-FIND_ADAPTERS(GET_FASTQ.out)
-=======
     GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
     GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out)
     GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out)
     FIND_ADAPTERS(GET_FASTQ.out)
     WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
->>>>>>> 56fde4a072d6873df13604769cfdd2cc9f2c6b66
 }
 
 
