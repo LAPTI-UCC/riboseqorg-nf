@@ -169,7 +169,7 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
                     "genome_fasta",
                     "annotation_sqlite",
                     "chrom_sizes_file",
-                    "project_dir",
+                    "study_dir",
                     "fastq_files",
                     "skip_trips",
                     "skip_gwips"]
@@ -183,7 +183,7 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
     ).fetchall()[0]
 
     parameter_dict['adapter_fasta'] = adapter_report_path
-    parameter_dict['project_dir'] = '/'.join(adapter_report_path.split('/')[:-2])
+    parameter_dict['study_dir'] = '/'.join(adapter_report_path.split('/')[:-2])
     parameter_dict['fastq_files'] = '/'.join(adapter_report_path.split('/')[:-1]) + '/*.fastq.gz'
 
     for i in zip(parameter_order[1:-2], reference_details[1:]):

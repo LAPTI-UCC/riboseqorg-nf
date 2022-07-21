@@ -5,6 +5,9 @@ params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
 params.data_folder = "/data"
 project_dir = projectDir 
 
+
+
+
 process GET_RUN_INFO {
 
     input:
@@ -19,6 +22,19 @@ process GET_RUN_INFO {
         """
 }
 
+process GET_INDIVIDUAL_RUN_INFOS {
+
+    input:
+        fie sraRunInfo
+
+    output:
+        file '*_sraRunInfo.csv'
+
+    script:
+        """
+        python3 $project_dir/scripts/split_runInfo_to_rows.py -r $sraRunInfo -o ./
+        """
+}
 
 process GET_FASTQ {
 
@@ -36,25 +52,53 @@ process GET_FASTQ {
 
 
 process FIND_ADAPTERS {
+    publishDir "$params.study_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+
 
     input:
         file raw_fastq
 
     output:
-        file adapter_report.fa
+        file "${raw_fastq}_adapter_report.fa"
 
     script:
         """
-        python3 $project_dir/scripts/get_adapters.py -q $raw_fastq -o $adapter_report.fa
+        python3 $project_dir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adapter_report.fa"
+        """
+}
+
+
+
+process WRITE_PARAMTERS_YAML {
+
+
+    input:
+        file sraRunInfo
+
+    output:
+        file "paramters.yaml"
+
+    script:
+        """
+        python3 $project_dir/scripts/write_paramaters_yaml.py -a "${params.study_dir}/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o paramaters.yaml
         """
 }
 
 
 workflow {
+<<<<<<< HEAD
 GSE_inputs = Channel.of("GSE158141")  /* a GSE I want to test. Another candidate is GSE152556*/
 GET_RUN_INFO(GSE_inputs)
 GET_FASTQ(GET_RUN_INFO.out)
 FIND_ADAPTERS(GET_FASTQ.out)
+=======
+    GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
+    GET_RUN_INFO(GSE_inputs)
+    GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out)
+    GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out)
+    FIND_ADAPTERS(GET_FASTQ.out)
+    WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
+>>>>>>> 56fde4a072d6873df13604769cfdd2cc9f2c6b66
 }
 
 
