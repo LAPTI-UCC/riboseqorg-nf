@@ -30,7 +30,7 @@ process GET_FASTQ {
 
     script:
         """
-        python3 $project_dir/scripts/ffq_fetch_fastq.py $sraRunInfo ./
+        python3 $project_dir/scripts/ffq_fetch_fastq.py -r $sraRunInfo -o ./
         """
 }
 
@@ -45,7 +45,7 @@ process FIND_ADAPTERS {
 
     script:
         """
-        python3 $project_dir/scripts/get_adapters.py $raw_fastq $adapter_report.fa
+        python3 $project_dir/scripts/get_adapters.py -q $raw_fastq -o $adapter_report.fa
         """
 }
 
