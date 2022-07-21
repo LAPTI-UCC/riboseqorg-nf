@@ -14,7 +14,7 @@ path "*_header.csv", emit: headed_csv
 
 script:
 """
-python3 ./scripts/get_runInfo.py ${ribosome_prof_superset} ${data_folder} $GSE
+python3 ./scripts/get_runInfo.py ${params.ribosome_prof_superset} ${params.data_folder} $GSE
 """
 }
 
