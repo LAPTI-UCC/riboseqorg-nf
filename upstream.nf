@@ -25,7 +25,7 @@ process GET_RUN_INFO {
 process GET_INDIVIDUAL_RUN_INFOS {
 
     input:
-        fie sraRunInfo
+        file sraRunInfo
 
     output:
         file '*_sraRunInfo.csv'
