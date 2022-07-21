@@ -11,7 +11,7 @@ input:
 val GSE
 
 output:
-path "*_header.csv", emit: headed_csv
+path "**/*_with_header.csv", emit: headed_csv
 
 script:
 """
