@@ -90,7 +90,8 @@ workflow {
     GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
     GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out)
-    GET_FASTQ(Channel.of(GET_INDIVIDUAL_RUN_INFOS.out))
+    GET_RUN_INFO.out.view()
+    GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out)
     FIND_ADAPTERS(GET_FASTQ.out)
     WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
