@@ -1,26 +1,31 @@
-/*
-params.smthing = "path_to_csv_superset.csv"  --> this ideally should be an argument given to nextflow at the start from terminal
-params.smthingelse = "path?to/data/folder"   --> as above
+/* Creating two parameters for the first two arguments of the get_runInfo.py script.
+*/
+
+params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
+params.data_folder = "/data"
+project_dir = projectDir 
 
 process GET_RUN_INFO {
 
-    input:
-    val GSE
-    output:
-    path CSV, emit: csv
-    path H_CSV, emit: header_csv     ----> This relates to the problem to define the input for process 2. 
-    
-""""
-python3 ./scripts/get_runInfo.py $params.smthing $params.smthingelse $GSE
-""""
+input:
+val GSE
+
+output:
+path "*_header.csv", emit: headed_csv
+
+script:
+"""
+python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_superset} $project_dir${params.data_folder} $GSE
+"""
 }
-*/
-/* 
+
 workflow {
-GSE_inputs = Channel.from( GSE , GSE , GSE , GSE )
+GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
 GET_RUN_INFO(GSE_inputs)
+GET_RUN_INFO.out.headed_csv.view()
 }
-*/
+
+
 /*
 The way this is structured, we want (and It should) process all elements (the GSEs) given as input.
 Such inputs can be emitted from a channel (as a start, try to just give here a list to process)
