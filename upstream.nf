@@ -11,13 +11,14 @@ input:
 val GSE
 
 output:
-path "*_header.csv", emit: headed_csv
+file "${GSE}_sraRunInfo.csv"
 
 script:
 """
-python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_superset} $project_dir${params.data_folder} $GSE
+python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_superset} $project_dir${params.data_folder} $GSE $GSE"_sraRunInfo.csv"
 """
 }
+
 
 workflow {
 GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
