@@ -3,6 +3,7 @@
 
 params.ribosome_prof_superset = "./data/ribosome_profiling_superset.csv"
 params.data_folder = "./data"
+project_dir = projectDir 
 
 process GET_RUN_INFO {
 
@@ -14,7 +15,7 @@ path "*_header.csv", emit: headed_csv
 
 script:
 """
-python3 ./scripts/get_runInfo.py ${params.ribosome_prof_superset} ${params.data_folder} $GSE
+python3 $project_dir/scripts/get_runInfo.py ${params.ribosome_prof_superset} ${params.data_folder} $GSE
 """
 }
 
