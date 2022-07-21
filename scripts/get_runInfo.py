@@ -72,7 +72,7 @@ def superset_row_to_outfile_name(row):
 
 
 def download_sra_run_table(
-    superset_path, datadir, num_samples=1, specific_GSEs=[], sep=","
+    superset_path, datadir, outfile_path, num_samples=1, specific_GSEs=[], sep=","
 ):
     """
     download the sra run table for either a random srp or a specified list of srps
@@ -90,7 +90,7 @@ def download_sra_run_table(
         outfile = superset_row_to_outfile_name(row)
         if not os.path.isdir(datadir + "/" + outfile):
             os.makedirs(datadir + "/" + outfile)
-        outfile_path = f"{datadir}/{outfile}/{outfile}_sraRunInfo.csv"
+        # outfile_path = f"{datadir}/{outfile}/{outfile}_sraRunInfo.csv"
         get_sra_run_info_as_df(row["SRA"], outfile_path)
         print(f"File outputted to {outfile_path}")
 
@@ -112,11 +112,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "gse_to_fetch", type=str, help="The specific GSE to fetch (es.GSE97384)"
     )
+    parser.add_argument(
+        "outpath", type=str, help="relative path to output"
+    )
 
     args = parser.parse_args()
     
     download_sra_run_table(
-        args.path_to_superset, args.path_to_datadir, specific_GSEs=[args.gse_to_fetch]
+        args.path_to_superset, args.path_to_datadir, args.outpath, specific_GSEs=[args.gse_to_fetch]
     )
 
     # download_sra_run_table('data/ribosome_profiling_superset.csv',
