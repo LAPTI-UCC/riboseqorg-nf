@@ -5,6 +5,8 @@ params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
 params.data_folder = "/data"
 project_dir = projectDir 
 
+params.study_dir = $project_dir"/data/test"
+
 
 
 
