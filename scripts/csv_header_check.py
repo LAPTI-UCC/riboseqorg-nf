@@ -204,7 +204,8 @@ def check_and_assign_header_from_file(path_to_sra_run_info):
     '''
     df = load_csv(path_to_sra_run_info)
     df = check_and_assign_header(df) 
-    save_with_new_name(df, path_to_sra_run_info) 
+    df.to_csv(path_to_sra_run_info, index=False)
+    # save_with_new_name(df, path_to_sra_run_info) 
 
 
 
