@@ -21,9 +21,9 @@ python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_s
 
 
 workflow {
-GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
+GSE_inputs = Channel.of("GSE158141")  /* a GSE I want to test. Another candidate is GSE152556*/
 GET_RUN_INFO(GSE_inputs)
-GET_RUN_INFO.out.headed_csv.view()
+GET_RUN_INFO.out.view()
 }
 
 
