@@ -74,6 +74,7 @@ process WRITE_PARAMTERS_YAML {
 
     input:
         file sraRunInfo
+        path find_adapters
 
     output:
         file "paramters.yaml"
