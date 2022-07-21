@@ -23,6 +23,7 @@ process GET_RUN_INFO {
 }
 
 process GET_INDIVIDUAL_RUN_INFOS {
+    publishDir "$params.study_dir/individual_runInfos", mode: 'copy', pattern: '*_sraRunInfo.csv'
 
     input:
         file sraRunInfo
@@ -90,7 +91,7 @@ workflow {
     GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
     GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out)
-    GET_RUN_INFO.out.view()
+    individual_runInfos = Channel.fromPath(params.study_dir/individual_runInfos)
     GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out)
     FIND_ADAPTERS(GET_FASTQ.out)
     WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
