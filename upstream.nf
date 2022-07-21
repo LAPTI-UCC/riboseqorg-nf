@@ -5,7 +5,7 @@ params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
 params.data_folder = "/data"
 project_dir = projectDir 
 
-params.study_dir = $project_dir"/data/test"
+params.study_dir = "/home/115316376"
 
 
 
@@ -31,7 +31,7 @@ process GET_INDIVIDUAL_RUN_INFOS {
         file sraRunInfo
 
     output:
-        file '*_sraRunInfo.csv'
+        path '*_sraRunInfo.csv'
 
     script:
         """
@@ -92,9 +92,10 @@ process WRITE_PARAMTERS_YAML {
 workflow {
     GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
-    GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out)
-    individual_runInfos = Channel.fromPath(params.study_dir'/individual_runInfos')
-    GET_FASTQ(individual_runInfos.)
+    GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
+
+    individual_runInfos = Channel.fromPath('${params.study_dir}/individual_runInfos')
+    GET_FASTQ(individual_runInfos)
     FIND_ADAPTERS(GET_FASTQ.out)
     WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
