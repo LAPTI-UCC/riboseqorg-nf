@@ -19,7 +19,7 @@ python3 ./scripts/get_runInfo.py ${ribosome_prof_superset} ${data_folder} $GSE
 }
 
 workflow {
-GSE_inputs = Channel.value(GSE)
+GSE_inputs = Channel.of("GSE152554")  /* a GSE I want to test. Another candidate is GSE152556*/
 GET_RUN_INFO(GSE_inputs)
 GET_RUN_INFO.out.headed_csv.view()
 }
