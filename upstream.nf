@@ -78,7 +78,7 @@ process RUN_FFQ {
         for (i in srrList) {
             println "hi ${i}"
             '''
-            ffq --ftp ${i} | jq -r .[] | cat > '${i}.json'
+            echo "ffq --ftp ${i} | jq -r .[] | cat > '${i}.json'"
             '''
         }
     }
