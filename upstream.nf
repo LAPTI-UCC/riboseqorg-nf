@@ -71,19 +71,14 @@ process RUN_FFQ {
     output:
         file "*.json"
 
-    shell:
+    script:
         """
-        #!usr/bin/env bash
-        
-        IFS=' '
+        def srrList = SRR.split(' ') as List
 
-        read -ra SRR_arr <<< $SRR
+        for(i in arr) {
+            ffq --ftp ${i} | jq -r .[] | cat > '${i}.json'
+        }
 
-        for val in "${SRR_arr[@]}";
-        do
-
-            ffq --ftp $SRR | jq -r .[] | cat > '${SRR}.json'
-        done
         """
 }
 
