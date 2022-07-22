@@ -63,9 +63,16 @@ process RUN_FFQ {
 
     shell:
     """
-    cat ${SRR} | while read line; do 
-        cat $line$line >> test.json
-    done
+    #! usr/bin/python 
+
+    import os
+
+    with open('${SRR}', 'r') as f:
+        lines = f.readlines()
+        for line in lines:
+
+            os.system(f"ffq --ftp {line.strip('\n')} | jq -r .[] | cat > file.json")
+
 
     """
     }
@@ -128,7 +135,7 @@ workflow {
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
     a = Channel.from(GET_INDIVIDUAL_RUNS.out)
     println(a)
-    // RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
+    RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
 
     GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
