@@ -31,7 +31,7 @@ process GET_INDIVIDUAL_RUN_INFOS {
         file sraRunInfo
 
     output:
-        path '*_sraRunInfo.csv'
+        file '*_sraRunInfo.csv'
 
     script:
         """
