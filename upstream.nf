@@ -25,7 +25,7 @@ process GET_RUN_INFO {
 }
 
 process GET_INDIVIDUAL_RUN_INFOS {
-    publishDir "/home/115316376/individual_runInfos", mode: 'copy', pattern: '*_sraRunInfo.csv'
+    publishDir "$project_dir/data/individual_runInfos", mode: 'copy', pattern: '*_sraRunInfo.csv'
 
     input:
         file sraRunInfo
@@ -38,6 +38,8 @@ process GET_INDIVIDUAL_RUN_INFOS {
         python3 $project_dir/scripts/split_runInfo_to_rows.py -r $sraRunInfo -o ./
         """
 }
+
+
 
 process GET_FASTQ {
 
