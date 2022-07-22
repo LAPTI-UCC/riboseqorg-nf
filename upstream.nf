@@ -132,10 +132,9 @@ workflow {
     GSE_inputs = Channel.of("GSE112305")  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
 
-    GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out)
-    println(GET_INDIVIDUAL_RUNS.out.view().getClass())
-    RUN_FFQ(GET_INDIVIDUAL_RUNS.out.flatten())
-    RUN_FFQ.out
+    GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) | RUN_FFQ
+
+    RUN_FFQ.out.view()
     // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
     // FIND_ADAPTERS(GET_FASTQ.out)
