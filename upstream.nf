@@ -70,8 +70,8 @@ import os
 with open('${SRR}', 'r') as f:
     lines = f.readlines()
     for line in lines:
-
-        os.system(f"ffq --ftp {line.strip('\\n')} | jq -r .[] | cat > ./file.json")
+        line = line.strip('\n')
+        os.system(f"ffq --ftp {line} | jq -r .[] | cat > ./file.json")
 
 
     """
