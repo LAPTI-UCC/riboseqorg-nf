@@ -50,7 +50,6 @@ process GET_INDIVIDUAL_RUNS {
     shell:
         """
         #!/usr/bin/env python3
-
         import pandas as pd
         import sys
 
