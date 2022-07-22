@@ -133,7 +133,7 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out)
-    println(GET_INDIVIDUAL_RUNS.out.getClass())
+    println(GET_INDIVIDUAL_RUNS.out.view().getClass())
     RUN_FFQ(GET_INDIVIDUAL_RUNS.out.flatten())
     RUN_FFQ.out
     // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
