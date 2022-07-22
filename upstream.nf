@@ -72,15 +72,15 @@ process RUN_FFQ {
         file "*.json"
 
     script:
-        """
+        
         def srrList = SRR.split(' ')
 
         for (i in srrList) {
-            ffq --ftp i | jq -r .[] | cat > 'i.json'
+            '''
+            ffq --ftp ${i} | jq -r .[] | cat > '${i}.json'
+            '''
         }
-
-        """
-}
+    }
 
 
 process GET_FASTQ {
