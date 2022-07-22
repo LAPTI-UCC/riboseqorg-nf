@@ -71,8 +71,10 @@ process RUN_FFQ {
     output:
         file "*.json"
 
-    script:
+    shell:
         """
+        #!usr/bin/env bash
+        
         IFS=' '
 
         read -ra SRR_arr <<< $SRR
