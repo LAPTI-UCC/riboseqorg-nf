@@ -75,7 +75,7 @@ process RUN_FFQ {
         """
         def srrList = SRR.split(' ') as List
 
-        for(i in arr) {
+        for(i in srrList) {
             ffq --ftp ${i} | jq -r .[] | cat > '${i}.json'
         }
 
