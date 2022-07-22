@@ -94,7 +94,6 @@ workflow {
     GSE_inputs.view()
     GET_RUN_INFO(GSE_inputs)
     GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
-    println(GET_INDIVIDUAL_RUN_INFOS.out.flatten().getClass())
     GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
     // FIND_ADAPTERS(GET_FASTQ.out)
     // WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)

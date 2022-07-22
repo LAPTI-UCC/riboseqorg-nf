@@ -16,12 +16,14 @@ def run_get_fastq(runInfo_path, outdir):
 
     for idx, row in runInfo.iterrows():
         ffq_stdout = subprocess.run(f"ffq --ftp {row['Run']} | jq -r .[]", check=True, capture_output=True, shell=True)
-        ffq_metadata_dict = json.loads(ffq_stdout.stdout.decode())
-        if not os.path.exists(outdir):
-            os.makedirs(outdir)
+        raise ffq_stdout.stdout.decode()
 
-        if not os.path.isfile(outdir + ffq_metadata_dict['filename']):
-            subprocess.run(f"wget {ffq_metadata_dict['url']} -P {outdir} ", check=True, capture_output=True, shell=True)
+        # ffq_metadata_dict = json.loads(ffq_stdout.stdout.decode())
+        # if not os.path.exists(outdir):
+        #     os.makedirs(outdir)
+
+        # if not os.path.isfile(outdir + ffq_metadata_dict['filename']):
+        #     subprocess.run(f"wget {ffq_metadata_dict['url']} -P {outdir} ", check=True, capture_output=True, shell=True)
 
 
 
