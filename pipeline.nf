@@ -207,7 +207,8 @@ process COVERAGEBED_TO_BIGWIG {
 
 workflow {
 
-	fastq_data = Channel.fromPath(params.fastq_files) /* Assign the fastq files in a folder to fastq_data */
+	fastq_data = Channel.fromPath ( params.fastq_files ) /* Assign the fastq files in a folder to fastq_data */
+	
 	CLIP_FASTQ          ( fastq_data )   /* Uses fastq_data and clips away the adapters */
 	rRNA_MAPPING        ( CLIP_FASTQ.out )
 	FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
