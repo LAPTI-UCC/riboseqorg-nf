@@ -63,7 +63,7 @@ process RUN_FFQ {
 
     shell:
     """
-    #! usr/bin/python3
+    #!usr/bin/python3
 
     import os
 
