@@ -207,28 +207,28 @@ process COVERAGEBED_TO_BIGWIG {
 
 workflow {
 
-    fastq_data = Channel.fromPath(params.fastq_files) /* Assign the fastq files in a folder to fastq_data */
-    CLIP_FASTQ          ( fastq_data )   /* Uses fastq_data and clips away the adapters */
+	fastq_data = Channel.fromPath(params.fastq_files) /* Assign the fastq files in a folder to fastq_data */
+	CLIP_FASTQ          ( fastq_data )   /* Uses fastq_data and clips away the adapters */
 	rRNA_MAPPING        ( CLIP_FASTQ.out )
 	FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
-    MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out )		
+	MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out )		
 
     /* IF STATEMENT #1 */
-    if ( params.skip_trips == false ) {
+	if ( params.skip_trips == false ) {
 		
-        TRANSCRIPTOME_MAPPING    ( rRNA_MAPPING.out.fastq_less_rRNA )
-        TRANSCRIPTOME_SAM_TO_BAM ( TRANSCRIPTOME_MAPPING.out.transcriptome_sams )
-        BAM_TO_SQLITE            ( TRANSCRIPTOME_SAM_TO_BAM.out )
+		TRANSCRIPTOME_MAPPING    ( rRNA_MAPPING.out.fastq_less_rRNA )
+		TRANSCRIPTOME_SAM_TO_BAM ( TRANSCRIPTOME_MAPPING.out.transcriptome_sams )
+		BAM_TO_SQLITE            ( TRANSCRIPTOME_SAM_TO_BAM.out )
 
-    }
+	}
     /* IF STATEMENT #2 */
-    if ( params.skip_gwips == false ) {
+	if ( params.skip_gwips == false ) {
 
-        GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
-        GENOME_SAM_TO_BED     ( GENOME_MAPPING.out.genome_sams )
-        BED_TO_BIGWIG         ( GENOME_SAM_TO_BED.out.sorted_beds )
-        COVERAGEBED_TO_BIGWIG ( GENOME_SAM_TO_BED.out.coverage_beds )
+		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
+		GENOME_SAM_TO_BED     ( GENOME_MAPPING.out.genome_sams )
+		BED_TO_BIGWIG         ( GENOME_SAM_TO_BED.out.sorted_beds )
+		COVERAGEBED_TO_BIGWIG ( GENOME_SAM_TO_BED.out.coverage_beds )
 
     }
-	
+
 }
