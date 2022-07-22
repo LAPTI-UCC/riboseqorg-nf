@@ -1,10 +1,8 @@
 import subprocess
 import argparse
 import pandas as pd
-import os
 import json
 
-from simplejson import loads 
 
 
 def run_get_fastq(runInfo_path, outdir):
