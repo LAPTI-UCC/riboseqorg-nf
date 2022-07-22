@@ -54,7 +54,7 @@ process GET_INDIVIDUAL_RUNS {
         import pandas as pd
         import sys
 
-        runInfo_path = ${sraRunInfo}
+        runInfo_path = "${sraRunInfo}"
         runInfo = pd.read_csv(runInfo_path, header=0)
 
 
