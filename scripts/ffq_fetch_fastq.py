@@ -21,12 +21,10 @@ def run_get_fastq(runInfo_path, outdir):
 
         ffq_metadata_dict = json.loads(ffq_stdout.stdout.decode())
 
-        raise Exception(ffq_metadata_dict['filename'])
         # if not os.path.exists(outdir):
         #     os.makedirs(outdir)
 
-        if not os.path.isfile(outdir + ffq_metadata_dict['filename']):
-            subprocess.run(f"wget {ffq_metadata_dict['url']} -P {outdir} ", check=True, capture_output=True, shell=True)
+        subprocess.run(f"wget {ffq_metadata_dict['url']} -P {outdir} ", check=True, capture_output=True, shell=True)
 
 
 
