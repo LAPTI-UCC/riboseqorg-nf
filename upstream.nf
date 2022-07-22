@@ -63,6 +63,21 @@ process GET_INDIVIDUAL_RUNS {
         """
 }
 
+process RUN_FFQ {
+
+    imput:
+        val SRR
+
+    output:
+        file "*.json"
+
+    script:
+        """
+        ffq --ftp $SRR | jq -r .[] | cat > $SRR.json
+        """
+}
+
+
 process GET_FASTQ {
 
     input:
@@ -118,7 +133,8 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out)
-    GET_INDIVIDUAL_RUNS.out.view()
+    RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
+    RUN_FFQ.out
     // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
     // FIND_ADAPTERS(GET_FASTQ.out)
