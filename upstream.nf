@@ -136,9 +136,10 @@ workflow {
     a = Channel.from(GET_INDIVIDUAL_RUNS.out)
     println(a)
     RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
+    RUN_FFQ.out.view()
 
-    GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
-    GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
+    // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
+    // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
     // FIND_ADAPTERS(GET_FASTQ.out)
     // WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
