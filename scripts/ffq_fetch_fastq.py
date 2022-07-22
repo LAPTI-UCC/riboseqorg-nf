@@ -24,7 +24,6 @@ def run_get_fastq(runInfo_path, outdir):
         # if not os.path.exists(outdir):
         #     os.makedirs(outdir)
         a = subprocess.run(f"wget {ffq_metadata_dict['url']} -P {outdir} ", check=True, capture_output=True, shell=True)
-        raise Exception(a)
 
 
 if __name__ == '__main__':
