@@ -59,7 +59,7 @@ process GET_INDIVIDUAL_RUNS {
 
 
         for idx, row in runInfo.iterrows():
-            print(row['Run'])
+            print(row['Run'], end=',')
         """
 }
 
@@ -139,8 +139,7 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
-    def srrList = [GET_INDIVIDUAL_RUNS.out as string]
-    println srrList
+    GET_INDIVIDUAL_RUNS.out.view()
 
     // RUN_FFQ
 
