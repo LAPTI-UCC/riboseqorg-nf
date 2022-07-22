@@ -16,7 +16,7 @@ def run_get_fastq(runInfo_path, outdir):
 
     for idx, row in runInfo.iterrows():
         ffq_stdout = subprocess.run(f"ffq --ftp {row['Run']} | jq -r .[]", check=True, capture_output=True, shell=True)
-        raise Exception(ffq_stdout.stdout)
+        raise Exception(f"ffq --ftp {row['Run']} | jq -r .[]")
 
         ffq_metadata_dict = json.loads(ffq_stdout.stdout.decode())
         # if not os.path.exists(outdir):
