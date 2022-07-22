@@ -73,7 +73,15 @@ process RUN_FFQ {
 
     script:
         """
-        ffq --ftp $SRR | jq -r .[] | cat > '${SRR}.json'
+        IFS=' '
+
+        read -ra SRR_arr <<< $SRR
+
+        for val in "${SRR_arr[@]}";
+        do
+
+            ffq --ftp $SRR | jq -r .[] | cat > '${SRR}.json'
+        done
         """
 }
 
