@@ -47,20 +47,10 @@ process GET_INDIVIDUAL_RUNS {
     output:
         file '*.txt'
 
-    shell:
-        """
-        #!/usr/bin/env python3
-        import pandas as pd
-        import sys
-
-        runInfo_path = "${sraRunInfo}"
-        runInfo = pd.read_csv(runInfo_path, header=0)
-
-        f = open('out.txt', 'w')
-        for idx, row in runInfo.iterrows():
-            f.write(f"row['Run']\n")
-        f.close()
-        """
+    script:
+    """
+    cut -f2 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.txt
+    """
 }
 
 process RUN_FFQ {
