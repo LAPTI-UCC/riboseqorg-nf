@@ -72,17 +72,16 @@ process RUN_FFQ {
         file "*.json"
 
     script:
-        """
-        def srrList = SRR.split(' ')
-
+        
+        def srrList = SRR.split('\n')
         println srrList
-
         for (i in srrList) {
-            ffq --ftp i | jq -r .[] | cat > 'i.json'
+            println "hi ${i}"
+            """
+            ffq --ftp $i | jq -r .[] | cat > ${i}.json
+            """
         }
-
-        """
-}
+    }
 
 
 process GET_FASTQ {
@@ -139,9 +138,12 @@ workflow {
     GSE_inputs = Channel.of("GSE112305")  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
 
-    GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) | RUN_FFQ
+    GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
+    def srrList = [GET_INDIVIDUAL_RUNS.out as string]
+    println srrList
 
-    RUN_FFQ.out.view()
+    // RUN_FFQ
+
     // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
     // FIND_ADAPTERS(GET_FASTQ.out)
