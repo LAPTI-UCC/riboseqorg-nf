@@ -78,7 +78,7 @@ process RUN_FFQ {
         println(srrList)
 
         for (i in srrList) {
-            ffq --ftp ${i} | jq -r .[] | cat > '${i}.json'
+            ffq --ftp i | jq -r .[] | cat > 'i.json'
         }
 
         """
