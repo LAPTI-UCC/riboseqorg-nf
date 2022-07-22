@@ -65,7 +65,7 @@ process GET_INDIVIDUAL_RUNS {
 
 process RUN_FFQ {
 
-    imput:
+    input:
         val SRR
 
     output:
