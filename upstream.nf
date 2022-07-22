@@ -42,7 +42,7 @@ process GET_INDIVIDUAL_RUN_INFOS {
 process GET_FASTQ {
 
     input:
-        file sraRunInfo
+        path sraRunInfo
 
     output:
         file '*.fastq.gz'
@@ -95,8 +95,8 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
     GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     GET_INDIVIDUAL_RUN_INFOS.out.view()
-    Channel.of(GET_INDIVIDUAL_RUN_INFOS.out).view()
-    // GET_FASTQ()
+    a = Channel.of(GET_INDIVIDUAL_RUN_INFOS.out).view()
+    GET_FASTQ(a)
     // FIND_ADAPTERS(GET_FASTQ.out)
     // WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
