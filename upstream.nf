@@ -139,7 +139,7 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
-    def srrList = [GET_INDIVIDUAL_RUNS.out.to]
+    def srrList = [GET_INDIVIDUAL_RUNS.out]
     println srrList
 
     // RUN_FFQ
