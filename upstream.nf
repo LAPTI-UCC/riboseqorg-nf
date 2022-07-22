@@ -39,7 +39,27 @@ process GET_INDIVIDUAL_RUN_INFOS {
         """
 }
 
+process GET_INDIVIDUAL_RUNS {
 
+    input:
+        file sraRunInfo
+
+    output:
+        stdout
+
+    shell:
+        """
+        #!/usr/bin/env python3
+
+        import pandas as pd#
+
+        runInfo = pd.read_csv(runInfo_path, header=0)
+
+
+        for idx, row in runInfo.iterrows():
+            print(row['Run'])
+        """
+}
 
 process GET_FASTQ {
 
@@ -94,8 +114,11 @@ process WRITE_PARAMTERS_YAML {
 workflow {
     GSE_inputs = Channel.of("GSE112305")  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
-    GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
-    GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
+
+    GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out)
+    GET_INDIVIDUAL_RUNS.out.view()
+    // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
+    // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
     // FIND_ADAPTERS(GET_FASTQ.out)
     // WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
