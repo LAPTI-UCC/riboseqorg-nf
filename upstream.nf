@@ -91,7 +91,6 @@ process WRITE_PARAMTERS_YAML {
 
 workflow {
     GSE_inputs = Channel.of("GSE112305")  /* a GSE I want to test. Another candidate is GSE152556*/
-    GSE_inputs.view()
     GET_RUN_INFO(GSE_inputs)
     GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
