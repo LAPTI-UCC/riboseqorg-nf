@@ -19,7 +19,6 @@ process CLIP_FASTQ {
     file '*_clipped.fastq' /* into clipped_fastq_channel  */
 	
 	script: 
-	/* STUDY CUTADAPT SO THAT YOU CAN READ ADAPTERS FROM A FILE. Test 1 -> inputting the assigned variable to the path" */
 	"""
     cutadapt --minimum-length=25 -a "file:$params.adapter_fasta" -o $raw_fastq"_clipped.fastq" $raw_fastq
     """
@@ -50,7 +49,7 @@ process FASTQC_ON_PROCESSED {
 	publishDir "$params.study_dir/fastqc", mode: 'copy'
 	
 	input:
-	file processed_fastq /*should I call it fastq_less_rRNA instrad? doesn't change a thing technically, but yh,know*/
+	file processed_fastq
 
 	output:
 	file '*_fastqc.{zip,html}' /* into raw_fastqc_dir */
@@ -70,7 +69,6 @@ process MULTIQC_ON_FASTQ {
 	output:
 	file "multiqc_report.html"
 	
-	/* To run multiqc, you just need to specify the folder where the fastqc files are */
 	"""
 	multiqc $params.study_dir/fastqc
 	"""
@@ -90,7 +88,7 @@ process TRANSCRIPTOME_MAPPING {
 	file less_rrna_fastq /* from fastq_less_rRNA */
 
 	output:
-	path "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sams  /* USE AN EMIT COMMAND HERE?*/
+	path "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sams
 	path "${less_rrna_fastq.baseName}_trips_alignment_stats.txt", emit: mRNA_alignment_stats
 
 	"""
@@ -104,7 +102,7 @@ process TRANSCRIPTOME_SAM_TO_BAM {
 	file transcriptome_sam /* from transcriptome_sams */
 
 	output:
-	file "${transcriptome_sam.baseName}.bam_sorted" /* into sorted_bams */  /* <--- THE BAM FILE IS PRODUCED HERE */
+	file "${transcriptome_sam.baseName}.bam_sorted" /* into sorted_bams */
 
 	"""
 	samtools view -@ 8 -b -S ${transcriptome_sam.baseName}.sam -o ${transcriptome_sam.baseName}.bam
@@ -203,18 +201,16 @@ process COVERAGEBED_TO_BIGWIG {
 }
 
 
-/* THE WORKFLOW BLOCK: It specifies the order of the processes and where outputs are used as inputs*/
-
 workflow {
 
-	fastq_data = Channel.fromPath ( params.fastq_files ) /* Assign the fastq files in a folder to fastq_data */
-	
-	CLIP_FASTQ          ( fastq_data )   /* Uses fastq_data and clips away the adapters */
+	fastq_data = Channel.fromPath ( params.fastq_files )
+
+	CLIP_FASTQ          ( fastq_data )
 	rRNA_MAPPING        ( CLIP_FASTQ.out )
 	FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
 	MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out )		
 
-    /* IF STATEMENT #1 */
+    /* TRANSCRIPTOME MAPPING */
 	if ( params.skip_trips == false ) {
 		
 		TRANSCRIPTOME_MAPPING    ( rRNA_MAPPING.out.fastq_less_rRNA )
@@ -222,7 +218,8 @@ workflow {
 		BAM_TO_SQLITE            ( TRANSCRIPTOME_SAM_TO_BAM.out )
 
 	}
-    /* IF STATEMENT #2 */
+
+    /* GENOME MAPPING #2 */
 	if ( params.skip_gwips == false ) {
 
 		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
