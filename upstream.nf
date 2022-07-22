@@ -45,7 +45,7 @@ process GET_INDIVIDUAL_RUNS {
         path sraRunInfo
 
     output:
-        stdout
+        file srr_txt
 
     shell:
         """
@@ -57,9 +57,10 @@ process GET_INDIVIDUAL_RUNS {
         runInfo_path = "${sraRunInfo}"
         runInfo = pd.read_csv(runInfo_path, header=0)
 
-
+        f = open($srr_txt, 'w')
         for idx, row in runInfo.iterrows():
-            print(row['Run'], end=',')
+            f.write(f"row['Run']\n")
+        f.close()
         """
 }
 
