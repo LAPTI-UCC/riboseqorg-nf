@@ -73,7 +73,7 @@ process RUN_FFQ {
 
     script:
         
-        def srrList = SRR.split(' ')
+        def srrList = SRR.split('\n')
 
         for (i in srrList) {
             println "hi ${i}"
