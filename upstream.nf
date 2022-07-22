@@ -135,6 +135,7 @@ workflow {
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
     a = Channel.from(GET_INDIVIDUAL_RUNS.out)
     println(a)
+    GET_INDIVIDUAL_RUNS.out.view()
     RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
     RUN_FFQ.out.view()
 
