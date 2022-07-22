@@ -76,7 +76,7 @@ process RUN_FFQ {
         def srrList = SRR.split(' ')
 
         for (i in srrList) {
-            println i
+            println "hi ${i}"
             '''
             ffq --ftp ${i} | jq -r .[] | cat > '${i}.json'
             '''
@@ -140,7 +140,6 @@ workflow {
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) | RUN_FFQ
 
-    RUN_FFQ.out.view()
     // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
     // FIND_ADAPTERS(GET_FASTQ.out)
