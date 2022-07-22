@@ -16,7 +16,7 @@ process GET_RUN_INFO {
         val GSE
 
     output:
-        file "${GSE}_sraRunInfo.csv"
+        path "${GSE}_sraRunInfo.csv"
 
     script:
         """
@@ -42,7 +42,7 @@ process GET_INDIVIDUAL_RUN_INFOS {
 process GET_INDIVIDUAL_RUNS {
 
     input:
-        file sraRunInfo
+        path sraRunInfo
 
     output:
         stdout
