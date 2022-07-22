@@ -63,7 +63,7 @@ process RUN_FFQ {
 
     shell:
     """
-    #! usr/bin/python 
+    #! usr/bin/python3
 
     import os
 
@@ -71,7 +71,7 @@ process RUN_FFQ {
         lines = f.readlines()
         for line in lines:
 
-            os.system(f"ffq --ftp {line.strip('\n')} | jq -r .[] | cat > file.json")
+            os.system(f"ffq --ftp {line.strip('\n')} | jq -r .[] | cat > ./file.json")
 
 
     """
