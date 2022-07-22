@@ -49,28 +49,27 @@ process GET_INDIVIDUAL_RUNS {
 
     script:
     """
-    cut -f2 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.txt
+    cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.txt
     """
 }
 
 process RUN_FFQ {
 
     input:
-        val SRR
+        file SRR
 
     output:
         file "*.json"
 
-    script:
-        
-        def srrList = SRR.split('\n')
-        println srrList
-        for (i in srrList) {
-            println "hi ${i}"
-            """
-            ffq --ftp $i | jq -r .[] | cat > ${i}.json
-            """
-        }
+    shell:
+    """
+    #! usr/bin/env bash
+
+    cat ${SRR} | while read line; do 
+        cat $line$line >> test.json
+    done
+
+    """
     }
 
 
@@ -132,7 +131,7 @@ workflow {
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
     GET_INDIVIDUAL_RUNS.out.view()
 
-    // RUN_FFQ
+    RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
 
     // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
