@@ -74,7 +74,7 @@ process RUN_FFQ {
     script:
         
         def srrList = SRR.split('\n')
-
+        println srrList
         for (i in srrList) {
             println "hi ${i}"
             """
