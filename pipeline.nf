@@ -10,7 +10,7 @@ PRE-PROCESSING BRANCH
 
 project_dir = projectDir  /*specify a new variable, the project directory */
 
-process clip_fastq {
+process CLIP_FASTQ {
         
     input:
     file raw_fastq 
@@ -25,7 +25,8 @@ process clip_fastq {
     """
 }
 
-process rRNA_mapping {
+process rRNA_MAPPING {
+
 	publishDir "$params.study_dir/less_rRNA_fastq_files", mode: 'copy', pattern: '*_less_rRNA.fastq'
 	publishDir "$params.study_dir/rRNA_alignment_stats", mode: 'copy', pattern: '*_rRNA_stats.txt'
 
@@ -44,7 +45,8 @@ process rRNA_mapping {
 /* ORIGINALLY THE BELOW PROCESS WAS NAMED "fastqc_on_raw". It has been updated for consistency, considering we are
 using fastqc on processed reads in this new version (sequences with no adapters and no rRNAs)-> new name is fastqc_on_processed */
 
-process fastqc_on_processed {
+process FASTQC_ON_PROCESSED {
+
 	publishDir "$params.study_dir/fastqc", mode: 'copy'
 	
 	input:
@@ -58,7 +60,8 @@ process fastqc_on_processed {
 	"""
 }
 
-process multiqc_on_fastq {
+process MULTIQC_ON_FASTQ {
+
 	publishDir "$params.study_dir/multiqc", mode: 'copy'
 
 	input:
@@ -79,7 +82,8 @@ TRANSCRIPTOME MAPPING BRANCH
 ---------------------------- */
 
 
-process transcriptome_mapping {
+process TRANSCRIPTOME_MAPPING {
+
 	publishDir "$params.study_dir/trips_alignment_stats", mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
 
 	input:    
@@ -94,7 +98,8 @@ process transcriptome_mapping {
 	"""
 } 
 
-process transcriptome_sam_to_bam {
+process TRANSCRIPTOME_SAM_TO_BAM {
+
 	input:
 	file transcriptome_sam /* from transcriptome_sams */
 
@@ -107,8 +112,10 @@ process transcriptome_sam_to_bam {
 	"""
 }
 
-process bam_to_sqlite {
+process BAM_TO_SQLITE {
+
 	publishDir "$params.study_dir/sqlites", mode: 'copy', pattern: '*.sqlite'
+
 	input:
 	file sorted_bam /* from sorted_bams */
 
@@ -125,8 +132,10 @@ process bam_to_sqlite {
 GENOME MAPPING BRANCH 
 ----------------------*/
 
-process genome_mapping {
+process GENOME_MAPPING {
+
 	publishDir "$params.study_dir/gwips_alignment_stats", mode: 'copy', pattern: '*_gwips_alignment_stats.txt'
+	
     input:
    	file less_rrna_fastq /* from fastq_less_rRNA */
 
@@ -139,8 +148,8 @@ process genome_mapping {
 	"""
 }
 
+process GENOME_SAM_TO_BED {
 
-process genome_sam_to_bed {
     input:
 	file genome_sam /* from genome_sams */
 
@@ -162,7 +171,8 @@ process genome_sam_to_bed {
 }
 
 
-process bed_to_bigwig {
+process BED_TO_BIGWIG {
+
 	publishDir "$params.study_dir/bigwigs", mode: 'copy', pattern: '*.bw'
 
 	input:
@@ -177,7 +187,8 @@ process bed_to_bigwig {
 }
 
 
-process coveragebed_to_bigwig {
+process COVERAGEBED_TO_BIGWIG {
+
 	publishDir "$params.study_dir/bigwigs", mode: 'copy', pattern: '*.bw'
 
 	input:
@@ -195,23 +206,30 @@ process coveragebed_to_bigwig {
 /* THE WORKFLOW BLOCK: It specifies the order of the processes and where outputs are used as inputs*/
 
 workflow {
-    fastq_data = Channel.fromPath(params.fastq_files) /* Assign the fastq files in a folder to fastq_data */
-    clip_fastq(fastq_data)   /* Uses fastq_data and clips away the adapters */
-	rRNA_mapping(clip_fastq.out)
-	fastqc_on_processed(rRNA_mapping.out.fastq_less_rRNA)
-    multiqc_on_fastq(fastqc_on_processed.out)		
+
+	fastq_data = Channel.fromPath ( params.fastq_files ) /* Assign the fastq files in a folder to fastq_data */
+	
+	CLIP_FASTQ          ( fastq_data )   /* Uses fastq_data and clips away the adapters */
+	rRNA_MAPPING        ( CLIP_FASTQ.out )
+	FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
+	MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out )		
 
     /* IF STATEMENT #1 */
-    if (params.skip_trips == false) {
-        transcriptome_mapping(rRNA_mapping.out.fastq_less_rRNA)
-        transcriptome_sam_to_bam(transcriptome_mapping.out.transcriptome_sams)
-        bam_to_sqlite(transcriptome_sam_to_bam.out)
-    }
+	if ( params.skip_trips == false ) {
+		
+		TRANSCRIPTOME_MAPPING    ( rRNA_MAPPING.out.fastq_less_rRNA )
+		TRANSCRIPTOME_SAM_TO_BAM ( TRANSCRIPTOME_MAPPING.out.transcriptome_sams )
+		BAM_TO_SQLITE            ( TRANSCRIPTOME_SAM_TO_BAM.out )
+
+	}
     /* IF STATEMENT #2 */
-    if (params.skip_gwips == false) {
-        genome_mapping(rRNA_mapping.out.fastq_less_rRNA)
-        genome_sam_to_bed(genome_mapping.out.genome_sams)
-        bed_to_bigwig(genome_sam_to_bed.out.sorted_beds)
-        coveragebed_to_bigwig(genome_sam_to_bed.out.coverage_beds)
+	if ( params.skip_gwips == false ) {
+
+		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
+		GENOME_SAM_TO_BED     ( GENOME_MAPPING.out.genome_sams )
+		BED_TO_BIGWIG         ( GENOME_SAM_TO_BED.out.sorted_beds )
+		COVERAGEBED_TO_BIGWIG ( GENOME_SAM_TO_BED.out.coverage_beds )
+
     }
+
 }
