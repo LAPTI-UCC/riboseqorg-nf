@@ -126,7 +126,7 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
-    a = Channel.from(file(GET_INDIVIDUAL_RUNS.out).readLines())
+    a = Channel.from(GET_INDIVIDUAL_RUNS.out.readLines())
     println(a)
     // RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
 
