@@ -95,9 +95,12 @@ process WGET_FASTQ_SHELL {
     output:
         file "*.fastq.gz"
 
-    script:
+    shell:
     """
-    cat ${ffq_json} | wget 
+    #!/usr/bin/env bash 
+    
+    URL=$(head -n 1 ${ffq_json})
+    wget $URL 
     """
 
 }
@@ -148,8 +151,8 @@ workflow {
     WGET_FASTQ_SHELL(RUN_FFQ.out.flatten())
     // WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
 
-    // FIND_ADAPTERS(WGET_FASTQ.out)
-    // WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
+    FIND_ADAPTERS(WGET_FASTQ.out)
+    WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
 
 
