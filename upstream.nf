@@ -145,7 +145,7 @@ process WRITE_PARAMTERS_YAML {
 
     script:
         """
-        python3 $project_dir/scripts/write_paramaters_yaml.py -a "${params.study_dir}/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o paramaters.yaml
+        python3 $project_dir/scripts/write_parameters_yaml.py -a "${params.study_dir}/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o paramaters.yaml
         """
 }
 
@@ -156,8 +156,9 @@ workflow {
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
     GET_INDIVIDUAL_RUNS.out.view()
-    RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
-    WGET_FASTQ(RUN_FFQ.out.flatten())
+    RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
+    WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
+
 
     // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
