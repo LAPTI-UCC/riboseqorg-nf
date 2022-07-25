@@ -98,7 +98,7 @@ process WGET_FASTQ_SHELL {
     script:
     """
     URL = readFile ${ffq_json}
-    wget $URL 
+    wget ${URL} 
     """
 
 }
