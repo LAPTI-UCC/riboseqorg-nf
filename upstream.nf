@@ -71,7 +71,7 @@ with open('${SRR}', 'r') as f:
     lines = f.readlines()
     for line in lines:
         line = line.strip('\\n')
-        os.system(f"ffq --ftp {line} | jq -r .[] | cat > ./{line}.json")
+        os.system(f"ffq --ftp {line} | jq -r .[].url | cat > ./{line}.json")
 
 
     """
