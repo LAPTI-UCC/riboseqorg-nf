@@ -87,23 +87,6 @@ with open('${ffq_json}', 'r') as f:
 }
 
 
-// process WGET_FASTQ_SHELL {
-
-//     input:
-//         path ffq_json
-
-//     output:
-//         file "*.fastq.gz"
-
-//     shell:
-//     """
-//     #!/usr/bin/bash 
-
-//     URL=$(head -n 1 ${ffq_json})
-//     wget $URL 
-//     """
-
-// }
 
 
 process FIND_ADAPTERS {
@@ -148,18 +131,11 @@ workflow {
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
     GET_INDIVIDUAL_RUNS.out.view()
 
-    a = Channel
-        .fromPath(GET_INDIVIDUAL_RUNS.out)
-        .splitText()
-        .view()
+    RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
+    WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
 
-    println (a)
-    // RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
-    // // WGET_FASTQ_SHELL(RUN_FFQ.out.flatten())
-    // // WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
-
-    // FIND_ADAPTERS(WGET_FASTQ.out)
-    // WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
+    FIND_ADAPTERS(WGET_FASTQ.out)
+    WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
 
 
