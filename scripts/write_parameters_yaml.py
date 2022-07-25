@@ -100,9 +100,9 @@ def run_project_setup(adapter_report_dir, sraRunInfo, paramters_yaml_path, db='a
     '''
     given a sra run info file for a study, run the necessary data fetching and setup. 
     '''
-    fianl_adapter_report_path = merge_adapter_reports(adapter_report_dir)
+    final_adapter_report_path = merge_adapter_reports(adapter_report_dir)
     annotation_inventory_organism = get_annotation_organism(sraRunInfo, db)
-    write_paramters_yaml(annotation_inventory_organism, fianl_adapter_report_path, paramters_yaml_path, annotations_inventory_sqlite=db)
+    write_paramters_yaml(annotation_inventory_organism, final_adapter_report_path, paramters_yaml_path, annotations_inventory_sqlite=db)
     
 
 

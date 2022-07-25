@@ -24,20 +24,6 @@ process GET_RUN_INFO {
         """
 }
 
-process GET_INDIVIDUAL_RUN_INFOS {
-    publishDir "$project_dir/data/individual_runInfos", mode: 'copy', pattern: '*_sraRunInfo.csv'
-
-    input:
-        file sraRunInfo
-
-    output:
-        file '*_sraRunInfo.csv'
-
-    script:
-        """
-        python3 $project_dir/scripts/split_runInfo_to_rows.py -r $sraRunInfo -o ./
-        """
-}
 
 process GET_INDIVIDUAL_RUNS {
 
@@ -100,18 +86,21 @@ with open('${ffq_json}', 'r') as f:
 
 }
 
-process GET_FASTQ {
+
+process WGET_FASTQ_SHELL {
 
     input:
-        path sraRunInfo
+        path ffq_json
 
     output:
-        file '*.fastq.gz'
+        file "*.fastq.gz"
 
     script:
-        """
-        python3 $project_dir/scripts/ffq_fetch_fastq.py -r $sraRunInfo -o ./
-        """
+    """
+    URL=$(head -n 1 ${ffq_json})
+    wget $URL 
+    """
+
 }
 
 
@@ -157,11 +146,9 @@ workflow {
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
     GET_INDIVIDUAL_RUNS.out.view()
     RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
-    WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
+    WGET_FASTQ_SHELL(RUN_FFQ.out.flatten())
+    // WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
 
-
-    // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
-    // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
     FIND_ADAPTERS(WGET_FASTQ.out)
     WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
