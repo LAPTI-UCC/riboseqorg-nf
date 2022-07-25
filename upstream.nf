@@ -147,6 +147,12 @@ workflow {
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
     GET_INDIVIDUAL_RUNS.out.view()
+
+    a = Channel
+        .fromPath(GET_INDIVIDUAL_RUNS.out)
+        .splitText()
+        .view()
+
     RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
     WGET_FASTQ_SHELL(RUN_FFQ.out.flatten())
     // WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
