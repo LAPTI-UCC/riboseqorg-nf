@@ -98,7 +98,7 @@ with open('${ffq_json}', 'r') as f:
         line = line.strip('\\n')
         if '"url":' in line: 
             url = line.split('": "')[1]
-            os.system(f"wget {url} -P ./)
+            os.system(f"wget {url} -P ./")
 
 
     """
