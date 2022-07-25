@@ -93,13 +93,8 @@ process WGET_FASTQ {
 import os
 
 with open('${ffq_json}', 'r') as f:
-    lines = f.readlines()
-    for line in lines:
-        line = line.strip('\\n')
-        if '"url":' in line: 
-            url = line.split('": "')[1]
-            os.system(f"wget {url} -P ./")
-
+    url = f.readlines()[0].strip('\\n')
+    os.system(f"wget {url} -P ./")
 
     """
 
