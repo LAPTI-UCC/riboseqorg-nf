@@ -86,9 +86,21 @@ process WGET_FASTQ {
     output:
         file "*.fastq.gz"
 
-    script:
+    shell:
     """
-    wget 
+    #!/usr/bin/python3
+
+import os
+
+with open('${ffq_json}', 'r') as f:
+    lines = f.readlines()
+    for line in lines:
+        line = line.strip('\\n')
+        if '"url":' in line: 
+            url = line.split('": "')[1]
+            os.system(f"wget {url} -P ./)
+
+
     """
 
 }
@@ -148,11 +160,10 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
-    a = Channel.from(GET_INDIVIDUAL_RUNS.out)
-    println(a)
     GET_INDIVIDUAL_RUNS.out.view()
     RUN_FFQ(GET_INDIVIDUAL_RUNS.out)
     RUN_FFQ.out.view()
+    WGET_FASTQ(RUN_FFQ.out.flatten())
 
     // GET_INDIVIDUAL_RUN_INFOS(GET_RUN_INFO.out) /* this outputs a string of filenames and I want a channel */
     // GET_FASTQ(GET_INDIVIDUAL_RUN_INFOS.out.flatten())
