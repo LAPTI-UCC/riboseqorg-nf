@@ -97,8 +97,8 @@ process WGET_FASTQ_SHELL {
 
     shell:
     """
-    #!/usr/bin/env bash 
-    
+    #!/usr/bin/bash 
+
     URL=$(head -n 1 ${ffq_json})
     wget $URL 
     """
