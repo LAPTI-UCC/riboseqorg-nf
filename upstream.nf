@@ -87,23 +87,23 @@ with open('${ffq_json}', 'r') as f:
 }
 
 
-process WGET_FASTQ_SHELL {
+// process WGET_FASTQ_SHELL {
 
-    input:
-        path ffq_json
+//     input:
+//         path ffq_json
 
-    output:
-        file "*.fastq.gz"
+//     output:
+//         file "*.fastq.gz"
 
-    shell:
-    """
-    #!/usr/bin/bash 
+//     shell:
+//     """
+//     #!/usr/bin/bash 
 
-    URL=$(head -n 1 ${ffq_json})
-    wget $URL 
-    """
+//     URL=$(head -n 1 ${ffq_json})
+//     wget $URL 
+//     """
 
-}
+// }
 
 
 process FIND_ADAPTERS {
