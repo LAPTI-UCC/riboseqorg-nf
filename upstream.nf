@@ -125,12 +125,10 @@ process WRITE_PARAMTERS_YAML {
 
 
 workflow {
-    GSE_inputs = Channel.of("GSE112305")  /* a GSE I want to test. Another candidate is GSE152556*/
+    GSE_inputs = Channel.of("GSE152556")  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
-    GET_INDIVIDUAL_RUNS.out.view()
-
     RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
     WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
 
