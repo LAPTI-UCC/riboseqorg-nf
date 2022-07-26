@@ -229,7 +229,7 @@ workflow {
 	if ( params.skip_gwips == false ) {
 
 		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
-		GENOME_SAM_TO_BED     ( GENOME_MAPPING.out.genome_sams )
+		GENOME_SAM_TO_BED     ( GENOME_MAPPING.out.genome_sorted_bams )
 		BED_TO_BIGWIG         ( GENOME_SAM_TO_BED.out.sorted_beds )
 		COVERAGEBED_TO_BIGWIG ( GENOME_SAM_TO_BED.out.coverage_beds )
 
