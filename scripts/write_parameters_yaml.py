@@ -5,6 +5,19 @@ import pandas as pd
 
 
 
+def check_absolute_path(path, path_from_root="/data1/riboseq_org/riboseq_data_processing/"):
+    '''
+    Check whether the path starts with "/" or not. If not, returns absolute path.
+    '''
+    if path.startswith("/"):
+        return path
+    else:
+        path = path_from_root + path
+        return path
+
+
+
+
 def merge_adapter_reports(fastq_dir):
     '''
     Combine all found adapters into one report of the same format.
@@ -27,6 +40,8 @@ def merge_adapter_reports(fastq_dir):
     with open(final_report_path, 'w') as final_report:
         for idx, adapter in enumerate(all_adapters):
             final_report.write(f">adapter{idx+1}\n{adapter}\n")
+
+    final_report_path = check_absolute_path(final_report_path)
 
     return final_report_path
 
@@ -109,7 +124,7 @@ def run_project_setup(adapter_report_dir, sraRunInfo, paramters_yaml_path, db='a
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("-a", help="Path to the adapter report directory")
+    parser.add_argument("-a", help="absolute path to the adapter report directory")
     parser.add_argument("-s", help="path to sqlite of annotation inventory", default="annotation_inventory.sqlite")
     parser.add_argument("-r", help="runInfo file for this study from SRA")
     parser.add_argument("-o", help="outpath for paramters.yaml")
