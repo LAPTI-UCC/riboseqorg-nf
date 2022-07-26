@@ -82,7 +82,7 @@ def write_paramters_yaml(organism, adapter_report_path, yaml_outpath, skip_gwips
 
     parameter_dict['adapter_fasta'] = adapter_report_path
     parameter_dict['study_dir'] = '/'.join(adapter_report_path.split('/')[:-2])
-    parameter_dict['fastq_files'] = '/'.join(adapter_report_path.split('/')[:-1]) + '*.fastq.gz'
+    parameter_dict['fastq_files'] = '/'.join(adapter_report_path.split('/')[:-1]) + '/*.fastq.gz'
 
     for i in zip(parameter_order[1:-2], reference_details[1:]):
         parameter_dict[i[0]] = i[1]
