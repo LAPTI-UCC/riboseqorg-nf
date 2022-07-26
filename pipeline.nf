@@ -146,7 +146,7 @@ process GENOME_MAPPING {
 
 	samtools view -@ 8 -b -S | 
 
-	samtools sort -m 1G -@ 8 -b -S -o ${less_rrna_fastq.baseName}.bam_sorted
+	samtools sort -m 1G -@ 8 -S -o ${less_rrna_fastq.baseName}.bam_sorted
 	"""
 }
 
