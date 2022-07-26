@@ -138,13 +138,19 @@ process GENOME_MAPPING {
    	file less_rrna_fastq /* from fastq_less_rRNA */
 
     output:
-    path "${less_rrna_fastq.baseName}_genome.sam", emit: genome_sams /* into genome_sams */
+    path "${less_rrna_fastq.baseName}_genome.bam_sorted", emit: genome_sorted_bams /* into genome_sams */
     path "${less_rrna_fastq.baseName}_gwips_alignment_stats.txt", emit: gwips_alignment_stats/* into gwips_alignment_stats */
 
     """
-	bowtie -p 8 -m 1 -n 2 --seedlen 25 ${params.genome_index} -q ${less_rrna_fastq} -S ${less_rrna_fastq.baseName}_genome.sam  >> ${less_rrna_fastq.baseName}_gwips_alignment_stats.txt 2>&1
+	bowtie -p 8 -m 1 -n 2 --seedlen 25 ${params.genome_index} -q ${less_rrna_fastq} -S 2>> ${less_rrna_fastq.baseName}_gwips_alignment_stats.txt | 
+
+	samtools view -@ 8 -b -S | 
+
+	samtools sort -m 1G -@ 8 -b -S -o ${less_rrna_fastq.baseName}.bam_sorted
 	"""
 }
+
+/*NEED TO UPDATE THIS PART */
 
 process GENOME_SAM_TO_BED {
 
