@@ -2,10 +2,9 @@
 */
 
 params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
-params.data_folder = "/data"
+params.data_dir = "/data"
 project_dir = projectDir 
 
-params.study_dir = "/home/115316376"
 
 
 
@@ -90,7 +89,7 @@ with open('${ffq_json}', 'r') as f:
 
 
 process FIND_ADAPTERS {
-    publishDir "$params.study_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "$project_dir/$data_dir/$raw_fastq.getSimpleName()/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
 
     input:
@@ -125,7 +124,8 @@ process WRITE_PARAMTERS_YAML {
 
 
 workflow {
-    GSE_inputs = Channel.of("GSE152556")  /* a GSE I want to test. Another candidate is GSE152556*/
+    gses = ["GSE152556"]
+    GSE_inputs = Channel.fromList(gses)  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
