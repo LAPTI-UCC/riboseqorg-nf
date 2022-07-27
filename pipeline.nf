@@ -152,7 +152,7 @@ process GENOME_MAPPING {
 
 /*NEED TO UPDATE THIS PART */
 
-process GENOME_SAM_TO_BED {
+process GENOME_BAM_TO_BED {
 
     input:
 	file genome_bam /* from genome_bams */
@@ -227,9 +227,9 @@ workflow {
 	if ( params.skip_gwips == false ) {
 
 		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
-		GENOME_SAM_TO_BED     ( GENOME_MAPPING.out.genome_sorted_bams )
-		BED_TO_BIGWIG         ( GENOME_SAM_TO_BED.out.sorted_beds )
-		COVERAGEBED_TO_BIGWIG ( GENOME_SAM_TO_BED.out.coverage_beds )
+		GENOME_BAM_TO_BED     ( GENOME_MAPPING.out.genome_sorted_bams )
+		BED_TO_BIGWIG         ( GENOME_BAM_TO_BED.out.sorted_beds )
+		COVERAGEBED_TO_BIGWIG ( GENOME_BAM_TO_BED.out.coverage_beds )
 
     }
 
