@@ -114,6 +114,7 @@ if __name__ == '__main__':
     "ACAGGTTCAGAGTTCTA",
     "CAAGCAGAAGACGGCAT",
     "TGATCGGAAGAGCACAC",
+    "GATCGGAAGAGCACACGT",
     ]
 
 
