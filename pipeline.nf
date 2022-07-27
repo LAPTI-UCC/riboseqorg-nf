@@ -37,7 +37,7 @@ process rRNA_MAPPING {
 	path "${clipped_fastq.baseName}_less_rRNA.fastq", emit: fastq_less_rRNA
 
 	"""
-	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -q ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fastq > ${clipped_fastq.baseName}_rRNA_stats.txt 2>&1
+	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -q ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fastq 2> ${clipped_fastq.baseName}_rRNA_stats.txt 
 	"""
 }
 
@@ -146,7 +146,7 @@ process GENOME_MAPPING {
 
 	samtools view -@ 8 -b -S | 
 
-	samtools sort -m 1G -@ 8 -b -S -o ${less_rrna_fastq.baseName}.bam_sorted
+	samtools sort -m 1G -@ 8 -o ${less_rrna_fastq.baseName}.bam_sorted
 	"""
 }
 
