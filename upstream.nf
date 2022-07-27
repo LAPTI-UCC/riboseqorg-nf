@@ -115,11 +115,11 @@ process WRITE_PARAMTERS_YAML {
         path find_adapters
 
     output:
-        file "paramters.yaml"
+        file "parameters.yaml"
 
     script:
         """
-        python3 $project_dir/scripts/write_parameters_yaml.py -a "${params.study_dir}/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o paramaters.yaml
+        python3 $project_dir/scripts/write_parameters_yaml.py -a "${params.study_dir}/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
         """
 }
 
