@@ -155,22 +155,20 @@ process GENOME_MAPPING {
 process GENOME_SAM_TO_BED {
 
     input:
-	file genome_sam /* from genome_sams */
+	file genome_bam /* from genome_bams */
 
     output:
-    path "${genome_sam.baseName}.sorted.cov", emit: coverage_beds /* into coverage_beds */
-	path "${genome_sam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /* into sorted_beds */
+    path "${genome_bam.baseName}.sorted.cov", emit: coverage_beds /* into coverage_beds */
+	path "${genome_bam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /* into sorted_beds */
     	
     """
-    samtools view -@ 8 -b -S ${genome_sam.baseName}.sam -o ${genome_sam.baseName}.bam
-    samtools sort -m 1G -@ 8 ${genome_sam.baseName}.bam > ${genome_sam.baseName}.bam_sorted
-	samtools index ${genome_sam.baseName}.bam_sorted
+	samtools index ${genome_bam.baseName}.bam_sorted
 
-	python3 $project_dir/scripts/bam_to_bed.py ${genome_sam.baseName}.bam_sorted 15  $params.genome_fasta
+	python3 $project_dir/scripts/bam_to_bed.py ${genome_bam.baseName}.bam_sorted 15  $params.genome_fasta
 
-	sort -k1,1 -k2,2n ${genome_sam.baseName}.bam_sorted.bed > ${genome_sam.baseName}.bam_sorted.sorted.bed
-	bedtools genomecov -ibam ${genome_sam.baseName}.bam_sorted -g $params.chrom_sizes_file -bg > ${genome_sam.baseName}.cov
-	sort -k1,1 -k2,2n ${genome_sam.baseName}.cov > ${genome_sam.baseName}.sorted.cov
+	sort -k1,1 -k2,2n ${genome_bam.baseName}.bam_sorted.bed > ${genome_bam.baseName}.bam_sorted.sorted.bed
+	bedtools genomecov -ibam ${genome_bam.baseName}.bam_sorted -g $params.chrom_sizes_file -bg > ${genome_bam.baseName}.cov
+	sort -k1,1 -k2,2n ${genome_bam.baseName}.cov > ${genome_bam.baseName}.sorted.cov
 	"""
 }
 
