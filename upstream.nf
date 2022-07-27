@@ -33,6 +33,7 @@ process GET_INDIVIDUAL_RUNS {
         file '*.txt'
 
     script:
+    print "$project_dir/$data_dir/$sraRunInfo.simpleName/adapter_reports"
     """
     cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.txt
     """
@@ -99,6 +100,7 @@ process FIND_ADAPTERS {
         file "${raw_fastq}_adapter_report.fa"
 
     script:
+    
         """
         python3 $project_dir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adapter_report.fa"
         """
@@ -129,11 +131,11 @@ workflow {
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
-    RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
-    WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
+    // RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
+    // WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
 
-    FIND_ADAPTERS(WGET_FASTQ.out)
-    WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
+    // FIND_ADAPTERS(WGET_FASTQ.out)
+    // WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
 }
 
 
