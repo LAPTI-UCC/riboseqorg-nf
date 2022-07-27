@@ -33,7 +33,7 @@ process GET_INDIVIDUAL_RUNS {
         file '*.txt'
 
     script:
-    print "$project_dir/$data_dir/$sraRunInfo.simpleName/adapter_reports"
+    print "$project_dir/$params.data_dir/$sraRunInfo.simpleName/adapter_reports"
     """
     cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.txt
     """
