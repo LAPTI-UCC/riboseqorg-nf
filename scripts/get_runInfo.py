@@ -101,28 +101,28 @@ def download_sra_run_table(
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="")
-    # parser.add_argument(
-    #     "path_to_superset",
-    #     type=str,
-    #     help="The path to the ribosome_profiling_superset.csv",
-    # )
-    # parser.add_argument(
-    #     "path_to_datadir", type=str, help="The folder where the data is"
-    # )
-    # parser.add_argument(
-    #     "gse_to_fetch", type=str, help="The specific GSE to fetch (es.GSE97384)"
-    # )
-    # parser.add_argument(
-    #     "outpath", type=str, help="relative path to output"
-    # )
+    parser.add_argument(
+        "path_to_superset",
+        type=str,
+        help="The path to the ribosome_profiling_superset.csv",
+    )
+    parser.add_argument(
+        "path_to_datadir", type=str, help="The folder where the data is"
+    )
+    parser.add_argument(
+        "gse_to_fetch", type=str, help="The specific GSE to fetch (es.GSE97384)"
+    )
+    parser.add_argument(
+        "outpath", type=str, help="relative path to output"
+    )
 
-    # args = parser.parse_args()
+    args = parser.parse_args()
     
-    # download_sra_run_table(
-    #     args.path_to_superset, args.path_to_datadir, args.outpath, specific_GSEs=[args.gse_to_fetch]
-    # )
+    download_sra_run_table(
+        args.path_to_superset, args.path_to_datadir, args.outpath, specific_GSEs=[args.gse_to_fetch]
+    )
 
-    download_sra_run_table('data/ribosome_profiling_superset.csv',
-            'data', outfile_path='data/test.csv',
-            specific_GSEs=['GSE152556']
-            )
+    # download_sra_run_table('data/ribosome_profiling_superset.csv',
+    #         'data', 'data/test.csv',
+    #         specific_GSEs=['GSE97384']
+    #         )
