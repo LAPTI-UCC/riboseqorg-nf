@@ -77,6 +77,11 @@ process WGET_FASTQ {
     #!/usr/bin/python3
 
 import os
+import time
+import random
+
+wait_time = random.choice([5,15,25,35,45,55,60])
+time.sleep(wait_time)
 
 with open('${ffq_json}', 'r') as f:
     url = f.readlines()[0].strip('\\n')
