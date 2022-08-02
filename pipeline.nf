@@ -88,7 +88,7 @@ process TRANSCRIPTOME_MAPPING {
 	file less_rrna_fastq /* from fastq_less_rRNA */
 
 	output:
-	path "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sams
+	path "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sam
 	path "${less_rrna_fastq.baseName}_trips_alignment_stats.txt", emit: mRNA_alignment_stats
 
 	"""
@@ -138,39 +138,62 @@ process GENOME_MAPPING {
    	file less_rrna_fastq /* from fastq_less_rRNA */
 
     output:
-    path "${less_rrna_fastq.baseName}_genome.bam_sorted", emit: genome_sorted_bams /* into genome_sams */
+    path "${less_rrna_fastq.baseName}_genome.bam_sorted", emit: genome_sorted_bam /* into genome_sams */
     path "${less_rrna_fastq.baseName}_gwips_alignment_stats.txt", emit: gwips_alignment_stats/* into gwips_alignment_stats */
 
     """
 	bowtie -p 8 -m 1 -n 2 --seedlen 25 ${params.genome_index} -q ${less_rrna_fastq} -S 2>> ${less_rrna_fastq.baseName}_gwips_alignment_stats.txt | 
 
-	samtools view -@ 8 -b -S | 
+	samtools view -@ 8 -b -S |
 
-	samtools sort -m 1G -@ 8 -o ${less_rrna_fastq.baseName}.bam_sorted
+	samtools sort -m 1G -@ 8 -o ${less_rrna_fastq.baseName}_genome.bam_sorted
 	"""
 }
 
-/*NEED TO UPDATE THIS PART */
 
-process GENOME_SAM_TO_BED {
+
+process INDEX_SORT_BAM {
+
+	input:
+	file genome_sorted_bam
+
+	output:
+	path "${genome_sorted_bam.baseName}.bam_sorted", emit: genome_index_sorted_bam
+
+
+	"""
+	samtools index ${genome_sorted_bam.baseName}.bam_sorted
+	"""
+
+}
+
+
+process BAM_TO_COVBED {
+
+	input:
+	file genome_sorted_bam /// this should be changed to make reading easier ///
+
+	output:
+	path "${genome_sorted_bam.baseName}.sorted.cov", emit: coverage_beds
+
+	"""
+	bedtools genomecov -ibam ${genome_sorted_bam.baseName}.bam_sorted -g $params.chrom_sizes_file -bg > ${genome_sorted_bam.baseName}.cov
+	sort -k1,1 -k2,2n ${genome_sorted_bam.baseName}.cov > ${genome_sorted_bam.baseName}.sorted.cov
+	"""
+}
+
+
+process GENOME_BAM_TO_BED {
 
     input:
-	file genome_sam /* from genome_sams */
+	file genome_index_sorted_bam /// from genome_bams ///
 
     output:
-    path "${genome_sam.baseName}.sorted.cov", emit: coverage_beds /* into coverage_beds */
-	path "${genome_sam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /* into sorted_beds */
+	path "${genome_index_sorted_bam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /// into sorted_beds ///
     	
     """
-    samtools view -@ 8 -b -S ${genome_sam.baseName}.sam -o ${genome_sam.baseName}.bam
-    samtools sort -m 1G -@ 8 ${genome_sam.baseName}.bam > ${genome_sam.baseName}.bam_sorted
-	samtools index ${genome_sam.baseName}.bam_sorted
-
-	python3 $project_dir/scripts/bam_to_bed.py ${genome_sam.baseName}.bam_sorted 15  $params.genome_fasta
-
-	sort -k1,1 -k2,2n ${genome_sam.baseName}.bam_sorted.bed > ${genome_sam.baseName}.bam_sorted.sorted.bed
-	bedtools genomecov -ibam ${genome_sam.baseName}.bam_sorted -g $params.chrom_sizes_file -bg > ${genome_sam.baseName}.cov
-	sort -k1,1 -k2,2n ${genome_sam.baseName}.cov > ${genome_sam.baseName}.sorted.cov
+	python3 $project_dir/scripts/bam_to_bed.py ${genome_index_sorted_bam.baseName}.bam_sorted 15  $params.genome_fasta
+	sort -k1,1 -k2,2n ${genome_index_sorted_bam.baseName}.bam_sorted.bed > ${genome_index_sorted_bam.baseName}.bam_sorted.sorted.bed
 	"""
 }
 
@@ -190,7 +213,13 @@ process BED_TO_BIGWIG {
 	"""
 }
 
+/* NEED TO:
+1) perform a sanity check over the code (expecially name of I/O)
+2) modify the workflow object accordingly... since the condition is still not implemented, maybe just update it and write a draft
+3) check how the file name is changed across the various processes. we want the final beds from each branch to have different names 
 
+
+/*
 process COVERAGEBED_TO_BIGWIG {
 
 	publishDir "$params.study_dir/bigwigs", mode: 'copy', pattern: '*.bw'
@@ -198,13 +227,14 @@ process COVERAGEBED_TO_BIGWIG {
 	input:
     file bedfile /* from coverage_beds */
 
-	output:
-    file "*.bw"  /* into cov_bigwigs */
+///	output:
+///   file "*.bw"  /* into cov_bigwigs */
 
-	"""
-	$project_dir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.coverage.bw
-	"""
-}
+///	"""
+///	$project_dir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.coverage.bw
+///	"""
+
+///} 
 
 
 workflow {
@@ -216,7 +246,7 @@ workflow {
 	FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
 	MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out )		
 
-    /* TRANSCRIPTOME MAPPING */
+    /// TRANSCRIPTOME MAPPING ///
 	if ( params.skip_trips == false ) {
 		
 		TRANSCRIPTOME_MAPPING    ( rRNA_MAPPING.out.fastq_less_rRNA )
@@ -225,14 +255,32 @@ workflow {
 
 	}
 
-    /* GENOME MAPPING #2 */
+    /// GENOME MAPPING ///
 	if ( params.skip_gwips == false ) {
 
 		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
-		GENOME_SAM_TO_BED     ( GENOME_MAPPING.out.genome_sorted_bams )
-		BED_TO_BIGWIG         ( GENOME_SAM_TO_BED.out.sorted_beds )
-		COVERAGEBED_TO_BIGWIG ( GENOME_SAM_TO_BED.out.coverage_beds )
+		/// This block is for RNA-Seq studies only. It's executed depending on a parameter, which defines the type of study we are working with.
+		params.x = "something_temporary"
+		if (params.x == "Is a RNA-Seq study") {
+			BAM_TO_COVBED     ( GENOME_MAPPING.out.genome_sorted_bams )
+			BED_TO_BIGWIG	  ( BAM_TO_COVBED.out.coverage_beds)
+		}
+		/// The following block is executed if the study is not an RNA-Seq. ///
+		else {
+			INDEX_SORT_BAM    ( GENOME_MAPPING.out.genome_sorted_bams )
+			GENOME_BAM_TO_BED ( INDEX_SORT_BAM.out.genome_index_sorted_bam )
+			BED_TO_BIGWIG     ( GENOME_BAM_TO_BED.out.sorted_beds )
+			BAM_TO_COVBED     ( INDEX_SORT_BAM.out.genome_index_sorted_bam )
+			BED_TO_BIGWIG     ( GENOME_BAM_TO_BED.out.coverage_beds )
+		}
 
+		/// OLD CODE ///
+		/*
+		GENOME_BAM_TO_BED     ( GENOME_MAPPING.out.genome_sorted_bams )
+		BED_TO_BIGWIG         ( GENOME_BAM_TO_BED.out.sorted_beds )
+		COVERAGEBED_TO_BIGWIG ( GENOME_BAM_TO_BED.out.coverage_beds )
+		*/
     }
 
 }
+
