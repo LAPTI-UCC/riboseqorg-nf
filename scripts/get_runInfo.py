@@ -94,7 +94,7 @@ def download_sra_run_table(
         get_sra_run_info_as_df(row["SRA"], outfile_path)
         print(f"File outputted to {outfile_path}")
 
-        check_and_assign_header_from_file(outfile_path)
+        # check_and_assign_header_from_file(outfile_path)
 
 
 
