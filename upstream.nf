@@ -64,6 +64,7 @@ with open('${SRR}', 'r') as f:
 
 
 process WGET_FASTQ {
+    publishDir "$project_dir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
     input:
         path ffq_json
@@ -89,7 +90,7 @@ with open('${ffq_json}', 'r') as f:
 
 
 process FIND_ADAPTERS {
-    publishDir "$project_dir/$params.data_dir/$raw_fastq.simpleName/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "$project_dir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
 
     input:
