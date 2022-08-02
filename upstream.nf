@@ -2,10 +2,9 @@
 */
 
 params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
-params.data_folder = "/data"
+params.data_dir = "data"
 project_dir = projectDir 
 
-params.study_dir = "/home/115316376"
 
 
 
@@ -20,7 +19,7 @@ process GET_RUN_INFO {
 
     script:
         """
-        python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_superset} $project_dir${params.data_folder} $GSE ${GSE}_sraRunInfo.csv
+        python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_superset} $project_dir/${params.data_dir} $GSE ${GSE}_sraRunInfo.csv
         """
 }
 
@@ -65,6 +64,7 @@ with open('${SRR}', 'r') as f:
 
 
 process WGET_FASTQ {
+    publishDir "$project_dir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
     input:
         path ffq_json
@@ -77,6 +77,11 @@ process WGET_FASTQ {
     #!/usr/bin/python3
 
 import os
+import time
+import random
+
+wait_time = random.choice([5,15,25,35,45,55,60])
+time.sleep(wait_time)
 
 with open('${ffq_json}', 'r') as f:
     url = f.readlines()[0].strip('\\n')
@@ -90,18 +95,19 @@ with open('${ffq_json}', 'r') as f:
 
 
 process FIND_ADAPTERS {
-    publishDir "$params.study_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "$project_dir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
 
     input:
         file raw_fastq
 
     output:
-        file "${raw_fastq}_adapter_report.fa"
+        file "${raw_fastq}.fa"
 
     script:
+    
         """
-        python3 $project_dir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adapter_report.fa"
+        python3 $project_dir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}.fa"
         """
 }
 
@@ -115,17 +121,18 @@ process WRITE_PARAMTERS_YAML {
         path find_adapters
 
     output:
-        file "paramters.yaml"
+        file "parameters.yaml"
 
     script:
         """
-        python3 $project_dir/scripts/write_parameters_yaml.py -a "${params.study_dir}/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o paramaters.yaml
+        python3 $project_dir/scripts/write_parameters_yaml.py -a "$project_dir/$params.data_dir/$find_adapters.simpleName/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
         """
 }
 
 
 workflow {
-    GSE_inputs = Channel.of("GSE152556")  /* a GSE I want to test. Another candidate is GSE152556*/
+    gses = ["GSE152556", "GSE112305"]
+    GSE_inputs = Channel.fromList(gses)  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
 
     GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 

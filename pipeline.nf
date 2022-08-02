@@ -151,6 +151,7 @@ process GENOME_MAPPING {
 }
 
 
+<<<<<<< HEAD
 
 process INDEX_SORT_BAM {
 
@@ -194,6 +195,25 @@ process GENOME_BAM_TO_BED {
     """
 	python3 $project_dir/scripts/bam_to_bed.py ${genome_index_sorted_bam.baseName}.bam_sorted 15  $params.genome_fasta
 	sort -k1,1 -k2,2n ${genome_index_sorted_bam.baseName}.bam_sorted.bed > ${genome_index_sorted_bam.baseName}.bam_sorted.sorted.bed
+=======
+process GENOME_BAM_TO_BED {
+
+    input:
+	file genome_bam /* from genome_bams */
+
+    output:
+    path "${genome_bam.baseName}.sorted.cov", emit: coverage_beds /* into coverage_beds */
+	path "${genome_bam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /* into sorted_beds */
+    	
+    """
+	samtools index ${genome_bam.baseName}.bam_sorted
+
+	python3 $project_dir/scripts/bam_to_bed.py ${genome_bam.baseName}.bam_sorted 15  $params.genome_fasta
+
+	sort -k1,1 -k2,2n ${genome_bam.baseName}.bam_sorted.bed > ${genome_bam.baseName}.bam_sorted.sorted.bed
+	bedtools genomecov -ibam ${genome_bam.baseName}.bam_sorted -g $params.chrom_sizes_file -bg > ${genome_bam.baseName}.cov
+	sort -k1,1 -k2,2n ${genome_bam.baseName}.cov > ${genome_bam.baseName}.sorted.cov
+>>>>>>> ef5134971dd7932861b41be5becf769a4eb25e9f
 	"""
 }
 
@@ -259,6 +279,7 @@ workflow {
 	if ( params.skip_gwips == false ) {
 
 		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
+<<<<<<< HEAD
 		/// This block is for RNA-Seq studies only. It's executed depending on a parameter, which defines the type of study we are working with.
 		params.x = "something_temporary"
 		if (params.x == "Is a RNA-Seq study") {
@@ -280,6 +301,12 @@ workflow {
 		BED_TO_BIGWIG         ( GENOME_BAM_TO_BED.out.sorted_beds )
 		COVERAGEBED_TO_BIGWIG ( GENOME_BAM_TO_BED.out.coverage_beds )
 		*/
+=======
+		GENOME_BAM_TO_BED     ( GENOME_MAPPING.out.genome_sorted_bams )
+		BED_TO_BIGWIG         ( GENOME_BAM_TO_BED.out.sorted_beds )
+		COVERAGEBED_TO_BIGWIG ( GENOME_BAM_TO_BED.out.coverage_beds )
+
+>>>>>>> ef5134971dd7932861b41be5becf769a4eb25e9f
     }
 
 }

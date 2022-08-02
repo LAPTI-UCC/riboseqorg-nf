@@ -49,7 +49,7 @@ def is_organism_in_use(organism, curosr):
     '''
     Return a boolean response describing whether the organism name is unique or not 
     '''
-    organisms = curosr.execute("SELECT organism FROM annotation_inventory;").fetchall()
+    organisms = curosr.execute(f"SELECT {organism} FROM annotation_inventory;").fetchall()
     return organism in [i[0] for i in organisms]
 
 
