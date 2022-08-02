@@ -125,7 +125,7 @@ process WRITE_PARAMTERS_YAML {
 
 
 workflow {
-    gses = ["GSE152556"]
+    gses = ["GSE152556", "GSE112305"]
     GSE_inputs = Channel.fromList(gses)  /* a GSE I want to test. Another candidate is GSE152556*/
     GET_RUN_INFO(GSE_inputs)
 
