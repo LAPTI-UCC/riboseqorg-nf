@@ -46,7 +46,7 @@ workflow {
 			BED_TO_BIGWIG     ( GENOME_BAM_TO_BED.out.sorted_beds )
 		}
 		/// BAM_TO_COVBED     ( INDEX_BAM.out.genome_index_sorted_bam )
-		/// BTB   			  ( BAM_TO_COVBED.out.coverage_beds )		
+		/// BTB   			  ( BAM_TO_COVBED.out.coverage_beds )		This needs the index as well!
 	
     }
 }

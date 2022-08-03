@@ -1,44 +1,51 @@
 #!/usr/bin/env python3
 
-import sys
+import argparse
 import pysam 
 from Bio import SeqIO
-import os
 
-filepath = sys.argv[1]
-offset = int(sys.argv[2])
-genomic_fasta = sys.argv[3]
 
-alignments = pysam.Samfile(filepath,  "rb")
-try:
+def get_fasta_as_dictionary(genomic_fasta):
+	'''
+	Reads a genomic fasta file as a dictionary. Chromosomes are keys, sequences are values.
+	'''
+
 	in_seq_handle = open(genomic_fasta)
-except:
-	print ("genome file will not open")
-	sys.exit()
+	seq_dict = SeqIO.to_dict(SeqIO.parse(in_seq_handle, "fasta"))
+	in_seq_handle.close()
 
-seq_dict = SeqIO.to_dict(SeqIO.parse(in_seq_handle,  "fasta"))
-in_seq_handle.close()
-seq_dict_keys = list(seq_dict.keys())
-seq_dict_keys.sort()
-bedfile = open("{0}.bed".format(filepath), "w")
-for chrom in seq_dict_keys:
-	chrom_len = len(seq_dict[chrom])
-	all_reads = alignments.fetch(chrom)
-	try:
-		all_reads = alignments.fetch(chrom)
-	except:
-		print (chrom,  "error")
-		for i in alignments:
-			print(i)
-		sys.exit()
+	return seq_dict
+
+
+def get_chromosomes_list(seq_dict):
+	'''
+	From a dictionary, retrieves a list of the keys (the chromosomes).
+	'''
+
+	seq_dict_keys = list(seq_dict.keys())
+	seq_dict_keys.sort()
+
+	return seq_dict_keys
+
+
+def process_chromosome(all_reads, offset):
+	'''
+	Processes through all the reads given, returns a set with Asite sequences.
+	'''
+
 	sequence = {}
 	for read in all_reads:
-		# Reads less than minreadlen are excluded.
+
+		# Reads less than a minimum read length (25) are excluded.
+
 		if read.qlen < 25:
 			continue
+
 		protect_nts = read.positions
 		protect_nts.sort()
-		#aligns to forward strand
+
+		# Aligns to forward strand
+
 		if not read.is_reverse:
 			Asite = protect_nts[offset]
 		else:
@@ -47,18 +54,41 @@ for chrom in seq_dict_keys:
 			sequence[Asite] += 1
 		else:
 			sequence[Asite] = 1
-	# print(len(sequence))
+		
+	return sequence
 
-	if sequence == {}:
-		raise Exception (" There are no valid A sites ")
 
-	for Asite in sorted(sequence):
-		bedfile.write("%s\t%s\t%s\t%s\n"%(chrom,  Asite,  Asite+1, sequence[Asite]))
-	del sequence
-	del all_reads
-bedfile.close()
-#bedfile = ("{0}{1}.bam_sorted.bam.bed".format(filepath, filename))
-#sorted_bedfile = ("{0}{1}.bam_sorted.bam.bed.sorted".format(filepath, filename))
-#subprocess.call("sort -k1,1 -k2,2n {0} > {1}".format(bedfile, sorted_bedfile), shell=True)
-#subprocess.call("bedtools genomecov -ibam {0}{1}.bam_sorted.bam -g {2} -bg > {0}{1}.cov".format(filepath, filename, master_dict["chrom_sizes_file"]), shell=True)
-#subprocess.call("sort -k1,1 -k2,2n {0}{1}.cov > {0}{1}.sorted.cov".format(filepath, filename), shell=True)
+def write_bedfile(filepath, seq_dict_keys, offset):
+	'''
+	Writes a bed file
+	'''
+
+	bedfile = open("{0}.bed".format(filepath), "w")
+	alignments = pysam.Samfile(filepath, "rb")
+
+	for chrom in seq_dict_keys:
+		try:
+			all_reads = alignments.fetch(chrom)
+		except:
+			raise Exception ("Error in fetching ", chrom, " from the alignments")
+
+		sequence = process_chromosome(all_reads, offset)
+
+		for Asite in sorted(sequence):
+			bedfile.write("%s\t%s\t%s\t%s\n"%(chrom,  Asite,  Asite+1, sequence[Asite]))
+		del sequence
+		del all_reads
+
+	bedfile.close()
+
+if __name__ == "__main__":
+	parser = argparse.ArgumentParser(description=" ")
+	parser.add_argument("filepath", type = str, help = "Path to the bam file and relative bai index")
+	parser.add_argument("offset", type = str, help = "The offset value. Depends on the treatment and type of experiment")
+	parser.add_argument("genomic_fasta", type = str, help = "The genomic fasta")
+
+	args = parser.parse_args()
+
+	seq_dict_keys = get_chromosomes_list(get_fasta_as_dictionary(args.genomic_fasta))
+
+	write_bedfile(args.filepath, seq_dict_keys, args.offset)
