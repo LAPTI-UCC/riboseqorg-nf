@@ -172,7 +172,7 @@ def generate_profile(sqlite_dict, organism_sqlite):
 
 
         counter += 1
-        if counter >10:
+        if counter >1000:
             print(metagene, gene_body)
 
             break
