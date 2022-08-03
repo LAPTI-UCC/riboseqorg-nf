@@ -148,7 +148,8 @@ process INDEX_BAM {
 
 	output:
 	path "${genome_sorted_bam.baseName}.bam_sorted", emit: genome_index_sorted_bam ///not outputting the index///
-
+	path "${genome_sorted_bam.baseName}.bam_sorted.bai", emit: genome_index_sorted_bam_bai
+	
 
 	"""
 	samtools index ${genome_sorted_bam.baseName}.bam_sorted

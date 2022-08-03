@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+from logging import raiseExceptions
 import sys
+from tkinter import E
 import pysam 
 from Bio import SeqIO
 
@@ -43,6 +45,11 @@ for chrom in seq_dict_keys:
 			sequence[Asite] += 1
 		else:
 			sequence[Asite] = 1
+	# print(len(sequence))
+
+	if sequence == {}:
+		raise Exception (" There are no valid A sites ")
+
 	for Asite in sorted(sequence):
 		bedfile.write("%s\t%s\t%s\t%s\n"%(chrom,  Asite,  Asite+1, sequence[Asite]))
 	del sequence
