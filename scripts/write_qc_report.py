@@ -114,10 +114,17 @@ def generate_profile(sqlite_dict, organism_sqlite):
     '''
     cursor = get_sqlite_cursor(organism_sqlite)
     transcript_table = query_database("SELECT transcript,cds_start,cds_stop,sequence from transcripts WHERE principal = 1;", cursor)
+    offsets = sqlite_dict['offsets']
+    gene_body = {'fiveprime':0, 'cds':0, 'threeprime':0}
+
+    metagene = {'fiveprime':{i:0 for i in range(-300, 301)}, 
+                'threeprime':{i:0 for i in range(-300, 301)}}
 
     for row in transcript_table:
         transcript, cds_start, cds_stop, sequence = row
-        print(transcript)
+        transcript_reads = sqlite_dict[transcript]["unambig"]
+
+        print(transcript_reads)
         break
 
 
