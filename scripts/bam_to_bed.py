@@ -23,6 +23,7 @@ seq_dict_keys.sort()
 bedfile = open("{0}.bed".format(filepath), "w")
 for chrom in seq_dict_keys:
 	chrom_len = len(seq_dict[chrom])
+	all_reads = alignments.fetch(chrom)
 	try:
 		all_reads = alignments.fetch(chrom)
 	except:
