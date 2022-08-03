@@ -26,6 +26,7 @@ for chrom in seq_dict_keys:
 		all_reads = alignments.fetch(chrom)
 	except:
 		print (chrom,  "error")
+		print( alignments )
 		sys.exit()
 	sequence = {}
 	for read in all_reads:
