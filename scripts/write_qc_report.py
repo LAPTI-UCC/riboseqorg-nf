@@ -155,7 +155,10 @@ def generate_profile(sqlite_dict, organism_sqlite):
     counter = 0
     for row in transcript_table:
         transcript, cds_start, cds_stop, sequence = row
-        transcript_reads = sqlite_dict[transcript]["unambig"]
+        if transcript in sqlite_dict:
+            transcript_reads = sqlite_dict[transcript]["unambig"]
+        else:
+            continue
 
         if cds_start != None and cds_stop !=None:
             transcript_gene_body, transcript_metagene = process_transcript_reads(transcript, cds_start, cds_stop, len(sequence), transcript_reads, offsets)
