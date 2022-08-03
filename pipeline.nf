@@ -260,12 +260,7 @@ workflow {
 		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
 		/// This block is for RNA-Seq studies only. It's executed depending on a parameter, which defines the type of study we are working with.
 		params.x = "something_temporary"
-		if (params.x == "Is a RNA-Seq study") {
-			BAM_TO_COVBED     ( GENOME_MAPPING.out.genome_sorted_bam )
-			BED_TO_BIGWIG	  ( BAM_TO_COVBED.out.coverage_beds)
-		}
-		/// The following block is executed if the study is not an RNA-Seq. ///
-		else {
+		if (params.x != "Is a RNA-Seq study") {
 			INDEX_SORT_BAM    ( GENOME_MAPPING.out.genome_sorted_bam )
 			GENOME_BAM_TO_BED ( INDEX_SORT_BAM.out.genome_index_sorted_bam )
 			BED_TO_BIGWIG     ( GENOME_BAM_TO_BED.out.sorted_beds )
@@ -273,13 +268,11 @@ workflow {
 			BAM_TO_COVBED     ( INDEX_SORT_BAM.out.genome_index_sorted_bam )
 			BED_TO_BIGWIG     ( BAM_TO_COVBED.out.coverage_beds )
 		}
-
-		/// OLD CODE ///
-		/*
-		GENOME_BAM_TO_BED     ( GENOME_MAPPING.out.genome_sorted_bams )
-		BED_TO_BIGWIG         ( GENOME_BAM_TO_BED.out.sorted_beds )
-		COVERAGEBED_TO_BIGWIG ( GENOME_BAM_TO_BED.out.coverage_beds )
-		*/
+		/// The following block is executed if the study is not an RNA-Seq. ///
+		else {
+			BAM_TO_COVBED     ( GENOME_MAPPING.out.genome_sorted_bam )
+			BED_TO_BIGWIG	  ( BAM_TO_COVBED.out.coverage_beds)
+		}
     }
 
 }
