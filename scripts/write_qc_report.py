@@ -114,7 +114,7 @@ def generate_profile(sqlite_dict, organism_sqlite):
     '''
     cursor = get_sqlite_cursor(organism_sqlite)
     transcript_table = query_database("SELECT transcript,cds_start,cds_stop,sequence from transcripts WHERE principal = 1;", cursor)
-    offsets = sqlite_dict['offsets']
+    # offsets = sqlite_dict['offsets']
     gene_body = {'fiveprime':0, 'cds':0, 'threeprime':0}
 
     metagene = {'fiveprime':{i:0 for i in range(-300, 301)}, 
@@ -151,7 +151,7 @@ def process_readfile(readfile_path, organism_sqlite):
     else:
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
-    generate_profile(readfile_path, organism_sqlite)
+    generate_profile(sqlite_dict, organism_sqlite)
     return readfile_report
 
 
