@@ -152,6 +152,7 @@ def generate_profile(sqlite_dict, organism_sqlite):
     metagene = {'fiveprime':{i:0 for i in range(-300, 301)}, 
                 'threeprime':{i:0 for i in range(-300, 301)}}
 
+    counter = 0
     for row in transcript_table:
         transcript, cds_start, cds_stop, sequence = row
         transcript_reads = sqlite_dict[transcript]["unambig"]
@@ -167,8 +168,11 @@ def generate_profile(sqlite_dict, organism_sqlite):
                     metagene[key][position] += transcript_metagene[key][position]
 
 
-        print(metagene, gene_body)
-        break
+        counter += 1
+        if counter >10:
+            print(metagene, gene_body)
+
+            break
 
 
 
