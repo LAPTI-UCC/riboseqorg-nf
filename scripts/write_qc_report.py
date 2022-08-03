@@ -148,7 +148,7 @@ def generate_profile(sqlite_dict, organism_sqlite):
         transcript_reads = sqlite_dict[transcript]["unambig"]
 
         if cds_start != None and cds_stop !=None:
-            process_transcript_reads(transcript, cds_start, cds_stop, len(sequence) transcript_reads)
+            process_transcript_reads(transcript, cds_start, cds_stop, len(sequence), transcript_reads)
 
         break
 
