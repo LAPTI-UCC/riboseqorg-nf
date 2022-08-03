@@ -107,7 +107,7 @@ def get_average_readlengths(read_length_dict):
     return round(numerator/number_of_reads, 2)
 
 
-def process_transcript_reads(transcript, cds_start, cds_stop, sequence_length, transcript_reads):
+def process_transcript_reads(transcript, cds_start, cds_stop, sequence_length, transcript_reads, offsets):
     '''
     get gene body distribution and profile for this transcript
     '''
@@ -118,17 +118,28 @@ def process_transcript_reads(transcript, cds_start, cds_stop, sequence_length, t
 
     for readlength in transcript_reads:
         for position in transcript_reads[readlength]:
-            if position in range(0, cds_start):
+            adjusted_position = position + offsets['fiveprime']["offsets"][readlength]
+            if adjusted_position in range(0, cds_start):
+                
                 gene_body['fiveprime'] += transcript_reads[readlength][position]
 
-            elif position in range(cds_start, cds_stop):
+            elif adjusted_position in range(cds_start, cds_stop):
                 gene_body['cds'] += transcript_reads[readlength][position]
 
-            elif position in range(cds_stop, sequence_length):
+            elif adjusted_position in range(cds_stop, sequence_length):
                 gene_body['threeprime'] += transcript_reads[readlength][position]
+            
+            if adjusted_position in range(cds_start-300, cds_start+300):
+                relative_position = adjusted_position - cds_start
+                metagene['fiveprime'][relative_position] += transcript_reads[readlength][position]
+            
+            elif adjusted_position in range(cds_stop-300, cds_stop+300):
+                relative_position = adjusted_position - cds_stop
+                metagene['threeprime'][relative_position] += transcript_reads[readlength][position]
 
 
     print(gene_body)
+    print(metagene)
 
 def generate_profile(sqlite_dict, organism_sqlite):
     '''
@@ -137,7 +148,7 @@ def generate_profile(sqlite_dict, organism_sqlite):
     '''
     cursor = get_sqlite_cursor(organism_sqlite)
     transcript_table = query_database("SELECT transcript,cds_start,cds_stop,sequence from transcripts WHERE principal = 1;", cursor)
-    # offsets = sqlite_dict['offsets']
+    offsets = sqlite_dict['offsets']
     gene_body = {'fiveprime':0, 'cds':0, 'threeprime':0}
 
     metagene = {'fiveprime':{i:0 for i in range(-300, 301)}, 
@@ -148,7 +159,7 @@ def generate_profile(sqlite_dict, organism_sqlite):
         transcript_reads = sqlite_dict[transcript]["unambig"]
 
         if cds_start != None and cds_stop !=None:
-            process_transcript_reads(transcript, cds_start, cds_stop, len(sequence), transcript_reads)
+            process_transcript_reads(transcript, cds_start, cds_stop, len(sequence), transcript_reads, offsets)
 
         break
 
