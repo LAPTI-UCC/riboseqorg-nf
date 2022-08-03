@@ -110,7 +110,7 @@ process BAM_TO_SQLITE {
 	file "*.sqlite" /// into sqlite_ch ///
 
 	"""
-	python3 $project_dir/scripts/bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
+	python3 $projectDir/scripts/bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
 	"""
 }
 
@@ -181,7 +181,7 @@ process GENOME_BAM_TO_BED {
 	path "${genome_index_sorted_bam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /// into sorted_beds ///
     	
     """
-	python3 $project_dir/scripts/bam_to_bed.py ${genome_index_sorted_bam.baseName}.bam_sorted 15  $params.genome_fasta
+	python3 $projectDir/scripts/bam_to_bed.py ${genome_index_sorted_bam.baseName}.bam_sorted 15  $params.genome_fasta
 	sort -k1,1 -k2,2n ${genome_index_sorted_bam.baseName}.bam_sorted.bed > ${genome_index_sorted_bam.baseName}.bam_sorted.sorted.bed
 	"""
 }
@@ -198,7 +198,7 @@ process BED_TO_BIGWIG {
 	file "*.bw"  /// into bigwigs ///
 
 	"""
-	$project_dir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.bw
+	$projectDir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.bw
 	"""
 }
 
