@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 
-from logging import raiseExceptions
 import sys
-from tkinter import E
 import pysam 
 from Bio import SeqIO
 
