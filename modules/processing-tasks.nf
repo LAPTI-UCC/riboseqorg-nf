@@ -200,29 +200,6 @@ process BED_TO_BIGWIG {
 	file "*.bw"  /// into bigwigs ///
 
 	"""
-	$projectDir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.bw
+	$projectDir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.coverage.bw
 	"""
 }
-
-/* NEED TO:
-1) perform a sanity check over the code (expecially name of I/O)
-2) modify the workflow object accordingly... since the condition is still not implemented, maybe just update it and write a draft
-3) check how the file name is changed across the various processes. we want the final beds from each branch to have different names 
-
-
-/*
-process COVERAGEBED_TO_BIGWIG {
-
-	publishDir "$params.study_dir/bigwigs", mode: 'copy', pattern: '*.bw'
-
-	input:
-    file bedfile /* from coverage_beds */
-
-///	output:
-///   file "*.bw"  /* into cov_bigwigs */
-
-///	"""
-///	$project_dir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.coverage.bw
-///	"""
-
-///} 
