@@ -45,6 +45,7 @@ import os
 with open('${SRR}', 'r') as f:
     lines = f.readlines()
     for line in lines:
+        print(line)
         line = line.strip('\\n')
         os.system(f"ffq --ftp {line} | jq -r .[].url | cat > ./{line}.json")
 
