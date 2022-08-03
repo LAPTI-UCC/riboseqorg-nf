@@ -9,7 +9,7 @@ process GET_RUN_INFO {
 
     script:
         """
-        python3 $project_dir/scripts/get_runInfo.py $project_dir${params.ribosome_prof_superset} $project_dir/${params.data_dir} $GSE ${GSE}_sraRunInfo.csv
+        python3 $projectDir/scripts/get_runInfo.py $projectDir/${params.ribosome_prof_superset} $projectDir/${params.data_dir} $GSE ${GSE}_sraRunInfo.csv
         """
 }
 
@@ -45,6 +45,7 @@ import os
 with open('${SRR}', 'r') as f:
     lines = f.readlines()
     for line in lines:
+        print(line)
         line = line.strip('\\n')
         os.system(f"ffq --ftp {line} | jq -r .[].url | cat > ./{line}.json")
 
@@ -54,7 +55,7 @@ with open('${SRR}', 'r') as f:
 
 
 process WGET_FASTQ {
-    publishDir "$project_dir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "../$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
     input:
         path ffq_json
@@ -85,7 +86,7 @@ with open('${ffq_json}', 'r') as f:
 
 
 process FIND_ADAPTERS {
-    publishDir "$project_dir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "../$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
 
     input:
@@ -97,7 +98,7 @@ process FIND_ADAPTERS {
     script:
     
         """
-        python3 $project_dir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}.fa"
+        python3 ../scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}.fa"
         """
 }
 
@@ -115,6 +116,6 @@ process WRITE_PARAMTERS_YAML {
 
     script:
         """
-        python3 $project_dir/scripts/write_parameters_yaml.py -a "$project_dir/$params.data_dir/$find_adapters.simpleName/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
+        python3 ../scripts/write_parameters_yaml.py -a "$project_dir/$params.data_dir/$find_adapters.simpleName/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
         """
 }
