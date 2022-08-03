@@ -137,9 +137,7 @@ def process_transcript_reads(transcript, cds_start, cds_stop, sequence_length, t
                 relative_position = adjusted_position - cds_stop
                 metagene['threeprime'][relative_position] += transcript_reads[readlength][position]
 
-
-    print(gene_body)
-    print(metagene)
+    return gene_body, metagene
 
 def generate_profile(sqlite_dict, organism_sqlite):
     '''
@@ -159,8 +157,17 @@ def generate_profile(sqlite_dict, organism_sqlite):
         transcript_reads = sqlite_dict[transcript]["unambig"]
 
         if cds_start != None and cds_stop !=None:
-            process_transcript_reads(transcript, cds_start, cds_stop, len(sequence), transcript_reads, offsets)
+            transcript_gene_body, transcript_metagene = process_transcript_reads(transcript, cds_start, cds_stop, len(sequence), transcript_reads, offsets)
+        
+            for key in transcript_gene_body:
+                gene_body[key] += transcript_gene_body[key]
 
+            for key in transcript_metagene:
+                for position in transcript_metagene[key]:
+                    metagene[key][position] += transcript_metagene[key][position]
+
+
+        print(metagene, gene_body)
         break
 
 
