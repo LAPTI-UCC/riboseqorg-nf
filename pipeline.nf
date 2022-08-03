@@ -1,14 +1,13 @@
 /* THE pipeline */
 
-/* OLD LINE OF CODE params.sra_files = "./sra/*.sra" */
 
 /* -------------------
 PRE-PROCESSING BRANCH
 --------------------- */
 
-/*VERY provisional -> I am literally copy and pasting the full path to the file. Ideally, this should be done from terminal when calling nextflow*/
 
-project_dir = projectDir  /*specify a new variable, the project directory */
+
+project_dir = projectDir  /// specify a new variable, the project directory ///
 
 process CLIP_FASTQ {
         
@@ -16,7 +15,7 @@ process CLIP_FASTQ {
     file raw_fastq 
 
     output:
-    file '*_clipped.fastq' /* into clipped_fastq_channel  */
+    file '*_clipped.fastq' /// into clipped_fastq_channel  ///
 	
 	script: 
 	"""
@@ -30,7 +29,7 @@ process rRNA_MAPPING {
 	publishDir "$params.study_dir/rRNA_alignment_stats", mode: 'copy', pattern: '*_rRNA_stats.txt'
 
 	input: 
-	file clipped_fastq /* from clipped_fastq_channel */
+	file clipped_fastq /// from clipped_fastq_channel ///
 
 	output:
 	path "${clipped_fastq.baseName}_rRNA_stats.txt" , emit: rRNA_stats
@@ -52,7 +51,7 @@ process FASTQC_ON_PROCESSED {
 	file processed_fastq
 
 	output:
-	file '*_fastqc.{zip,html}' /* into raw_fastqc_dir */
+	file '*_fastqc.{zip,html}' /// into raw_fastqc_dir ///
 
 	"""
 	fastqc -q $processed_fastq
@@ -85,7 +84,7 @@ process TRANSCRIPTOME_MAPPING {
 	publishDir "$params.study_dir/trips_alignment_stats", mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
 
 	input:    
-	file less_rrna_fastq /* from fastq_less_rRNA */
+	file less_rrna_fastq /// from fastq_less_rRNA ///
 
 	output:
 	path "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sam
@@ -99,10 +98,10 @@ process TRANSCRIPTOME_MAPPING {
 process TRANSCRIPTOME_SAM_TO_BAM {
 
 	input:
-	file transcriptome_sam /* from transcriptome_sams */
+	file transcriptome_sam /// from transcriptome_sams ///
 
 	output:
-	file "${transcriptome_sam.baseName}.bam_sorted" /* into sorted_bams */
+	file "${transcriptome_sam.baseName}.bam_sorted" /// into sorted_bams ///
 
 	"""
 	samtools view -@ 8 -b -S ${transcriptome_sam.baseName}.sam -o ${transcriptome_sam.baseName}.bam
@@ -115,10 +114,10 @@ process BAM_TO_SQLITE {
 	publishDir "$params.study_dir/sqlites", mode: 'copy', pattern: '*.sqlite'
 
 	input:
-	file sorted_bam /* from sorted_bams */
+	file sorted_bam /// from sorted_bams ///
 
 	output:
-	file "*.sqlite" /* into sqlite_ch */
+	file "*.sqlite" /// into sqlite_ch ///
 
 	"""
 	python3 $project_dir/scripts/bam_to_sqlite.py ${sorted_bam} $params.annotation_sqlite ${sorted_bam.baseName}
@@ -135,11 +134,11 @@ process GENOME_MAPPING {
 	publishDir "$params.study_dir/gwips_alignment_stats", mode: 'copy', pattern: '*_gwips_alignment_stats.txt'
 	
     input:
-   	file less_rrna_fastq /* from fastq_less_rRNA */
+   	file less_rrna_fastq /// from fastq_less_rRNA ///
 
     output:
-    path "${less_rrna_fastq.baseName}_genome.bam_sorted", emit: genome_sorted_bam /* into genome_sams */
-    path "${less_rrna_fastq.baseName}_gwips_alignment_stats.txt", emit: gwips_alignment_stats/* into gwips_alignment_stats */
+    path "${less_rrna_fastq.baseName}_genome.bam_sorted", emit: genome_sorted_bam /// into genome_sams ///
+    path "${less_rrna_fastq.baseName}_gwips_alignment_stats.txt", emit: gwips_alignment_stats  /// into gwips_alignment_stats ///
 
     """
 	bowtie -p 8 -m 1 -n 2 --seedlen 25 ${params.genome_index} -q ${less_rrna_fastq} -S 2>> ${less_rrna_fastq.baseName}_gwips_alignment_stats.txt | 
@@ -203,10 +202,10 @@ process BED_TO_BIGWIG {
 	publishDir "$params.study_dir/bigwigs", mode: 'copy', pattern: '*.bw'
 
 	input:
-	file bedfile /* from sorted_beds */
+	file bedfile /// from sorted_beds ///
 	
     output:
-	file "*.bw"  /* into bigwigs */
+	file "*.bw"  /// into bigwigs ///
 
 	"""
 	$project_dir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.bw
