@@ -151,13 +151,13 @@ process GENOME_MAPPING {
 
 
 
-process INDEX_SORT_BAM {
+process INDEX_BAM {
 
 	input:
 	file genome_sorted_bam
 
 	output:
-	path "${genome_sorted_bam.baseName}.bam_sorted", emit: genome_index_sorted_bam
+	path "${genome_sorted_bam.baseName}.bam_sorted", emit: genome_index_sorted_bam ///not outputting the index///
 
 
 	"""
@@ -170,7 +170,7 @@ process INDEX_SORT_BAM {
 process BAM_TO_COVBED {
 
 	input:
-	file genome_sorted_bam /// this should be changed to make reading easier ///
+	file genome_sorted_bam /// genome_aligned_and_sorted_bam ///
 
 	output:
 	path "${genome_sorted_bam.baseName}.sorted.cov", emit: coverage_beds
@@ -265,7 +265,7 @@ workflow {
 			GENOME_BAM_TO_BED ( INDEX_SORT_BAM.out.genome_index_sorted_bam )
 			BED_TO_BIGWIG     ( GENOME_BAM_TO_BED.out.sorted_beds )
 
-			BAM_TO_COVBED     ( INDEX_SORT_BAM.out.genome_index_sorted_bam )
+			BAM_TO_COVBED     ( INDEX_BAM.out.genome_index_sorted_bam )
 			BED_TO_BIGWIG     ( BAM_TO_COVBED.out.coverage_beds )
 		}
 		/// The following block is executed if the study is not an RNA-Seq. ///
