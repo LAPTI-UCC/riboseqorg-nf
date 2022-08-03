@@ -116,7 +116,8 @@ def generate_profile(sqlite_dict, organism_sqlite):
     transcript_table = query_database("SELECT transcript,cds_start,cds_stop,sequence from transcripts WHERE principal = 1;", cursor)
 
     for row in transcript_table:
-        print(row)
+        transcript, cds_start, cds_stop, sequence = row
+        print(transcript)
         break
 
 
