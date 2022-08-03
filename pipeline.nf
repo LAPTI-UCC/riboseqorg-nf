@@ -9,6 +9,8 @@ PRE-PROCESSING BRANCH
 
 project_dir = projectDir  /// specify a new variable, the project directory ///
 
+include { BED_TO_BIGWIG as BTB } from "${project_dir}/pipeline.nf"
+
 process CLIP_FASTQ {
         
     input:
@@ -266,7 +268,7 @@ workflow {
 			BED_TO_BIGWIG     ( GENOME_BAM_TO_BED.out.sorted_beds )
 		}
 		BAM_TO_COVBED     ( INDEX_BAM.out.genome_index_sorted_bam )
-		BED_TO_BIGWIG     ( BAM_TO_COVBED.out.coverage_beds )		
+		BTB   			  ( BAM_TO_COVBED.out.coverage_beds )		
 	
     }
 }
