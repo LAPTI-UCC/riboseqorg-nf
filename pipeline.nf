@@ -9,7 +9,7 @@ PRE-PROCESSING BRANCH
 
 project_dir = projectDir  /// specify a new variable, the project directory ///
 
-include { CLIP_FASTQ; rRNA_MAPPING; FASTQC_ON_PROCESSED; MULTIQC_ON_FASTQ; FASTQC_ON_PROCESSED } from "./modules/processing-tasks.nf"
+include { CLIP_FASTQ; rRNA_MAPPING; FASTQC_ON_PROCESSED; MULTIQC_ON_FASTQ } from "./modules/processing-tasks.nf"
 include { TRANSCRIPTOME_MAPPING; TRANSCRIPTOME_SAM_TO_BAM; BAM_TO_SQLITE } from "./modules/processing-tasks.nf"
 include { GENOME_MAPPING; INDEX_BAM; BAM_TO_COVBED; GENOME_BAM_TO_BED; BED_TO_BIGWIG} from "./modules/processing-tasks.nf"
 include { GENOME_BAM_TO_BED as BTB } from "./modules/processing-tasks.nf"
