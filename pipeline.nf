@@ -265,8 +265,8 @@ workflow {
 			GENOME_BAM_TO_BED ( INDEX_BAM.out.genome_index_sorted_bam )
 			BED_TO_BIGWIG     ( GENOME_BAM_TO_BED.out.sorted_beds )
 		}
-			BAM_TO_COVBED     ( INDEX_BAM.out.genome_index_sorted_bam )
-			BED_TO_BIGWIG     ( BAM_TO_COVBED.out.coverage_beds )		
+		BAM_TO_COVBED     ( INDEX_BAM.out.genome_index_sorted_bam )
+		BED_TO_BIGWIG     ( BAM_TO_COVBED.out.coverage_beds )		
 	
     }
 }
