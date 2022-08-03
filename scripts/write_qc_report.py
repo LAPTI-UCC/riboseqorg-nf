@@ -91,7 +91,7 @@ def query_database(query, cursor):
     return the results of the provided query
     '''
     results = cursor.execute(query).fetchall()
-    print(results)
+    return results
 
 
 
@@ -113,7 +113,12 @@ def generate_profile(sqlite_dict, organism_sqlite):
     reads too far from start or stop are combined in one variable.
     '''
     cursor = get_sqlite_cursor(organism_sqlite)
-    query_database("SELECT * FROM transcripts;", cursor)
+    transcript_table = query_database("SELECT transcript,cds_start,cds_stop,sequence from transcripts WHERE principal = 1;", cursor)
+
+    for row in transcript_table:
+        print(row)
+        break
+
 
 
 def process_readfile(readfile_path, organism_sqlite):
