@@ -45,7 +45,6 @@ import os
 with open('${SRR}', 'r') as f:
     lines = f.readlines()
     for line in lines:
-        print(line)
         line = line.strip('\\n')
         os.system(f"ffq --ftp {line} | jq -r .[].url | cat > ./{line}.json")
 
@@ -55,7 +54,7 @@ with open('${SRR}', 'r') as f:
 
 
 process WGET_FASTQ {
-    publishDir "../$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "$projectDir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
     input:
         path ffq_json
@@ -86,7 +85,7 @@ with open('${ffq_json}', 'r') as f:
 
 
 process FIND_ADAPTERS {
-    publishDir "../$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "$projectDir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
 
     input:
@@ -98,7 +97,7 @@ process FIND_ADAPTERS {
     script:
     
         """
-        python3 ../scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}.fa"
+        python3 $projectDir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}.fa"
         """
 }
 
@@ -116,6 +115,6 @@ process WRITE_PARAMTERS_YAML {
 
     script:
         """
-        python3 ../scripts/write_parameters_yaml.py -a "$project_dir/$params.data_dir/$find_adapters.simpleName/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
+        python3 $projectDir/scripts/write_parameters_yaml.py -a "$project_dir/$params.data_dir/$find_adapters.simpleName/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
         """
 }
