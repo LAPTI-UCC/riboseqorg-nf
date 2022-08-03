@@ -172,10 +172,7 @@ def generate_profile(sqlite_dict, organism_sqlite):
 
 
         counter += 1
-        if counter >1000:
-            print(metagene, gene_body)
-
-            break
+    return metagene, gene_body
 
 
 
@@ -201,7 +198,11 @@ def process_readfile(readfile_path, organism_sqlite):
     else:
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
-    generate_profile(sqlite_dict, organism_sqlite)
+    metagene, gene_body = generate_profile(sqlite_dict, organism_sqlite)
+    for i in metagene['fiveprime']:
+        print(i, metagene['fiveprime'][i])
+
+    print(gene_body)
     return readfile_report
 
 
