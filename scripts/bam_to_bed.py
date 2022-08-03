@@ -91,4 +91,4 @@ if __name__ == "__main__":
 
 	seq_dict_keys = get_chromosomes_list(get_fasta_as_dictionary(args.genomic_fasta))
 
-	write_bedfile(args.filepath, seq_dict_keys, args.offset)
+	write_bedfile(args.filepath, seq_dict_keys, int(args.offset))
