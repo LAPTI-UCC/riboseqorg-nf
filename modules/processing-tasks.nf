@@ -148,7 +148,8 @@ process INDEX_BAM {
 
 	output:
 	path "${genome_sorted_bam.baseName}.bam_sorted", emit: genome_index_sorted_bam ///not outputting the index///
-
+	path "${genome_sorted_bam.baseName}.bam_sorted.bai", emit: genome_index_sorted_bam_bai
+	
 
 	"""
 	samtools index ${genome_sorted_bam.baseName}.bam_sorted
@@ -176,6 +177,7 @@ process GENOME_BAM_TO_BED {
 
     input:
 	file genome_index_sorted_bam /// from genome_bams ///
+	file genome_index_sorted_bam_bai
 
     output:
 	path "${genome_index_sorted_bam.baseName}.bam_sorted.sorted.bed", emit: sorted_beds /// into sorted_beds ///

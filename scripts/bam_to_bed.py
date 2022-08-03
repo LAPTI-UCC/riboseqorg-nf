@@ -3,6 +3,7 @@
 import sys
 import pysam 
 from Bio import SeqIO
+import os
 
 filepath = sys.argv[1]
 offset = int(sys.argv[2])
@@ -22,10 +23,13 @@ seq_dict_keys.sort()
 bedfile = open("{0}.bed".format(filepath), "w")
 for chrom in seq_dict_keys:
 	chrom_len = len(seq_dict[chrom])
+	all_reads = alignments.fetch(chrom)
 	try:
 		all_reads = alignments.fetch(chrom)
 	except:
 		print (chrom,  "error")
+		for i in alignments:
+			print(i)
 		sys.exit()
 	sequence = {}
 	for read in all_reads:
@@ -43,6 +47,11 @@ for chrom in seq_dict_keys:
 			sequence[Asite] += 1
 		else:
 			sequence[Asite] = 1
+	# print(len(sequence))
+
+	if sequence == {}:
+		raise Exception (" There are no valid A sites ")
+
 	for Asite in sorted(sequence):
 		bedfile.write("%s\t%s\t%s\t%s\n"%(chrom,  Asite,  Asite+1, sequence[Asite]))
 	del sequence
