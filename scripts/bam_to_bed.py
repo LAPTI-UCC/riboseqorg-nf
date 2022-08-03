@@ -3,6 +3,7 @@
 import sys
 import pysam 
 from Bio import SeqIO
+import os
 
 filepath = sys.argv[1]
 offset = int(sys.argv[2])
@@ -26,7 +27,7 @@ for chrom in seq_dict_keys:
 		all_reads = alignments.fetch(chrom)
 	except:
 		print (chrom,  "error")
-		print( len(alignments) )
+		print( os.path.getsize(alignments) )
 		sys.exit()
 	sequence = {}
 	for read in all_reads:
