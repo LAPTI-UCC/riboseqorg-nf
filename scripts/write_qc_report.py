@@ -39,10 +39,10 @@ def process_fastqc(report_path):
 
     parsed_fastqc = parse_fastqc(report_path)
 
-    for entry in parsed_fastqc:
-        print(entry)
-        for line in parsed_fastqc[entry].split('\n'):
-            print(line)
+    # for entry in parsed_fastqc:
+    #     print(entry)
+    #     for line in parsed_fastqc[entry].split('\n'):
+    #         print(line)
 
     return parsed_fastqc
 
@@ -139,6 +139,7 @@ def process_transcript_reads(transcript, cds_start, cds_stop, sequence_length, t
 
     return gene_body, metagene
 
+
 def generate_profile(sqlite_dict, organism_sqlite):
     '''
     create a whole gene metagene profile from the given sqlite dict
@@ -175,7 +176,7 @@ def generate_profile(sqlite_dict, organism_sqlite):
     return metagene, gene_body
 
 
-def sliding_window(elements, window_size):
+def sliding_window(elements, window_size=10):
     '''
     given a list of elements and a set window size return a nested list of sliding windows 
     '''
@@ -212,14 +213,12 @@ def process_readfile(readfile_path, organism_sqlite):
     if "trip_periodicity" in sqlite_dict:
         trip_peridicity = sqlite_dict['trip_periodicity']
         trip_periodicity_score = calculate_triplet_periodicity_score(trip_peridicity)
-        print(trip_periodicity_score)
     else:
         raise Exception(f"No triplet periodicity in sqlite database {readfile_path}")
 
     if "read_lengths" in sqlite_dict:
         read_lengths = sqlite_dict["read_lengths"]
         average_readlength = get_average_readlengths(read_lengths)
-        print(average_readlength)
     else:
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
