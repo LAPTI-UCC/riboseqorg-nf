@@ -197,8 +197,8 @@ def calculate_metagene_summary_score(metagene):
 
     for prime in metagene:
         print()
-        print('fiveprime', sum([i for i in metagene[prime] if i < 0])/300)
-        print('threeprime', sum([i for i in metagene[prime] if i >= 0])/300)
+        print('fiveprime', sum([metagene[prime][i] for i in metagene[prime] if i < 0])/300)
+        print('threeprime', sum([metagene[prime][i] for i in metagene[prime] if i >= 0])/300)
 
 
         positions = sorted(metagene[prime].keys())
