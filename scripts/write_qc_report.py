@@ -237,8 +237,8 @@ def triplet_periodicity_module(trip_periodicity_prime):
                                         trip_periodicity_prime[i]['1'], 
                                         trip_periodicity_prime[i]['2']])   
 
-        score = 1 - (sorted_frame_counts[2]/sorted_frame_counts[1])     
-        print(i, trip_periodicity_prime[i]['0'], trip_periodicity_prime[i]['1'], trip_periodicity_prime[i]['2'], score)
+        score = 1 - (sorted_frame_counts[1]/sorted_frame_counts[2])     
+        print(f"{i}\t{trip_periodicity_prime[i]['0']}\t{trip_periodicity_prime[i]['1']}\t{trip_periodicity_prime[i]['2']}\t{score}")
 
 
 def process_readfile(readfile_path, organism_sqlite):
