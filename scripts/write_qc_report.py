@@ -175,6 +175,31 @@ def generate_profile(sqlite_dict, organism_sqlite):
     return metagene, gene_body
 
 
+def sliding_window(elements, window_size):
+    '''
+    given a list of elements and a set window size return a nested list of sliding windows 
+    '''
+    if len(elements) <= window_size:
+       return elements
+
+    window_list = []
+    for i in range(len(elements)):
+        window_list.append(elements[i:i+window_size])
+    
+    return window_list
+
+
+def calculate_metagene_summary_score(metagene):
+    '''
+    Generate a summary score for both metagene profiles in metagene dict
+    '''
+
+    for prime in metagene:
+        positions = sorted(metagene[prime].keys())
+        print(sliding_window(positions))
+
+
+
 
 def process_readfile(readfile_path, organism_sqlite):
     '''
@@ -199,12 +224,12 @@ def process_readfile(readfile_path, organism_sqlite):
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
     metagene, gene_body = generate_profile(sqlite_dict, organism_sqlite)
-    for i in metagene['fiveprime']:
-        print(i, metagene['fiveprime'][i])
+    
+    calculate_metagene_summary_score(metagene)
 
-    gene_body_proportion_cds = gene_body['cds']/(gene_body['fiveprime'] + gene_body['cds'] + gene_body['threeprime'])
-    gene_body_ratio = gene_body['cds']/(gene_body['fiveprime'] + gene_body['threeprime'])
-    print(gene_body_proportion_cds, gene_body_ratio)
+    gene_body_proportion_cds = round(gene_body['cds']/(gene_body['fiveprime'] + gene_body['cds'] + gene_body['threeprime']), 2)
+    gene_body_ratio = round(gene_body['cds']/(gene_body['fiveprime'] + gene_body['threeprime']), 2)
+
     return readfile_report
 
 
