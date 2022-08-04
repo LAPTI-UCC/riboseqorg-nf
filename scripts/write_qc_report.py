@@ -280,16 +280,19 @@ def write_final(qc_report, readfile_report, outpath):
     combine the metrics to a standard report. 
     '''
     readfile_report_headers = {
-        'Triplet Periodicity Five Prime Offsets':"#readlength\tframe1\tframe2\tframe3\tscore\n",
-        'Triplet Periodicity Three Prime Offsets':"#readlength\tframe1\tframe2\tframe3\tscore\n",
-        'Read Length Distribution':"#readlength\tcount\n",
-        'Metagene Profile at Start Site':"#position relative to start\tcount\n",
-        'Metagene Profile at Stop Site':"#position relative to stop\tcount\n",
-        'Gene Body Distribution':"#region\tcount\n",
-        'Ribo-Seq Basic Statistics':"#Measure\tvalue\n"
+        'Triplet Periodicity Five Prime Offsets'    :"#readlength\tframe1\tframe2\tframe3\tscore\n",
+        'Triplet Periodicity Three Prime Offsets'   :"#readlength\tframe1\tframe2\tframe3\tscore\n",
+        'Read Length Distribution'                  :"#readlength\tcount\n",
+        'Metagene Profile at Start Site'            :"#position relative to start\tcount\n",
+        'Metagene Profile at Stop Site'             :"#position relative to stop\tcount\n",
+        'Gene Body Distribution'                    :"#region\tcount\n",
+        'Ribo-Seq Basic Statistics'                 :"#Measure\tvalue\n"
     }
+
+
     with open(outpath, 'w') as outfile:
         for entry in qc_report:
+            print({qc_report[entry]})
             outfile.write(f"{entry} \t {qc_report[entry]}")
 
         for module in readfile_report:
