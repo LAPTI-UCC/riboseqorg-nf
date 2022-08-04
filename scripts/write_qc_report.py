@@ -224,8 +224,7 @@ def riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body
     module['Metagene Non-coding/Coding Ratio at Start Site'] = metagene_summary_scores['fiveprime']
     module['Metagene Non-coding/Coding Ratio at Stop Site'] = metagene_summary_scores['threeprime']
 
-    for item in module:
-        print(f'{item}\t{module[item]}')
+    return module
 
 
 def process_readfile(readfile_path, organism_sqlite):
@@ -238,6 +237,9 @@ def process_readfile(readfile_path, organism_sqlite):
 
     if "trip_periodicity" in sqlite_dict:
         trip_periodicity = sqlite_dict['trip_periodicity']
+        print(trip_periodicity.keys())
+        for i in trip_periodicity:
+            print(i, trip_periodicity[i])
     else:
         raise Exception(f"No triplet periodicity in sqlite database {readfile_path}")
 
