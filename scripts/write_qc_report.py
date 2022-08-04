@@ -296,7 +296,7 @@ def write_final(qc_report, readfile_report, outpath):
             outfile.write(f">>{module}\n")
             outfile.write(readfile_report_headers[module])
             for i in readfile_report[module]:
-                outfile.write("{: >5} {: >5}".format(i, readfile_report[module][i]))
+                outfile.write("{: >5} {: >5}\n".format(i, readfile_report[module][i]))
                 # outfile.write(f"{i}\t{readfile_report[module][i]}\n")
             outfile.write(">>END_MODULE\n")
 
