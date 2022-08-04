@@ -46,7 +46,7 @@ process FASTQC_ON_PROCESSED {
 
 	"""
 	fastqc -q $processed_fastq 
-    unzip ${processed_fastq}_fastqc.zip
+    unzip ${processed_fastq.simpleName}_fastqc.zip
 	"""
 }
 
