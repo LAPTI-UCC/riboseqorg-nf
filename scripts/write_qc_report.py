@@ -1,5 +1,6 @@
 
 import argparse
+from operator import mod
 import sqlite3
 from sqlitedict import SqliteDict
 import pickle5
@@ -285,8 +286,12 @@ def write_final(qc_report, readfile_report, outpath):
         for entry in qc_report:
             outfile.write(f"{entry} \t {qc_report[entry]}")
 
-        for entry in readfile_report:
-            outfile.write(f"{entry} \t  {readfile_report[entry]}")
+        for module in readfile_report:
+            outfile.write(f">>{module}")
+            for i in readfile_report[module]:
+                outfile.write(f"{i}\t{readfile_report[module][i]}")
+            outfile.write(">>END_MODULE")
+
 
 
 
@@ -295,7 +300,6 @@ def main(report_path, readfile_path, organism_sqlite, outpath):
     produce qc report for this dataset and write it to outpath
     '''
     qc_report = process_fastqc(report_path)
-    print(qc_report)
 
     readfile_report = process_readfile(readfile_path, organism_sqlite)
 
