@@ -232,6 +232,7 @@ def triplet_periodicity_module(trip_periodicity_prime):
     for a given prime (five or three) convert the triplet periodicity dict to a module 
     #readlength frame1 frame2 frame3 score
     '''
+    module = {}
     for i in trip_periodicity_prime:
         sorted_frame_counts = sorted([trip_periodicity_prime[i]['0'], 
                                         trip_periodicity_prime[i]['1'], 
@@ -240,7 +241,8 @@ def triplet_periodicity_module(trip_periodicity_prime):
             score = round(1 - (sorted_frame_counts[1]/sorted_frame_counts[2]), 2)  
         except:
             score = 0
-        print(f"{i}\t\t{trip_periodicity_prime[i]['0']}\t\t{trip_periodicity_prime[i]['1']}\t\t{trip_periodicity_prime[i]['2']}\t\t{score}")
+        module[i] = f"{trip_periodicity_prime[i]['0']}\t\t{trip_periodicity_prime[i]['1']}\t\t{trip_periodicity_prime[i]['2']}\t\t{score}"
+    return module
 
 
 def process_readfile(readfile_path, organism_sqlite):
@@ -261,12 +263,13 @@ def process_readfile(readfile_path, organism_sqlite):
 
     if "read_lengths" in sqlite_dict:
         read_lengths = sqlite_dict["read_lengths"]
+        print(read_lengths)
     else:
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
     metagene, gene_body = generate_profile(sqlite_dict, organism_sqlite)
     
-    basic_statistics_module = riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body)
+    readfile_report['Ribo-Seq Basic Statistics'] = riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body)
 
     return readfile_report
 
