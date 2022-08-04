@@ -237,9 +237,8 @@ def process_readfile(readfile_path, organism_sqlite):
 
     if "trip_periodicity" in sqlite_dict:
         trip_periodicity = sqlite_dict['trip_periodicity']
-        print(trip_periodicity.keys())
-        for i in trip_periodicity:
-            print(i, trip_periodicity[i])
+        for i in trip_periodicity['fiveprime']:
+            print(i, trip_periodicity['fiveprime'][i])
     else:
         raise Exception(f"No triplet periodicity in sqlite database {readfile_path}")
 
