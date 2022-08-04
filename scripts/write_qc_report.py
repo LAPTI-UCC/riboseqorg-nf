@@ -227,6 +227,20 @@ def riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body
     return module
 
 
+def triplet_periodicity_module(trip_periodicity_prime):
+    '''
+    for a given prime (five or three) convert the triplet periodicity dict to a module 
+    #readlength frame1 frame2 frame3 score
+    '''
+    for i in trip_periodicity_prime:
+        sorted_frame_counts = sorted([trip_periodicity_prime[i]['0'], 
+                                        trip_periodicity_prime[i]['1'], 
+                                        trip_periodicity_prime[i]['2']])   
+
+        score = 1 - (sorted_frame_counts[2]/sorted_frame_counts[1])     
+        print(i, trip_periodicity_prime[i]['0'], trip_periodicity_prime[i]['1'], trip_periodicity_prime[i]['2'], score)
+
+
 def process_readfile(readfile_path, organism_sqlite):
     '''
     Get desired metrics from read file 
@@ -237,8 +251,9 @@ def process_readfile(readfile_path, organism_sqlite):
 
     if "trip_periodicity" in sqlite_dict:
         trip_periodicity = sqlite_dict['trip_periodicity']
-        for i in trip_periodicity['fiveprime']:
-            print(i, trip_periodicity['fiveprime'][i])
+        readfile_report['Triplet Periodicity Five Prime Offsets'] = triplet_periodicity_module(trip_periodicity['fiveprime'])
+        readfile_report['Triplet Periodicity Three Prime Offsets'] = triplet_periodicity_module(trip_periodicity['threeprime'])
+
     else:
         raise Exception(f"No triplet periodicity in sqlite database {readfile_path}")
 
