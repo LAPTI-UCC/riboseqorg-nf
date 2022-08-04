@@ -1,11 +1,8 @@
 
 import argparse
-from operator import mod
 import sqlite3
-from black import out
 from sqlitedict import SqliteDict
 import pickle5
-import time
 
 
 def parse_fastqc(report_path):
