@@ -28,7 +28,7 @@ workflow {
 	if ( params.skip_trips == false ) {
 		
 		TRANSCRIPTOME_MAPPING    ( rRNA_MAPPING.out.fastq_less_rRNA )
-		TRANSCRIPTOME_SAM_TO_BAM ( TRANSCRIPTOME_MAPPING.out.transcriptome_sams )
+		TRANSCRIPTOME_SAM_TO_BAM ( TRANSCRIPTOME_MAPPING.out.transcriptome_sam )
 		BAM_TO_SQLITE            ( TRANSCRIPTOME_SAM_TO_BAM.out )
 		RIBO_QC					 ( BAM_TO_SQLITE.out, FASTQC_ON_PROCESSED.out.fastq_data )
 
