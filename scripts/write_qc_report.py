@@ -2,6 +2,7 @@
 import argparse
 from operator import mod
 import sqlite3
+from black import out
 from sqlitedict import SqliteDict
 import pickle5
 import time
@@ -298,7 +299,8 @@ def write_final(qc_report, readfile_report, outpath):
             outfile.write(f">>{module}\n")
             outfile.write(readfile_report_headers[module])
             for i in readfile_report[module]:
-                outfile.write(f"{i}\t{readfile_report[module][i]}\n")
+                outfile.write("{: >5} {: >5}".format(i, readfile_report[module][i]))
+                # outfile.write(f"{i}\t{readfile_report[module][i]}\n")
             outfile.write(">>END_MODULE\n")
 
 
@@ -326,19 +328,3 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     main(args.r, args.s, args.p, args.o)
-
-
-'''
-
-The output of this script shoud be like an extended fastqc report with added ribo-seq metrics
-
-Include fastqc report at top of file and then a similar style riboqc report
-
-- basic statistics (averages or scores for each stat)
-- triplet periodicity (done)
-- read length distribution (done)
-- gene body distribution 
-- metagene start counts
-- metagene stop counts 
-
-'''
