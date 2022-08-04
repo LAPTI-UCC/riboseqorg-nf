@@ -271,7 +271,9 @@ def process_readfile(readfile_path, organism_sqlite):
     toc = time.perf_counter()
     print(f"generate_profile in {toc - tic:0.4f} seconds")
 
-    print(metagene['fiveprime'])
+    readfile_report['Metagene Profile at Start Site'] =  metagene['fiveprime']
+    readfile_report['Metagen Profile at Stop Site'] =  metagene['threeprime']
+
     
     readfile_report['Ribo-Seq Basic Statistics'] = riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body)
 
