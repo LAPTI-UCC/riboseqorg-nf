@@ -116,7 +116,11 @@ def process_transcript_reads(transcript, cds_start, cds_stop, sequence_length, t
 
     for readlength in transcript_reads:
         for position in transcript_reads[readlength]:
-            adjusted_position = position + offsets['fiveprime']["offsets"][readlength]
+            if readlength in offsets['fiveprime']["offsets"]:
+                adjusted_position = position + offsets['fiveprime']["offsets"][readlength]
+            else:
+                adjusted_position = position + 15 # if we haven't a recorded offset for this readlength use the default 15
+
             if adjusted_position in range(0, cds_start):
                 
                 gene_body['fiveprime'] += transcript_reads[readlength][position]
