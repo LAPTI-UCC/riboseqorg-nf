@@ -42,11 +42,11 @@ process FASTQC_ON_PROCESSED {
 
 	output:
 	path "*_fastqc.{zip,html}", emit: fastqc_full_reports/// into raw_fastqc_dir ///
-    path "${processed_fastq.simpleName}_fastqc/fastqc_data.txt", emit: fastqc_data
+    path "${processed_fastq.baseName}_fastqc/fastqc_data.txt", emit: fastqc_data
 
 	"""
 	fastqc -q $processed_fastq 
-    unzip ${processed_fastq.simpleName}_fastqc.zip
+    unzip ${processed_fastq.baseName}_fastqc.zip
 	"""
 }
 
