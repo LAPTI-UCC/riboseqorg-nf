@@ -20,6 +20,7 @@ workflow {
 
 	fastq_data = Channel.fromPath ( params.fastq_files )
 	FASTQC_ON_PROCESSED ( fastq_data )
+	FASTQC_ON_PROCESSED.out.fastqc_data.view()
 	// CLIP_FASTQ          ( fastq_data )
 	// rRNA_MAPPING        ( CLIP_FASTQ.out )
 	// FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
