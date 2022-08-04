@@ -270,7 +270,7 @@ def process_readfile(readfile_path, organism_sqlite):
     metagene, gene_body = generate_profile(sqlite_dict, organism_sqlite)
 
     readfile_report['Metagene Profile at Start Site'] =  metagene['fiveprime']
-    readfile_report['Metagen Profile at Stop Site'] =  metagene['threeprime']
+    readfile_report['Metagene Profile at Stop Site'] =  metagene['threeprime']
     readfile_report['Gene Body Distribution'] = gene_body
     readfile_report['Ribo-Seq Basic Statistics'] = riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body)
 
@@ -281,13 +281,22 @@ def write_final(qc_report, readfile_report, outpath):
     '''
     combine the metrics to a standard report. 
     '''
-
+    readfile_report_headers = {
+        'Triplet Periodicity Five Prime Offsets':"#readlength\tframe1\tframe2\tframe3\tscore\n",
+        'Triplet Periodicity Three Prime Offsets':"#readlength\tframe1\tframe2\tframe3\tscore\n",
+        'Read Length Distribution':"#readlength\tcount\n",
+        'Metagene Profile at Start Site':"#position relative to start\tcount\n",
+        'Metagene Profile at Stop Site':"#position relative to stop\tcount\n",
+        'Gene Body Distribution':"#region\tcount\n",
+        'Ribo-Seq Basic Statistics':"#Measure\tvalue\n"
+    }
     with open(outpath, 'w') as outfile:
         for entry in qc_report:
             outfile.write(f"{entry} \t {qc_report[entry]}")
 
         for module in readfile_report:
             outfile.write(f">>{module}\n")
+            outfile.write(readfile_report_headers[module])
             for i in readfile_report[module]:
                 outfile.write(f"{i}\t{readfile_report[module][i]}\n")
             outfile.write(">>END_MODULE\n")
