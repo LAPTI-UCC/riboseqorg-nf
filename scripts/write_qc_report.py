@@ -193,21 +193,39 @@ def sliding_window(elements, window_size=100):
 def calculate_metagene_summary_score(metagene):
     '''
     Generate a summary score for both metagene profiles in metagene dict
+    scores are avg UTR counts / avg coding counts 
     '''
+    summary_scores = {}
 
     for prime in metagene:
         fiveprime_avg = sum([metagene[prime][i] for i in metagene[prime] if i < 0])/300
         threeprime_avg =  sum([metagene[prime][i] for i in metagene[prime] if i >= 0])/300
 
-        short_fiveprime_avg = sum([metagene[prime][i] for i in metagene[prime] if i < 0 and i > -10])/10
-        short_threeprime_avg =  sum([metagene[prime][i] for i in metagene[prime] if i >= 0 and i < 10])/10
         if prime == 'fiveprime':
-            print(prime, round(fiveprime_avg/threeprime_avg,2), fiveprime_avg, threeprime_avg)
-            print(prime, round(short_fiveprime_avg/short_threeprime_avg,2), short_fiveprime_avg, short_threeprime_avg)
-        else:
-            print(prime, round(threeprime_avg/fiveprime_avg, 2), fiveprime_avg, threeprime_avg)
-            print(prime, round(short_threeprime_avg/short_fiveprime_avg, 2), short_fiveprime_avg, short_threeprime_avg)
+            summary_scores[prime] = round(fiveprime_avg/threeprime_avg,2)
 
+        else:
+            summary_scores[prime] = round(threeprime_avg/fiveprime_avg, 2)
+    return summary_scores
+
+
+def riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body):
+    '''
+    produce the basic statistics module on riboseq data
+    '''
+    module = {}
+    module['Total Unambig Read Mappings'] = gene_body['fiveprime'] + gene_body['cds'] + gene_body['threeprime']
+    module['Avergae Read Length'] = get_average_readlengths(read_lengths)
+    module['Triplet Periodicity Score'] = calculate_triplet_periodicity_score(trip_periodicity)
+    module['Gene Body Distribution: CDS Proportion of Total'] = round(gene_body['cds']/(gene_body['fiveprime'] + gene_body['cds'] + gene_body['threeprime']), 2)
+    module['Gene Body Distribution: CDS Ratio to UTRs'] = round(gene_body['cds']/(gene_body['fiveprime'] + gene_body['threeprime']), 2)
+
+    metagene_summary_scores = calculate_metagene_summary_score(metagene)
+    module['Metagene Non-coding/Coding Ratio at Start Site'] = metagene_summary_scores['fiveprime']
+    module['Metagene Non-coding/Coding Ratio at Stop Site'] = metagene_summary_scores['threeprime']
+
+    for item in module:
+        print(f'{item}\t{module[item]}')
 
 
 def process_readfile(readfile_path, organism_sqlite):
@@ -219,23 +237,18 @@ def process_readfile(readfile_path, organism_sqlite):
     sqlite_dict = read_sqlite_dict(readfile_path)
 
     if "trip_periodicity" in sqlite_dict:
-        trip_peridicity = sqlite_dict['trip_periodicity']
-        trip_periodicity_score = calculate_triplet_periodicity_score(trip_peridicity)
+        trip_periodicity = sqlite_dict['trip_periodicity']
     else:
         raise Exception(f"No triplet periodicity in sqlite database {readfile_path}")
 
     if "read_lengths" in sqlite_dict:
         read_lengths = sqlite_dict["read_lengths"]
-        average_readlength = get_average_readlengths(read_lengths)
     else:
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
     metagene, gene_body = generate_profile(sqlite_dict, organism_sqlite)
     
-    calculate_metagene_summary_score(metagene)
-
-    gene_body_proportion_cds = round(gene_body['cds']/(gene_body['fiveprime'] + gene_body['cds'] + gene_body['threeprime']), 2)
-    gene_body_ratio = round(gene_body['cds']/(gene_body['fiveprime'] + gene_body['threeprime']), 2)
+    basic_statistics_module = riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body)
 
     return readfile_report
 
