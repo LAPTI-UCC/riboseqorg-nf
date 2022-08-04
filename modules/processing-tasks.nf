@@ -41,8 +41,8 @@ process FASTQC_ON_PROCESSED {
 	file processed_fastq 
 
 	output:
-	file '*_fastqc.{zip,html}', emit: fastqc_full_reports/// into raw_fastqc_dir ///
-    path '*/fastqc_data.txt', emit: fastqc_data
+	file "*_fastqc.{zip,html}", emit: fastqc_full_reports/// into raw_fastqc_dir ///
+    path "${processed_fastq}_fastqc/fastqc_data.txt", emit: fastqc_data
 
 	"""
 	fastqc -q $processed_fastq 
