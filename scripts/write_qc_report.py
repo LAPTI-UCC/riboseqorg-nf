@@ -287,10 +287,10 @@ def write_final(qc_report, readfile_report, outpath):
             outfile.write(f"{entry} \t {qc_report[entry]}")
 
         for module in readfile_report:
-            outfile.write(f">>{module}")
+            outfile.write(f">>{module}\n")
             for i in readfile_report[module]:
-                outfile.write(f"{i}\t{readfile_report[module][i]}")
-            outfile.write(">>END_MODULE")
+                outfile.write(f"{i}\t{readfile_report[module][i]}\n")
+            outfile.write(">>END_MODULE\n")
 
 
 
