@@ -176,12 +176,12 @@ def generate_profile(sqlite_dict, organism_sqlite):
     return metagene, gene_body
 
 
-def sliding_window(elements, window_size=10):
+def sliding_window(elements, window_size=100):
     '''
     given a list of elements and a set window size return a nested list of sliding windows 
     '''
     if len(elements) <= window_size:
-       return elements
+       return None
 
     window_list = []
     for i in range(len(elements)):
@@ -196,9 +196,11 @@ def calculate_metagene_summary_score(metagene):
     '''
 
     for prime in metagene:
+        print()
         positions = sorted(metagene[prime].keys())
-        print(sliding_window(positions))
-
+        for window in sliding_window(positions):
+            metagene_window = [metagene[prime][i] for i in window]
+            print(sum(metagene_window)/len(metagene_window))
 
 
 
