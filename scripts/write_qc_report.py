@@ -202,7 +202,9 @@ def process_readfile(readfile_path, organism_sqlite):
     for i in metagene['fiveprime']:
         print(i, metagene['fiveprime'][i])
 
-    print(gene_body['cds']/(gene_body['fiveprime'] + gene_body['threeprime']))
+    gene_body_proportion_cds = gene_body['cds']/(gene_body['fiveprime'] + gene_body['cds'] + gene_body['threeprime'])
+    gene_body_ratio = gene_body['cds']/(gene_body['fiveprime'] + gene_body['threeprime'])
+    print(gene_body_proportion_cds, gene_body_ratio)
     return readfile_report
 
 
