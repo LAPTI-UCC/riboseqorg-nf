@@ -3,8 +3,7 @@ import argparse
 import sqlite3
 from sqlitedict import SqliteDict
 import pickle5
-import sys 
-import os
+import time
 
 
 def parse_fastqc(report_path):
@@ -267,7 +266,11 @@ def process_readfile(readfile_path, organism_sqlite):
     else:
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
+    tic = time.perf_counter()
     metagene, gene_body = generate_profile(sqlite_dict, organism_sqlite)
+    toc = time.perf_counter()
+    print(f"generate_profile in {toc - tic:0.4f} seconds")
+
     print(metagene['fiveprime'])
     
     readfile_report['Ribo-Seq Basic Statistics'] = riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body)
