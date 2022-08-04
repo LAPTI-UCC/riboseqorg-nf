@@ -19,10 +19,10 @@ include { BED_TO_BIGWIG as BED_TO_COV_BIGWIG } from "./modules/processing-tasks.
 workflow {
 
 	fastq_data = Channel.fromPath ( params.fastq_files )
-
-	CLIP_FASTQ          ( fastq_data )
-	rRNA_MAPPING        ( CLIP_FASTQ.out )
-	FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
+	FASTQC_ON_PROCESSED ( fastq_data )
+	// CLIP_FASTQ          ( fastq_data )
+	// rRNA_MAPPING        ( CLIP_FASTQ.out )
+	// FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
 	// MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out )		
 
     // /// TRANSCRIPTOME MAPPING ///
