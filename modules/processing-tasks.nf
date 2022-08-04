@@ -38,13 +38,15 @@ process FASTQC_ON_PROCESSED {
 	publishDir "$params.study_dir/fastqc", mode: 'copy'
 	
 	input:
-	file processed_fastq
+	file processed_fastq 
 
 	output:
-	file '*_fastqc.{zip,html}' /// into raw_fastqc_dir ///
+	file '*_fastqc.{zip,html}'  emit: fastqc_full_reports/// into raw_fastqc_dir ///
+    file '*/fastqc_data.txt'
 
 	"""
-	fastqc -q $processed_fastq
+	fastqc -q $processed_fastq 
+    unzip ${processed_fastq}_fastqc.zip
 	"""
 }
 
@@ -114,6 +116,21 @@ process BAM_TO_SQLITE {
 	"""
 }
 
+process RIBO_QC {
+
+	publishDir "$params.study_dir/quality_reports", mode: 'copy', pattern: '*.txt'
+
+	input:
+	file sqlite_readfile 
+    file fastqc_report
+
+	output:
+	file "*.txt" /// into sqlite_ch ///
+
+	"""
+	python3 $projectDir/scripts/write_qc_report.py -s ${sqlite_readfile} -r {$fastqc_report} -p $params.annotation_sqlite -o {outpath}
+	"""
+}
 
 /* --------------------
 GENOME MAPPING BRANCH 
