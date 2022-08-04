@@ -263,11 +263,12 @@ def process_readfile(readfile_path, organism_sqlite):
 
     if "read_lengths" in sqlite_dict:
         read_lengths = sqlite_dict["read_lengths"]
-        print(read_lengths)
+        readfile_report['Read Length Distribution'] = read_lengths
     else:
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
     metagene, gene_body = generate_profile(sqlite_dict, organism_sqlite)
+    print(metagene['fiveprime'])
     
     readfile_report['Ribo-Seq Basic Statistics'] = riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body)
 
