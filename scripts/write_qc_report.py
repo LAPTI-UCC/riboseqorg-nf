@@ -199,14 +199,14 @@ def calculate_metagene_summary_score(metagene):
         fiveprime_avg = sum([metagene[prime][i] for i in metagene[prime] if i < 0])/300
         threeprime_avg =  sum([metagene[prime][i] for i in metagene[prime] if i >= 0])/300
 
-        short_fiveprime_avg = sum([metagene[prime][i] for i in metagene[prime] if i < 0 and i > -20])/20
-        short_threeprime_avg =  sum([metagene[prime][i] for i in metagene[prime] if i >= 0 and i < 20])/20
+        short_fiveprime_avg = sum([metagene[prime][i] for i in metagene[prime] if i < 0 and i > -10])/10
+        short_threeprime_avg =  sum([metagene[prime][i] for i in metagene[prime] if i >= 0 and i < 10])/10
         if prime == 'fiveprime':
-            print(prime, fiveprime_avg/threeprime_avg, fiveprime_avg, threeprime_avg)
-            print(prime, short_fiveprime_avg/short_threeprime_avg, short_fiveprime_avg, short_threeprime_avg)
+            print(prime, round(fiveprime_avg/threeprime_avg,2), fiveprime_avg, threeprime_avg)
+            print(prime, round(short_fiveprime_avg/short_threeprime_avg,2), short_fiveprime_avg, short_threeprime_avg)
         else:
-            print(prime, threeprime_avg/fiveprime_avg, fiveprime_avg, threeprime_avg)
-            print(prime, short_threeprime_avg/short_fiveprime_avg, short_fiveprime_avg, short_threeprime_avg)
+            print(prime, round(threeprime_avg/fiveprime_avg, 2), fiveprime_avg, threeprime_avg)
+            print(prime, round(short_threeprime_avg/short_fiveprime_avg, 2), short_fiveprime_avg, short_threeprime_avg)
 
 
 
