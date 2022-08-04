@@ -266,17 +266,11 @@ def process_readfile(readfile_path, organism_sqlite):
     else:
         raise Exception(f"No read length distribution data in sqlite database {readfile_path}")
 
-    tic = time.perf_counter()
     metagene, gene_body = generate_profile(sqlite_dict, organism_sqlite)
-    toc = time.perf_counter()
-    print(f"generate_profile in {toc - tic:0.4f} seconds")
 
     readfile_report['Metagene Profile at Start Site'] =  metagene['fiveprime']
     readfile_report['Metagen Profile at Stop Site'] =  metagene['threeprime']
-
-    print(gene_body)
-
-    
+    readfile_report['Gene Body Distribution'] = gene_body
     readfile_report['Ribo-Seq Basic Statistics'] = riboseq_basic_statistics(trip_periodicity, read_lengths, metagene, gene_body)
 
     return readfile_report
@@ -289,10 +283,10 @@ def write_final(qc_report, readfile_report, outpath):
 
     with open(outpath, 'w') as outfile:
         for entry in qc_report:
-            outfile.write(f"{entry} : {qc_report[entry]}")
+            outfile.write(f"{entry} \t {qc_report[entry]}")
 
         for entry in readfile_report:
-            outfile.write(f"{entry} : {readfile_report[entry]}")
+            outfile.write(f"{entry} \t  {readfile_report[entry]}")
 
 
 
@@ -301,6 +295,7 @@ def main(report_path, readfile_path, organism_sqlite, outpath):
     produce qc report for this dataset and write it to outpath
     '''
     qc_report = process_fastqc(report_path)
+    print(qc_report)
 
     readfile_report = process_readfile(readfile_path, organism_sqlite)
 
