@@ -237,7 +237,7 @@ def triplet_periodicity_module(trip_periodicity_prime):
                                         trip_periodicity_prime[i]['1'], 
                                         trip_periodicity_prime[i]['2']])   
         try:
-            score = 1 - (sorted_frame_counts[1]/sorted_frame_counts[2])     
+            score = round(1 - (sorted_frame_counts[1]/sorted_frame_counts[2]), 2)  
         except:
             score = 0
         print(f"{i}\t{trip_periodicity_prime[i]['0']}\t{trip_periodicity_prime[i]['1']}\t{trip_periodicity_prime[i]['2']}\t{score}")
