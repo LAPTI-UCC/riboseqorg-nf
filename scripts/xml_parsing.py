@@ -1,5 +1,7 @@
+from numpy import inner
 import xmltodict
 import sys
+import pandas as pd
 
 # example = [{'@tag': 'cell line background', '#text': 'HCT-116'}, {'@tag': 'rna isolation', '#text': 'Total RNA'}, {'@tag': 'adapter sequence', '#text': 'TAGACAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'}]
 
@@ -15,12 +17,11 @@ def get_cell_info_from_dict_list(list_of_dicts):
             def_type = dicts['@tag']
     return (def_type, cell_line)
 
-def inner_dictionary_compiler(Title, Organism, Cell_line, Description, Library_strategy, Protocol = ""):
-    '''
-    Compiles a dictionary with the relevant fields for the processed GSM.
-    '''
-    inner_dic = {"Title": Title, "Organism": Organism, "Cell_line/Strain" : Cell_line, "Description" : Description, "Library_strategy" : Library_strategy, "Extraction_protocol" : Protocol}
-    return inner_dic
+
+def lister(Title, Organism, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available"):
+    inner_list = [Title, Organism, Cell_line, Description, Library_strategy, Protocol]
+    return (inner_list)
+
 
 def parse_xml(xml_path):
     '''
@@ -34,70 +35,90 @@ def parse_xml(xml_path):
             for j in data_dict[i]:
                 if j == "Sample":
                     for k in data_dict[i][j]:
-                        #print()
-                        #print("-"*40)
+                        
+                        # Set default values for those fields that are not always specified
+                        desc = "No description available"
+                        Lib_Strat = "Not available"
+                        protocol = "Not available"
+
                         GSM_id = k["@iid"]
-                        #print("ID: ", GSM_id)
-                        #print("-" *40)
+
                         for each in k:
                             if each == "Title":
                                 title = k[each]
-                                #print("title: ", title)
+
                             if each == "Channel":
                                 for every in k[each]:
 
                                     if every == "Source":
-                                        #print (every)
-                                        #print( "~" * 50)
+
                                         source_string = k[each][every]
-                                        #print(source_string)
+
                                     
                                     if every == "Extract-Protocol":
                                         protocol = k[each][every]
-                                        #print (every)
-                                        #print( "~" * 50)
-                                        #print(protocol)
+
                                     if every == "Organism":
                                         organism = k[each][every]['#text']
-                                        #print (every)
-                                        #print( "~" * 50)
-                                        #print(organism)
 
                                     if every == "Characteristics":
                                         s_type, cell = get_cell_info_from_dict_list(k[each][every])
-                                        #print (every)
-                                        #print( "~" * 50)
-                                        #print(s_type, ": ", cell)
-                                    #print()
-                                #print()
-                            #print()
                             
                             if each == "Description":
                                 desc = k[each]
-                                #print(each)
-                                #print("~"*50)
-                                #print(desc)
-                                #print()
+
                             if each == "Library-Strategy":
                                 Lib_Strat = k[each]
-                                #print(each)
-                                #print("~"*50)
-                                #print(Lib_Strat)
-
-                                        #cell_line = k[each][every]['#text']
-                                        #strategy = k[each][every]['#text']
-                                    #print(k[each][every])
-
-                        inner_dic = inner_dictionary_compiler(title,organism, cell, desc, Lib_Strat)
-                        output_dictionary[GSM_id] = inner_dic
-    return output_dictionary
+                            
+                        inner = lister(title,organism, cell, desc, Lib_Strat, protocol)
+                        output_dictionary[GSM_id] = inner
+    return ( output_dictionary )
 
 
+def compile_df(dict):
+    '''
+    Creates a df from a dictionary. GSM are keys and relative fields are the values, given as a list.
+    '''
+    df = pd.DataFrame.from_dict(dict, orient="index")
+    df.columns = ["Title", "Organism", "Cell_line/Strain", "Description", "Library_Strategy", "Extraction_Protocol"]
+    return(df)
 
+def temp_read_path_list(txt_file):
+    '''
+    reads a txt file containing the path to a GSE.xm. Each line of the file is a path and all paths are returned as a list.
+    FUNCTION NEEDED ONLY FOR TESTING PURPOSES.
+    '''
+    file = open(txt_file, "r")
+    path_list = file.readlines()
+    return path_list
+
+def temp_main(path_list):
+    '''
+    from a list of paths to GSE.xml reports, produces a csv file with all the single GSM and relative fields
+    '''
+    ls = [["","","","","",""]]
+    output = pd.DataFrame(ls, columns = ["Title", "Organism", "Cell_line/Strain", "Description", "Library_Strategy", "Extraction_Protocol"])
+    paths = temp_read_path_list(path_list)
+    for GSE_report in paths:
+        GSE_report = GSE_report[:-1]
+        dict = parse_xml(GSE_report)
+        df = compile_df(dict)
+        output = pd.concat([output, df])
+    output.to_csv("../../XML_CSV_output.csv")
 
 
 if __name__ == '__main__':
-    xml_path = sys.argv[1]
-    parse_xml(xml_path)
+    input_list = sys.argv[1]
+    temp_main(input_list)
+    # output = 
+    # for each in path_list:
+        # 
+        # 
+        # output.append(df)
+    # return output
+
+    # xml_path = sys.argv[1]
+    # dict = parse_xml(xml_path)
+    # df = compile_df(dict)
 
 
