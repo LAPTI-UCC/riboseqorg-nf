@@ -7,71 +7,73 @@ import pandas as pd
 
 def get_cell_info_from_dict_list(list_of_dicts):
     """
-    given an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell-line or strain of the sample.
+    Given an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell-line or strain of the sample.
     """
     cell_line = "No tag found"
-    def_type = "No tag found"
     for dicts in list_of_dicts:
         if 'cell line' in dicts['@tag'] or "strain" in dicts['@tag']:
             cell_line = dicts['#text']
-            def_type = dicts['@tag']
-    return (def_type, cell_line)
+    return (cell_line)
 
 
 def lister(Title, Organism, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available"):
+    '''
+    Just creates a list with the given arguments, allows for some of the to be optional.
+    '''
     inner_list = [Title, Organism, Cell_line, Description, Library_strategy, Protocol]
     return (inner_list)
 
 
 def parse_xml(xml_path):
     '''
-    read the GSE*.xml into python and retrieves the fields needed, returned as a dictionary for each GSM
+    Reads the GSE*.xml into python and retrieves the fields needed, returned as a list within a dictionary, where each GSM is the key.
     '''
     output_dictionary = {}
     with open(xml_path) as xml_file:
         data_dict = xmltodict.parse(xml_file.read())
-        for i in data_dict:
-            
-            for j in data_dict[i]:
-                if j == "Sample":
-                    for k in data_dict[i][j]:
-                        
-                        # Set default values for those fields that are not always specified
+
+        # Progressively searches inside the MINiML, through each section, field, subfield, and sub_subfield for the data required.
+        for MINiML in data_dict:
+            for section in data_dict[MINiML]:
+                if section == "Sample":
+                    for field in data_dict[MINiML][section]:
+
+                        # Set default values for those specifc sub-fields that are not always specified
                         desc = "No description available"
                         Lib_Strat = "Not available"
                         protocol = "Not available"
 
-                        GSM_id = k["@iid"]
+                        GSM_id = field["@iid"]
 
-                        for each in k:
-                            if each == "Title":
-                                title = k[each]
+                        for subfield in field:
+                            if subfield == "Title":
+                                title = field[subfield]
 
-                            if each == "Channel":
-                                for every in k[each]:
-
-                                    if every == "Source":
-
-                                        source_string = k[each][every]
-
+                            if subfield == "Channel":
+                                for sub_subfield in field[subfield]:
                                     
-                                    if every == "Extract-Protocol":
-                                        protocol = k[each][every]
+                                    # This snippet is left for a possibile future use.
+                                    # if sub_subfield == "Source":
+                                        # source_string = field[subfield][sub_subfield]
 
-                                    if every == "Organism":
-                                        organism = k[each][every]['#text']
+                                    if sub_subfield == "Extract-Protocol":
+                                        protocol = field[subfield][sub_subfield]
 
-                                    if every == "Characteristics":
-                                        s_type, cell = get_cell_info_from_dict_list(k[each][every])
+                                    if sub_subfield == "Organism":
+                                        organism = field[subfield][sub_subfield]['#text']
+
+                                    if sub_subfield == "Characteristics":
+                                        cell = get_cell_info_from_dict_list(field[subfield][sub_subfield])
                             
-                            if each == "Description":
-                                desc = k[each]
+                            if subfield == "Description":
+                                desc = field[subfield]
 
-                            if each == "Library-Strategy":
-                                Lib_Strat = k[each]
+                            if subfield == "Library-Strategy":
+                                Lib_Strat = field[subfield]
                             
                         inner = lister(title,organism, cell, desc, Lib_Strat, protocol)
                         output_dictionary[GSM_id] = inner
+
     return ( output_dictionary )
 
 
@@ -83,9 +85,11 @@ def compile_df(dict):
     df.columns = ["Title", "Organism", "Cell_line/Strain", "Description", "Library_Strategy", "Extraction_Protocol"]
     return(df)
 
+# Temporary functions, defined only for testing purposes and not required in the nextflow implementation.
+
 def temp_read_path_list(txt_file):
     '''
-    reads a txt file containing the path to a GSE.xm. Each line of the file is a path and all paths are returned as a list.
+    Reads a txt file containing the path to a GSE.xm. Each line of the file is a path and all paths are returned as a list.
     FUNCTION NEEDED ONLY FOR TESTING PURPOSES.
     '''
     file = open(txt_file, "r")
@@ -94,7 +98,7 @@ def temp_read_path_list(txt_file):
 
 def temp_main(path_list):
     '''
-    from a list of paths to GSE.xml reports, produces a csv file with all the single GSM and relative fields
+    From a list of paths to GSE.xml reports, produces a csv file with all the single GSM and relative fields
     '''
     ls = [["","","","","",""]]
     output = pd.DataFrame(ls, columns = ["Title", "Organism", "Cell_line/Strain", "Description", "Library_Strategy", "Extraction_Protocol"])
@@ -106,19 +110,27 @@ def temp_main(path_list):
         output = pd.concat([output, df])
     output.to_csv("../../XML_CSV_output.csv")
 
+# Function needed in the nextflow implementation, to name each signle csv accordingly.
+
+def get_GSE(string):
+    '''
+    Using the input path, returns the GSE (which will be used to name the csv file appropriately).
+    '''
+    word_list = string.split("/")
+    GSE = word_list[-1][:-4]
+    return GSE
+
 
 if __name__ == '__main__':
     input_list = sys.argv[1]
     temp_main(input_list)
-    # output = 
-    # for each in path_list:
-        # 
-        # 
-        # output.append(df)
-    # return output
+
+    # When implemented in nextflow, this will be actual code:
 
     # xml_path = sys.argv[1]
     # dict = parse_xml(xml_path)
     # df = compile_df(dict)
+    # GSE = get_GSE(xml_path)
+    # df.to_csv(GSE + ".csv")     the final name should be something like "GSEnnnnnn_family.csv"
 
 
