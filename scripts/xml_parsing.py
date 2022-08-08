@@ -6,29 +6,22 @@ import collections
 
 # example = [{'@tag': 'cell line background', '#text': 'HCT-116'}, {'@tag': 'rna isolation', '#text': 'Total RNA'}, {'@tag': 'adapter sequence', '#text': 'TAGACAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'}]
 
-def get_cell_info_from_dict_or_dict_list(list_or_dicts):
+def get_cell_info(tags_list):
     """
     Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell-line or strain of the sample.
     """
-    cell_line = "No tag found among 'Characteristics' detailing the cell/strain"
-    if type(list_or_dicts) == list:
-        for dicts in list_or_dicts:
-            if 'cell line' in dicts['@tag'] or "strain" in dicts['@tag'] or "tissue" in dicts['@tag']:
-                cell_line = dicts['#text']
-                return (cell_line)
-            elif 'genotype' in dicts['@tag']:
-                cell_line = dicts['#text']
-                return (cell_line)
-    elif type(list_or_dicts) == collections.OrderedDict:
-        list_or_dicts = dict(list_or_dicts)
-        # The issue is here
-        if 'cell line' in list_or_dicts['@tag'] or "strain" in list_or_dicts['@tag'] or "tissue" in list_or_dicts['@tag']:
-            cell_line = list_or_dicts['#text']
-            return (cell_line)
+    
+    if type(tags_list) != list:
+        tags_list = [tags_list]
+    for dicts in tags_list:
+        if 'cell line' in dicts['@tag'] or "strain" in dicts['@tag']:
+            return dicts['#text']
+        elif "tissue" in dicts['@tag']:
+            return dicts['#text']
         elif 'genotype' in dicts['@tag']:
-            cell_line = dicts['#text']
-            return (cell_line)
-    return (cell_line)
+            return dicts['#text']
+    cell_line = "No tag found among 'Characteristics' detailing the cell/strain"
+    return cell_line
 
 # 	GSE130465
 
@@ -80,7 +73,7 @@ def parse_xml(xml_path):
                                         organism = field[subfield][sub_subfield]['#text']
 
                                     if sub_subfield == "Characteristics":
-                                        cell = get_cell_info_from_dict_or_dict_list(field[subfield][sub_subfield])
+                                        cell = get_cell_info(field[subfield][sub_subfield])
                             
                             if subfield == "Description":
                                 desc = field[subfield]
