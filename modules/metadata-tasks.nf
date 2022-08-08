@@ -30,7 +30,7 @@ process GET_CSV_FROM_XML {
 
     script:
     """
-    python3 $projectDir/scripts/xml_parsing.py  ${xml_report}
+    python3 $projectDir/../scripts/xml_parsing.py  ${xml_report}
     """
 }
 
