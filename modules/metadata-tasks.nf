@@ -16,11 +16,9 @@ process GET_GSE_REPORT {
     """
 }
 
-/*
-workflow {
 
+workflow {
     input = Channel.of( "GSE180669" ) 
     GET_GSE_REPORT          ( input )
     GET_GSE_REPORT.out.view()   
 }
-*/
