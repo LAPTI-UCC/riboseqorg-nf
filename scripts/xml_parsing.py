@@ -23,11 +23,11 @@ def get_cell_info(tags_list):
     return cell_line
 
 
-def lister(Title, Organism, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available"):
+def lister(Title, Organism, Source, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available", Tags = "None"):
     '''
     Just creates a list with the given arguments, allows for some of the to be optional.
     '''
-    inner_list = [Title, Organism, Cell_line, Description, Library_strategy, Protocol]
+    inner_list = [Title, Organism, Source, Cell_line, Description, Library_strategy, Protocol, Tags]
     return (inner_list)
 
 
@@ -60,8 +60,8 @@ def parse_xml(xml_path):
                                 for sub_subfield in field[subfield]:
                                     
                                     # This snippet is left for a possibile future use.
-                                    # if sub_subfield == "Source":
-                                        # source_string = field[subfield][sub_subfield]
+                                    if sub_subfield == "Source":
+                                        source_string = field[subfield][sub_subfield]
 
                                     if sub_subfield == "Extract-Protocol":
                                         protocol = field[subfield][sub_subfield]
@@ -71,7 +71,18 @@ def parse_xml(xml_path):
 
                                     if sub_subfield == "Characteristics":
                                         cell = get_cell_info(field[subfield][sub_subfield])
-                            
+                                        
+                                        # REWRITE THIS BIT AS ITS OWN FUNCTION
+
+                                        tags = field[subfield][sub_subfield]
+                                        if type(tags) != list:
+                                            tags = [tags]
+                                        final_tags= {}
+                                        for key in tags:
+                                            new_key = key["@tag"]
+                                            final_tags[new_key] = key["#text"]
+
+
                             if subfield == "Description":
                                 desc = field[subfield]
 
@@ -79,7 +90,7 @@ def parse_xml(xml_path):
                             if subfield == "Library-Strategy":
                                 Lib_Strat = field[subfield]
                             
-                        inner = lister(title,organism, cell, desc, Lib_Strat, protocol)
+                        inner = lister(title,organism, source_string, cell, desc, Lib_Strat, protocol, final_tags)
                         output_dictionary[GSM_id] = inner
 
     return ( output_dictionary )
@@ -90,7 +101,7 @@ def compile_df(dict):
     Creates a df from a dictionary. GSM are keys and relative fields are the values, given as a list.
     '''
     df = pd.DataFrame.from_dict(dict, orient="index")
-    df.columns = ["Title", "Organism", "Cell/Strain", "Description", "Library_Strategy", "Extraction_Protocol"]
+    df.columns = ["Title", "Organism", "Source", "Cell/Strain", "Description", "Library_Strategy", "Extraction_Protocol", "Tags"]
     return(df)
 
 # Function needed in the nextflow implementation, to name each signle csv accordingly.
