@@ -19,12 +19,12 @@ def get_cell_info_from_dict_or_dict_list(list_or_dicts):
         return (cell_line)
     elif type(list_or_dicts) == dict:         # code that checks the key
         if 'cell line' in list_or_dicts['@tag'] or "strain" in list_or_dicts['@tag'] or "tissue" in list_or_dicts['@tag']:
-                cell_line = list_or_dicts['#text']
+            cell_line = list_or_dicts['#text']
         elif 'genotype' in dicts['@tag']:
             cell_line = dicts['#text']
         return (cell_line)
 
-
+# 	GSE130465
 
 
 def lister(Title, Organism, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available"):
