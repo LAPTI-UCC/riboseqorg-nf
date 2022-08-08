@@ -14,10 +14,15 @@ def get_cell_info_from_dict_or_dict_list(list_or_dicts):
         for dicts in list_or_dicts:
             if 'cell line' in dicts['@tag'] or "strain" in dicts['@tag'] or "tissue" in dicts['@tag']:
                 cell_line = dicts['#text']
+            elif 'genotype' in dicts['@tag']:
+                cell_line = dicts['#text']
         return (cell_line)
     elif type(list_or_dicts) == dict:         # code that checks the key
         if 'cell line' in list_or_dicts['@tag'] or "strain" in list_or_dicts['@tag'] or "tissue" in list_or_dicts['@tag']:
                 cell_line = list_or_dicts['#text']
+        elif 'genotype' in dicts['@tag']:
+            cell_line = dicts['#text']
+        return (cell_line)
 
 
 
@@ -73,7 +78,7 @@ def parse_xml(xml_path):
                             
                             if subfield == "Description":
                                 desc = field[subfield]
-                                
+
 
                             if subfield == "Library-Strategy":
                                 Lib_Strat = field[subfield]
