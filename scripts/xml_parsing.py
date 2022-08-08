@@ -18,8 +18,10 @@ def get_cell_info_from_dict_or_dict_list(list_or_dicts):
             elif 'genotype' in dicts['@tag']:
                 cell_line = dicts['#text']
                 return (cell_line)
-    elif type(list_or_dicts) == dict:         # code that checks the key
+    elif type(list_or_dicts) == dict:
+        # The issue is here
         if 'cell line' in list_or_dicts['@tag'] or "strain" in list_or_dicts['@tag'] or "tissue" in list_or_dicts['@tag']:
+            print(list_or_dicts)
             cell_line = list_or_dicts['#text']
             return (cell_line)
         elif 'genotype' in dicts['@tag']:
@@ -77,7 +79,6 @@ def parse_xml(xml_path):
 
                                     if sub_subfield == "Characteristics":
                                         cell = get_cell_info_from_dict_or_dict_list(field[subfield][sub_subfield])
-                                        print(cell)
                             
                             if subfield == "Description":
                                 desc = field[subfield]
