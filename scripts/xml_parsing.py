@@ -2,6 +2,7 @@ from numpy import inner
 import xmltodict
 import sys
 import pandas as pd
+import collections
 
 # example = [{'@tag': 'cell line background', '#text': 'HCT-116'}, {'@tag': 'rna isolation', '#text': 'Total RNA'}, {'@tag': 'adapter sequence', '#text': 'TAGACAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'}]
 
@@ -9,7 +10,7 @@ def get_cell_info_from_dict_or_dict_list(list_or_dicts):
     """
     Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell-line or strain of the sample.
     """
-    cell_line = "No tag found"
+    cell_line = "No tag found among 'Characteristics' detailing the cell/strain"
     if type(list_or_dicts) == list:
         for dicts in list_or_dicts:
             if 'cell line' in dicts['@tag'] or "strain" in dicts['@tag'] or "tissue" in dicts['@tag']:
@@ -18,15 +19,16 @@ def get_cell_info_from_dict_or_dict_list(list_or_dicts):
             elif 'genotype' in dicts['@tag']:
                 cell_line = dicts['#text']
                 return (cell_line)
-    elif type(list_or_dicts) == dict:
+    elif type(list_or_dicts) == collections.OrderedDict:
+        list_or_dicts = dict(list_or_dicts)
         # The issue is here
         if 'cell line' in list_or_dicts['@tag'] or "strain" in list_or_dicts['@tag'] or "tissue" in list_or_dicts['@tag']:
-            print(list_or_dicts)
             cell_line = list_or_dicts['#text']
             return (cell_line)
         elif 'genotype' in dicts['@tag']:
             cell_line = dicts['#text']
             return (cell_line)
+    return (cell_line)
 
 # 	GSE130465
 
