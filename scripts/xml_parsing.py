@@ -122,15 +122,15 @@ def get_GSE(string):
 
 
 if __name__ == '__main__':
-    input_list = sys.argv[1]
-    temp_main(input_list)
+    #input_list = sys.argv[1]
+    #temp_main(input_list)
 
     # When implemented in nextflow, this will be actual code:
 
-    # xml_path = sys.argv[1]
-    # dict = parse_xml(xml_path)
-    # df = compile_df(dict)
-    # GSE = get_GSE(xml_path)
-    # df.to_csv(GSE + ".csv")     the final name should be something like "GSEnnnnnn_family.csv"
+    xml_path = sys.argv[1]
+    dict = parse_xml(xml_path)
+    df = compile_df(dict)
+    GSE = get_GSE(xml_path)
+    df.to_csv(GSE + ".csv")     # the final name should be something like "GSEnnnnnn_family.csv"
 
 
