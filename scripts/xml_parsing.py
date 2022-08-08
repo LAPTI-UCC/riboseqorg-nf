@@ -4,12 +4,11 @@ import sys
 import pandas as pd
 import collections
 
-# example = [{'@tag': 'cell line background', '#text': 'HCT-116'}, {'@tag': 'rna isolation', '#text': 'Total RNA'}, {'@tag': 'adapter sequence', '#text': 'TAGACAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'}]
 
 def get_cell_info(tags_list):
-    """
+    '''
     Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell-line or strain of the sample.
-    """
+    '''
     
     if type(tags_list) != list:
         tags_list = [tags_list]
@@ -22,8 +21,6 @@ def get_cell_info(tags_list):
             return dicts['#text']
     cell_line = "No tag found among 'Characteristics' detailing the cell/strain"
     return cell_line
-
-# 	GSE130465
 
 
 def lister(Title, Organism, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available"):
@@ -95,31 +92,6 @@ def compile_df(dict):
     df = pd.DataFrame.from_dict(dict, orient="index")
     df.columns = ["Title", "Organism", "Cell/Strain", "Description", "Library_Strategy", "Extraction_Protocol"]
     return(df)
-
-# Temporary functions, defined only for testing purposes and not required in the nextflow implementation.
-
-def temp_read_path_list(txt_file):
-    '''
-    Reads a txt file containing the path to a GSE.xm. Each line of the file is a path and all paths are returned as a list.
-    FUNCTION NEEDED ONLY FOR TESTING PURPOSES.
-    '''
-    file = open(txt_file, "r")
-    path_list = file.readlines()
-    return path_list
-
-def temp_main(path_list):
-    '''
-    From a list of paths to GSE.xml reports, produces a csv file with all the single GSM and relative fields
-    '''
-    ls = [["","","","","",""]]
-    output = pd.DataFrame(ls, columns = ["Title", "Organism", "Cell_line/Strain", "Description", "Library_Strategy", "Extraction_Protocol"])
-    paths = temp_read_path_list(path_list)
-    for GSE_report in paths:
-        GSE_report = GSE_report[:-1]
-        dict = parse_xml(GSE_report)
-        df = compile_df(dict)
-        output = pd.concat([output, df])
-    output.to_csv("../../XML_CSV_output.csv")
 
 # Function needed in the nextflow implementation, to name each signle csv accordingly.
 
