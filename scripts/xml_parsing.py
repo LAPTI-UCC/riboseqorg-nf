@@ -77,6 +77,7 @@ def parse_xml(xml_path):
 
                                     if sub_subfield == "Characteristics":
                                         cell = get_cell_info_from_dict_or_dict_list(field[subfield][sub_subfield])
+                                        print(cell)
                             
                             if subfield == "Description":
                                 desc = field[subfield]
