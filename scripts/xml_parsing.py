@@ -5,15 +5,21 @@ import pandas as pd
 
 # example = [{'@tag': 'cell line background', '#text': 'HCT-116'}, {'@tag': 'rna isolation', '#text': 'Total RNA'}, {'@tag': 'adapter sequence', '#text': 'TAGACAGATCGGAAGAGCACACGTCTGAACTCCAGTCAC'}]
 
-def get_cell_info_from_dict_list(list_of_dicts):
+def get_cell_info_from_dict_or_dict_list(list_or_dicts):
     """
-    Given an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell-line or strain of the sample.
+    Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell-line or strain of the sample.
     """
     cell_line = "No tag found"
-    for dicts in list_of_dicts:
-        if 'cell line' in dicts['@tag'] or "strain" in dicts['@tag']:
-            cell_line = dicts['#text']
-    return (cell_line)
+    if type(list_or_dicts) == list:
+        for dicts in list_or_dicts:
+            if 'cell line' in dicts['@tag'] or "strain" in dicts['@tag'] or "tissue" in dicts['@tag']:
+                cell_line = dicts['#text']
+        return (cell_line)
+    elif type(list_or_dicts) == dict:         # code that checks the key
+        if 'cell line' in list_or_dicts['@tag'] or "strain" in list_or_dicts['@tag'] or "tissue" in list_or_dicts['@tag']:
+                cell_line = list_or_dicts['#text']
+
+
 
 
 def lister(Title, Organism, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available"):
@@ -63,10 +69,11 @@ def parse_xml(xml_path):
                                         organism = field[subfield][sub_subfield]['#text']
 
                                     if sub_subfield == "Characteristics":
-                                        cell = get_cell_info_from_dict_list(field[subfield][sub_subfield])
+                                        cell = get_cell_info_from_dict_or_dict_list(field[subfield][sub_subfield])
                             
                             if subfield == "Description":
                                 desc = field[subfield]
+                                
 
                             if subfield == "Library-Strategy":
                                 Lib_Strat = field[subfield]
@@ -82,7 +89,7 @@ def compile_df(dict):
     Creates a df from a dictionary. GSM are keys and relative fields are the values, given as a list.
     '''
     df = pd.DataFrame.from_dict(dict, orient="index")
-    df.columns = ["Title", "Organism", "Cell_line/Strain", "Description", "Library_Strategy", "Extraction_Protocol"]
+    df.columns = ["Title", "Organism", "Cell/Strain", "Description", "Library_Strategy", "Extraction_Protocol"]
     return(df)
 
 # Temporary functions, defined only for testing purposes and not required in the nextflow implementation.
