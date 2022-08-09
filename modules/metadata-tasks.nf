@@ -10,6 +10,7 @@ process GET_GSE_REPORT {
 	script: 
 /// sleep ${GSE[-1]} introduces a random delay in the download of the files.
 	"""
+    echo ${GSE}
     sleep ${GSE[-1]} 
     wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/${GSE[0..-4]}nnn/${GSE}/miniml/${GSE}_family.xml.tgz
     tar -xzvf ${GSE}_family.xml.tgz
@@ -49,10 +50,9 @@ workflow {
     params.path_to_txt = 
     input = Channel
         .fromPath("/data1/riboseq_org/riboseq_data_processing/data/ribosome_profiling_superset.csv")
-        .splitCsv(header: true)
+        .splitCsv(header: false)
     input.view({it[0]})
-  
-           /// file(${params.path_to_txt}).readLines().each{file(it)} )
+
     GET_GSE_REPORT          ( input )
     GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
 }
