@@ -49,9 +49,9 @@ workflow {
 
     params.path_to_txt = 
     input = Channel
-        .fromPath("/data1/riboseq_org/riboseq_data_processing/data/ribosome_profiling_superset.csv")
-        .splitCsv(header: false)
-    ///input.view({it[0]})
+        .fromPath("/home/121109636/CSV_reports/GSEs.txt")
+        .readLines
+    input.view({it[0]})
 
     GET_GSE_REPORT          ( input )
     GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
