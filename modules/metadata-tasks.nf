@@ -46,8 +46,13 @@ workflow {
 "GSE133111","GSE112705","GSE116233","GSE127713","GSE121952","GSE110618","GSE123675",
 "GSE97286","GSE102216") */
 
-    params.path_to_txt = "/home/121109636/CSV_reports/GSEs.txt"
-    input = Channel.from( file(${params.path_to_txt}).readLines().each{file(it)} )
+    params.path_to_txt = 
+    input = Channel
+        .fromPath("/data1/riboseq_org/riboseq_data_processing/data/ribosome_profiling_superset.csv")
+        .splitCsv(header: true)
+    input.view({it[0]})
+  
+           /// file(${params.path_to_txt}).readLines().each{file(it)} )
     GET_GSE_REPORT          ( input )
     GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
 }
