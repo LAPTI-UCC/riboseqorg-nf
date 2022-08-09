@@ -66,8 +66,6 @@ def parse_xml(xml_path):
                     sample_list = data_dict[MINiML][section]
                     for field in data_dict[MINiML][section]:
                         if field == "@iid":
-                            print("There is only one sample")
-                            print()
                             sample_list = [data_dict[MINiML][section]]
                     
                     for field in sample_list:
