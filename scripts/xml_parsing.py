@@ -2,7 +2,6 @@ from numpy import inner
 import xmltodict
 import sys
 import pandas as pd
-import collections
 
 
 def get_cell_info(tags_list):
@@ -25,7 +24,7 @@ def get_cell_info(tags_list):
 
 def lister(Title, Organism, Source, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available", Tags = "None"):
     '''
-    Just creates a list with the given arguments, allows for some of the to be optional.
+    Creates a list with the given arguments, allows for some of the to be optional.
     '''
     inner_list = [Title, Organism, Source, Cell_line, Description, Library_strategy, Protocol, Tags]
     return (inner_list)
@@ -59,7 +58,6 @@ def parse_xml(xml_path):
                             if subfield == "Channel":
                                 for sub_subfield in field[subfield]:
                                     
-                                    # This snippet is left for a possibile future use.
                                     if sub_subfield == "Source":
                                         source_string = field[subfield][sub_subfield]
 
@@ -72,7 +70,7 @@ def parse_xml(xml_path):
                                     if sub_subfield == "Characteristics":
                                         cell = get_cell_info(field[subfield][sub_subfield])
                                         
-                                        # REWRITE THIS BIT AS ITS OWN FUNCTION
+                                        # retrieves all the "characteristics tags" of the .xml 
 
                                         tags = field[subfield][sub_subfield]
                                         if type(tags) != list:
@@ -82,10 +80,8 @@ def parse_xml(xml_path):
                                             new_key = key["@tag"]
                                             final_tags[new_key] = key["#text"]
 
-
                             if subfield == "Description":
                                 desc = field[subfield]
-
 
                             if subfield == "Library-Strategy":
                                 Lib_Strat = field[subfield]
@@ -104,7 +100,6 @@ def compile_df(dict):
     df.columns = ["Title", "Organism", "Source", "Cell/Strain", "Description", "Library_Strategy", "Extraction_Protocol", "Tags"]
     return(df)
 
-# Function needed in the nextflow implementation, to name each signle csv accordingly.
 
 def get_GSE(string):
     '''
@@ -116,15 +111,11 @@ def get_GSE(string):
 
 
 if __name__ == '__main__':
-    #input_list = sys.argv[1]
-    #temp_main(input_list)
-
-    # When implemented in nextflow, this will be actual code:
 
     xml_path = sys.argv[1]
     dict = parse_xml(xml_path)
     df = compile_df(dict)
     GSE = get_GSE(xml_path)
-    df.to_csv(GSE + ".csv")     # the final name should be something like "GSEnnnnnn_family.csv"
+    df.to_csv(GSE + ".csv")
 
 
