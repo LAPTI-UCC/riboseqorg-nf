@@ -20,15 +20,6 @@ def get_cell_info(tags_list):
     return cell_line
 
 
-#            return dicts['#text']
-#        elif "tissue" in dicts['@tag']:
-#            return dicts['#text']
-#        elif 'genotype' in dicts['@tag']:
-#            return dicts['#text']
-#    cell_line = "No tag found among 'Characteristics' detailing the cell/strain"
-#    return cell_line
-
-
 def get_strain_info(tags_list):
     '''
     Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the strain and/or genotype of the sample.
@@ -50,7 +41,7 @@ def lister(Title, Organism, Source, Strain_Genotype, Cell_Tissue, Description = 
     Creates a list with the given arguments, allows for some of the to be optional.
     '''
     inner_list = [Title, Organism, Source, Strain_Genotype, Cell_Tissue, Description, Library_strategy, Protocol, Tags]
-    return (inner_list)
+    return inner_list
 
 
 def parse_xml(xml_path):
@@ -113,16 +104,16 @@ def parse_xml(xml_path):
                         inner = lister(title,organism, source_string, strain, cell, desc, Lib_Strat, protocol, final_tags)
                         output_dictionary[GSM_id] = inner
 
-    return ( output_dictionary )
+    return  output_dictionary 
 
 
-def compile_df(dict):
+def compile_df(dictionary):
     '''
     Creates a df from a dictionary. GSM are keys and relative fields are the values, given as a list.
     '''
-    df = pd.DataFrame.from_dict(dict, orient="index")
+    df = pd.DataFrame.from_dict(dictionary, orient="index")
     df.columns = ["Title", "Organism", "Source", "Strain/Genotype","Cell/Tissue", "Description", "Library_Strategy", "Extraction_Protocol", "Tags"]
-    return(df)
+    return df
 
 
 def get_GSE(string):
@@ -137,8 +128,8 @@ def get_GSE(string):
 if __name__ == '__main__':
 
     xml_path = sys.argv[1]
-    dict = parse_xml(xml_path)
-    df = compile_df(dict)
+    dictionary = parse_xml(xml_path)
+    df = compile_df(dictionary)
     GSE = get_GSE(xml_path)
     df.to_csv(GSE + ".csv")
 
