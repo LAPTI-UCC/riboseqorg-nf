@@ -50,8 +50,8 @@ workflow {
     params.path_to_txt = 
     input = Channel
         .fromPath("/home/121109636/CSV_reports/GSEs.txt")
-        .splitText
-    input.view({it[0]})
+        .splitText()
+        .view()
 
     GET_GSE_REPORT          ( input )
     GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
