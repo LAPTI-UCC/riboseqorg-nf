@@ -8,8 +8,9 @@ process GET_GSE_REPORT {
     path "*.xml"
 
 	script: 
-/// sleep ${GSE[-1]} introduces a random delay in the download of the files.
+/// slicing the GSE so it does not have the /n inside (the /n is added by the splitText operator, see workflow)
     GSE = "${GSE_WNL[0..-2]}"
+/// sleep ${GSE[-1]} introduces a random delay in the download of the files.
 	"""
     sleep ${GSE[-1]}
     wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/${GSE[0..-4]}nnn/${GSE}/miniml/${GSE}_family.xml.tgz
