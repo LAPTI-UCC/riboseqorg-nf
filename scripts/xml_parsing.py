@@ -48,9 +48,9 @@ def get_sample_info(sample):
                     tags = sample["Channel"]["Characteristics"]
                     if type(tags) != list:
                         tags = [tags]
-                        for key in tags:
-                            new_key = key["@tag"]
-                            final_tags[new_key] = key["#text"]
+                    for key in tags:
+                        new_key = key["@tag"]
+                        final_tags[new_key] = key["#text"]
 
     return (GSM_id, title, organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags)
 
