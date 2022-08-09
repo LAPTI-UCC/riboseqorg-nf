@@ -49,7 +49,7 @@ workflow {
 
     params.path_to_txt = 
     input = Channel
-        .fromPath("/home/121109636/CSV_reports/GSEs.txt")
+        .fromPath("/home/121109636/CSV_reports/GSEs2.txt")
         .splitText()
         .view()
 
