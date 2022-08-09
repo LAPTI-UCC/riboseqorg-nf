@@ -52,7 +52,6 @@ workflow {
     input = Channel
         .fromPath("/home/121109636/CSV_reports/GSEs.txt")
         .splitText()
-        .view()
 
     GET_GSE_REPORT          ( input )
     GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
