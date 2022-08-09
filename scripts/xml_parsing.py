@@ -6,27 +6,50 @@ import pandas as pd
 
 def get_cell_info(tags_list):
     '''
-    Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell-line or strain of the sample.
+    Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell line and tissue of the sample.
     '''
     
     if type(tags_list) != list:
         tags_list = [tags_list]
+    cell_line = ""
     for dicts in tags_list:
-        if 'cell' in dicts['@tag'] or "strain" in dicts['@tag']:
-            return dicts['#text']
-        elif "tissue" in dicts['@tag']:
-            return dicts['#text']
-        elif 'genotype' in dicts['@tag']:
-            return dicts['#text']
-    cell_line = "No tag found among 'Characteristics' detailing the cell/strain"
+        if 'cell' in dicts['@tag']:
+            cell_line = dicts['#text']
+        if 'tissue' in dicts['@tag']:
+            cell_line = cell_line + dicts['#text']
     return cell_line
 
 
-def lister(Title, Organism, Source, Cell_line, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available", Tags = "None"):
+#            return dicts['#text']
+#        elif "tissue" in dicts['@tag']:
+#            return dicts['#text']
+#        elif 'genotype' in dicts['@tag']:
+#            return dicts['#text']
+#    cell_line = "No tag found among 'Characteristics' detailing the cell/strain"
+#    return cell_line
+
+
+def get_strain_info(tags_list):
+    '''
+    Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the strain and/or genotype of the sample.
+    '''
+    
+    if type(tags_list) != list:
+        tags_list = [tags_list]
+    strain_info = ""
+    for dicts in tags_list:
+        if 'strain' in dicts['@tag']:
+            strain_info = dicts['#text']
+        if 'genotype' in dicts['@tag']:
+            strain_info = strain_info + dicts['#text']
+    return strain_info
+
+
+def lister(Title, Organism, Source, Strain_Genotype, Cell_Tissue, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available", Tags = "None"):
     '''
     Creates a list with the given arguments, allows for some of the to be optional.
     '''
-    inner_list = [Title, Organism, Source, Cell_line, Description, Library_strategy, Protocol, Tags]
+    inner_list = [Title, Organism, Source, Strain_Genotype, Cell_Tissue, Description, Library_strategy, Protocol, Tags]
     return (inner_list)
 
 
@@ -69,6 +92,7 @@ def parse_xml(xml_path):
 
                                     if sub_subfield == "Characteristics":
                                         cell = get_cell_info(field[subfield][sub_subfield])
+                                        strain = get_strain_info(field[subfield][sub_subfield])
                                         
                                         # retrieves all the "characteristics tags" of the .xml 
 
@@ -86,7 +110,7 @@ def parse_xml(xml_path):
                             if subfield == "Library-Strategy":
                                 Lib_Strat = field[subfield]
                             
-                        inner = lister(title,organism, source_string, cell, desc, Lib_Strat, protocol, final_tags)
+                        inner = lister(title,organism, source_string, strain, cell, desc, Lib_Strat, protocol, final_tags)
                         output_dictionary[GSM_id] = inner
 
     return ( output_dictionary )
@@ -97,7 +121,7 @@ def compile_df(dict):
     Creates a df from a dictionary. GSM are keys and relative fields are the values, given as a list.
     '''
     df = pd.DataFrame.from_dict(dict, orient="index")
-    df.columns = ["Title", "Organism", "Source", "Cell/Strain", "Description", "Library_Strategy", "Extraction_Protocol", "Tags"]
+    df.columns = ["Title", "Organism", "Source", "Strain/Genotype","Cell/Tissue", "Description", "Library_Strategy", "Extraction_Protocol", "Tags"]
     return(df)
 
 
