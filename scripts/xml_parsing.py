@@ -56,12 +56,27 @@ def parse_xml(xml_path):
         for MINiML in data_dict:
             for section in data_dict[MINiML]:
                 if section == "Sample":
-                    for field in data_dict[MINiML][section]:
 
+# Problem: if there is just one sample, then the nested structure is changed and the code will not work.
+# Solution: I just need to put inside a list the study if it contains only one sample.
+# Method: I check if data_dict[MINiML][section] contains traight up the ley "@iid" or not. If it does, then it's a single-sample study and needs to be put in
+# a list. Otherwise, there are multiple samples and data_dict[MINiML][section] can be left as it is
+
+                    # SHOULD I WRAP THIS UP IN A LIST?
+                    sample_list = data_dict[MINiML][section]
+                    for field in data_dict[MINiML][section]:
+                        if field == "@iid":
+                            print("There is only one sample")
+                            print()
+                            sample_list = [data_dict[MINiML][section]]
+                    
+                    for field in sample_list:
+                    
                         # Set default values for those specifc sub-fields that are not always specified
                         desc = "No description available"
                         Lib_Strat = "Not available"
                         protocol = "Not available"
+
 
                         GSM_id = field["@iid"]
 
