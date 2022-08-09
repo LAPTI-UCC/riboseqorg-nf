@@ -12,7 +12,7 @@ def get_cell_info(tags_list):
     if type(tags_list) != list:
         tags_list = [tags_list]
     for dicts in tags_list:
-        if 'cell line' in dicts['@tag'] or "strain" in dicts['@tag']:
+        if 'cell' in dicts['@tag'] or "strain" in dicts['@tag']:
             return dicts['#text']
         elif "tissue" in dicts['@tag']:
             return dicts['#text']
