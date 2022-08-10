@@ -20,7 +20,7 @@ process GET_GSE_REPORT {
 process EXTRACT_XML_REPORT {
 
     input:
-    path compressed_xml
+    file compressed_xml
 
     output:
     path "*.xml"
