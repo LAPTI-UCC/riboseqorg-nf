@@ -26,8 +26,10 @@ process EXTRACT_XML_REPORT {
     path "*.xml"
 
     script:
+    name = ${compressed_xml[0..-4]}
     """
-    tar -zxvf ${compressed_xml} *.xml
+    echo ${name}
+    tar -zxvf ${compressed_xml} ${name}    
     """
 }
 
