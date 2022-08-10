@@ -1,3 +1,5 @@
+from re import sub
+from typing import final
 from numpy import inner
 import xmltodict
 import sys
@@ -39,18 +41,31 @@ def get_sample_info(sample):
                 if sub_section == "Extract-Protocol":
                     protocol = sample["Channel"]["Extract-Protocol"]
 
-                # HERE IS WHERE THE ERROR WAS IN THE LAST SCRIPT: NEED TO CHECK THIS DATA STRUCTURE
-                if sub_section == "Organism": # Here we are extracting from another dictionary, so there maight be issues
-                    organism = sample["Channel"]["Organism"]['#text']
+# Improved: now this block of code accounts for multiple organisms in the same sample (ie. virus-infected human cells)
+                if sub_section == "Organism":
+                    organism_list = sample["Channel"]["Organism"]
+                    for field in organism_list:
+                        if "text" in field:
+                            organism_list = [organism_list]
+                    for org in organism_list:
+                        organism = organism + " - " + org["#text"]
+                    organism = organism[2:]
+
                 if sub_section == "Characteristics":
                     cell = get_cell_info(sample[section][sub_section])
                     strain = get_strain_info(sample[section][sub_section])
                     tags = sample["Channel"]["Characteristics"]
                     if type(tags) != list:
                         tags = [tags]
-                    for key in tags:
-                        new_key = key["@tag"]
-                        final_tags[new_key] = key["#text"]
+                    if type(tags[0]) != str:
+                        for key in tags:
+                            new_key = key["@tag"]
+                            final_tags[new_key] = key["#text"]
+                    elif type(tags[0]) == str:
+
+                        final_tags = set(final_tags)
+                        for each in tags:
+                            final_tags.add(each)
 
     return (GSM_id, title, organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags)
 
@@ -59,15 +74,18 @@ def get_cell_info(tags_list):
     '''
     Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell line and tissue of the sample.
     '''
-    
     if type(tags_list) != list:
         tags_list = [tags_list]
     cell_line = ""
-    for dicts in tags_list:
-        if 'cell' in dicts['@tag']:
-            cell_line = dicts['#text']
-        if 'tissue' in dicts['@tag']:
-            cell_line = cell_line + dicts['#text']
+    for tag in tags_list:
+        get_tag_type = type(tag)
+        if "str" not in str(get_tag_type):
+            if 'cell' in tag['@tag']:
+                cell_line = tag['#text']
+            if 'tissue' in tag['@tag']:
+                cell_line = cell_line + tag['#text']
+        elif "str" in str(get_tag_type):
+            cell_line = cell_line + " " + tag
     return cell_line
 
 
@@ -79,11 +97,15 @@ def get_strain_info(tags_list):
     if type(tags_list) != list:
         tags_list = [tags_list]
     strain_info = ""
-    for dicts in tags_list:
-        if 'strain' in dicts['@tag']:
-            strain_info = dicts['#text']
-        if 'genotype' in dicts['@tag']:
-            strain_info = strain_info + dicts['#text']
+    for tag in tags_list:
+        get_tag_type = type(tag)
+        if "str" not in str(get_tag_type):
+            if 'strain' in tag['@tag']:
+                strain_info = tag['#text']
+            if 'genotype' in tag['@tag']:
+                strain_info = strain_info + tag['#text']
+        elif "str" in str(get_tag_type):
+            strain_info = strain_info + " " + tag
     return strain_info
 
 
