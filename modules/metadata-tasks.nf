@@ -27,7 +27,7 @@ process EXTRACT_XML_REPORT {
 
     script:
     """
-    tar -zxvf compressed_xml *.xml
+    tar -zxvf ${compressed_xml} *.xml
     """
 }
 
