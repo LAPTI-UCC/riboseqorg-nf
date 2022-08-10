@@ -20,6 +20,8 @@ process GET_GSE_REPORT {
 
 process EXTRACT_XML_REPORT {
 
+    errorStrategy 'ignore'
+
     input:
     file compressed_xml
     val GSE
