@@ -14,7 +14,7 @@ process GET_GSE_REPORT {
     sleep_GSE = "${GSE[-1]}"
 /// sleep ${GSE[-1]} introduces a random delay in the download of the files.
 	"""
-    timer =  $(${sleep_GSE} + 2)
+    timer =  ${sleep_GSE} + 2
     echo $timer
     sleep $timer
     wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/${GSE[0..-4]}nnn/${GSE}/miniml/${GSE}_family.xml.tgz
