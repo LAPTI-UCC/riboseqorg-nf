@@ -13,10 +13,10 @@ process GET_GSE_REPORT {
     GSE = "${GSE_WNL[0..-2]}"
     second = "${GSE[-1]}"
     int sleep_GSE = ${second} as Integer
-    sleep_GSE = ${sleep_GSE} +2
+    sleepest_GSE = ${sleep_GSE} +2
 /// sleep ${GSE[-1]} introduces a random delay in the download of the files.
 	"""
-    sleep ${sleep_GSE}
+    sleep ${sleepest_GSE}
     wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/${GSE[0..-4]}nnn/${GSE}/miniml/${GSE}_family.xml.tgz
     """
 }
