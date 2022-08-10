@@ -70,8 +70,6 @@ workflow {
         .splitText()
 
     GET_GSE_REPORT          ( input )
-    println GET_GSE_REPORT.out.xml_tgz.getClass()
-
     EXTRACT_XML_REPORT      ( GET_GSE_REPORT.out.xml_tgz, GET_GSE_REPORT.out.GSE )
     GET_CSV_FROM_XML        ( EXTRACT_XML_REPORT.out )
 }
