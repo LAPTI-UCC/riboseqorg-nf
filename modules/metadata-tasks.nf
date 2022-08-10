@@ -12,8 +12,8 @@ process GET_GSE_REPORT {
 /// slicing the GSE so it does not have the /n inside (the /n is added by the splitText operator, see workflow)
     GSE = "${GSE_WNL[0..-2]}"
     second = "${GSE[-1]}"
-    int sleep_GSE = ${second} as Integer
-    sleepest_GSE = ${sleep_GSE} +2
+    int sleep_GSE = second as Integer
+    sleepest_GSE = sleep_GSE +2
 /// sleep ${GSE[-1]} introduces a random delay in the download of the files.
 	"""
     sleep ${sleepest_GSE}
