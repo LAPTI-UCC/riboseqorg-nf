@@ -5,7 +5,7 @@ process GET_GSE_REPORT {
     val GSE_WNL
 
     output:
-    path "*.xml"
+    path "*.xml.tgz"
 
 	script: 
 /// slicing the GSE so it does not have the /n inside (the /n is added by the splitText operator, see workflow)
@@ -14,15 +14,27 @@ process GET_GSE_REPORT {
 	"""
     sleep ${GSE[-1]}
     wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/${GSE[0..-4]}nnn/${GSE}/miniml/${GSE}_family.xml.tgz
-    tar -xzvf ${GSE}_family.xml.tgz
+    """
+}
+
+process EXTRACT_XML_REPORT {
+
+    input:
+    path compressed_xml
+
+    output:
+    path "*.xml"
+
+    script:
+    """
+    tar -zxvf compressed_xml *.xml
     """
 }
 
 process GET_CSV_FROM_XML {
-    /// VERY provisional, I just need to iterate this process over several GSE and check the result
-    /// The publishing directory will be the one of the study
+    /// VERY provisional, I just need to  check the result (and thus having a single folder makes it easier)
+    /// The publishing directory will be the one of the study in exam
     publishDir "/home/121109636/CSV_reports"
-
 
     input:
     path xml_report
@@ -54,5 +66,6 @@ workflow {
         .splitText()
 
     GET_GSE_REPORT          ( input )
-    GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
+    EXTRACT_XML_REPORT      ( GET_GSE_REPORT.out )
+    GET_CSV_FROM_XML        ( EXTRACT_XML_REPORT.out )
 }
