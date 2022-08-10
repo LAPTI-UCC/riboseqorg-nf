@@ -4,6 +4,57 @@ import sys
 import pandas as pd
 
 
+def get_sample_info(sample):
+    '''
+    Given a list of nested dictionaries, retrieves the required info and returns it in a tuple.
+    '''
+
+    # Set default values for returned argument in case they are missing
+
+    GSM_id = sample["@iid"]
+    desc = "No description available"
+    Lib_Strat = "Not available"
+
+    strain = ""
+    cell = ""
+    source = ""
+    protocol = ""
+    organism = ""
+    final_tags = {}
+
+
+    for section in sample:
+
+        if section == "Title":
+            title = sample["Title"]
+        if section == "Description":
+            desc = sample["Description"]
+        if section == "Library-Strategy":
+            Lib_Strat = sample["Library-Strategy"]
+            
+        if section == "Channel":
+            for sub_section in sample["Channel"]:
+                if sub_section == "Source":
+                    source = sample["Channel"]["Source"]
+                if sub_section == "Extract-Protocol":
+                    protocol = sample["Channel"]["Extract-Protocol"]
+
+                # HERE IS WHERE THE ERROR WAS IN THE LAST SCRIPT: NEED TO CHECK THIS DATA STRUCTURE
+                if sub_section == "Organism": # Here we are extracting from another dictionary, so there maight be issues
+                    organism = sample["Channel"]["Organism"]['#text']
+                if sub_section == "Characteristics":
+                    cell = get_cell_info(sample[section][sub_section])
+                    strain = get_strain_info(sample[section][sub_section])
+                    tags = sample["Channel"]["Characteristics"]
+                    if type(tags) != list:
+                        tags = [tags]
+                    for key in tags:
+                        new_key = key["@tag"]
+                        final_tags[new_key] = key["#text"]
+
+    return (GSM_id, title, organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags)
+
+
 def get_cell_info(tags_list):
     '''
     Given a dictionary or an unordered list of dictionaries (derived from the GEO report in xml format), returns the cell line and tissue of the sample.
@@ -67,54 +118,11 @@ def parse_xml(xml_path):
                     for field in data_dict[MINiML][section]:
                         if field == "@iid":
                             sample_list = [data_dict[MINiML][section]]
-                    
-                    for field in sample_list:
-                    
-                        # Set default values for those specifc sub-fields that are not always specified
-                        desc = "No description available"
-                        Lib_Strat = "Not available"
-                        protocol = "Not available"
 
+                    for sample in sample_list:
+                        GSM_id, title, organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags = get_sample_info(sample)
 
-                        GSM_id = field["@iid"]
-
-                        for subfield in field:
-                            if subfield == "Title":
-                                title = field[subfield]
-
-                            if subfield == "Channel":
-                                for sub_subfield in field[subfield]:
-                                    
-                                    if sub_subfield == "Source":
-                                        source_string = field[subfield][sub_subfield]
-
-                                    if sub_subfield == "Extract-Protocol":
-                                        protocol = field[subfield][sub_subfield]
-
-                                    if sub_subfield == "Organism":
-                                        organism = field[subfield][sub_subfield]['#text']
-
-                                    if sub_subfield == "Characteristics":
-                                        cell = get_cell_info(field[subfield][sub_subfield])
-                                        strain = get_strain_info(field[subfield][sub_subfield])
-                                        
-                                        # retrieves all the "characteristics tags" of the .xml 
-
-                                        tags = field[subfield][sub_subfield]
-                                        if type(tags) != list:
-                                            tags = [tags]
-                                        final_tags= {}
-                                        for key in tags:
-                                            new_key = key["@tag"]
-                                            final_tags[new_key] = key["#text"]
-
-                            if subfield == "Description":
-                                desc = field[subfield]
-
-                            if subfield == "Library-Strategy":
-                                Lib_Strat = field[subfield]
-                            
-                        inner = lister(title,organism, source_string, strain, cell, desc, Lib_Strat, protocol, final_tags)
+                        inner = lister(title,organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags)
                         output_dictionary[GSM_id] = inner
 
     return  output_dictionary 
