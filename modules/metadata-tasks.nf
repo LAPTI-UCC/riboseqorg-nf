@@ -5,7 +5,8 @@ process GET_GSE_REPORT {
     val GSE_WNL
 
     output:
-    path "*.xml.tgz"
+    path "*.xml.tgz",emit: xml_tgz
+    val GSE, emit: GSE
 
 	script: 
 /// slicing the GSE so it does not have the /n inside (the /n is added by the splitText operator, see workflow)
@@ -21,15 +22,14 @@ process EXTRACT_XML_REPORT {
 
     input:
     file compressed_xml
+    val GSE
 
     output:
     path "*.xml"
 
     script:
-    name = "${compressed_xml[0..-4]}"
     """
-    echo ${name}
-    tar -zxvf ${compressed_xml} ${name}    
+    tar -zxvf ${compressed_xml} ${GSE}_family.xml 
     """
 }
 
@@ -68,6 +68,6 @@ workflow {
         .splitText()
 
     GET_GSE_REPORT          ( input )
-    EXTRACT_XML_REPORT      ( GET_GSE_REPORT.out )
+    EXTRACT_XML_REPORT      ( GET_GSE_REPORT.out.xml_tgz, GET_GSE_REPORT.out.GSE )
     GET_CSV_FROM_XML        ( EXTRACT_XML_REPORT.out )
 }
