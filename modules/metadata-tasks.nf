@@ -2,6 +2,7 @@
 process GET_GSE_REPORT {
 
     errorStrategy 'retry'
+    maxRetries 3
         
     input:
     val GSE_WNL
