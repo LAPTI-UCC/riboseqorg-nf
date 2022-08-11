@@ -1,7 +1,7 @@
 
 process GET_GSE_REPORT {
 
-    errorStrategy {sleep 1 : 'retry'}
+    errorStrategy 'retry'
         
     input:
     val GSE_WNL
