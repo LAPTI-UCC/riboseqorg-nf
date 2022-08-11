@@ -1,7 +1,7 @@
 
 process GET_GSE_REPORT {
 
-    errorStrategy 'retry'
+    errorStrategy {sleep 'retry'}
     maxRetries 3
         
     input:
@@ -15,8 +15,8 @@ process GET_GSE_REPORT {
     GSE = "${GSE_WNL[0..-2]}"
 /// sleep_GSE introduces a random delay in the download of the files.
     sleep_GSE = "${GSE[-1]}"
-    if (sleep_GSE == "0" || sleep_GSE == "1" || sleep_GSE == "2"){
-        sleep_GSE = "3"
+    if (sleep_GSE == "0" || sleep_GSE == "1" ){
+        sleep_GSE = "2"
     }
 
 	"""
