@@ -25,7 +25,7 @@ process GET_GSE_REPORT {
 
 process EXTRACT_XML_REPORT {
 
-    errorStrategy { echo ${GSE} >> "/home/121109636/gionmattia/errors.txt"  }
+    errorStrategy { task.exitStatus == 2 ? echo "NOOOPE"}
 
     input:
     file compressed_xml
