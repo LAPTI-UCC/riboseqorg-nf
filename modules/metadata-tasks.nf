@@ -15,7 +15,7 @@ process GET_GSE_REPORT {
     GSE = "${GSE_WNL[0..-2]}"
 /// sleep_GSE introduces a random delay in the download of the files.
     sleep_GSE = "${GSE[-1]}"
-    if (sleep_GSE == "0"){
+    if (sleep_GSE == "0" || sleep_GSE == "1"){
         sleep_GSE = "2"
     }
 
