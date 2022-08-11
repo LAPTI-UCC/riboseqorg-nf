@@ -25,7 +25,7 @@ process GET_GSE_REPORT {
 
 process EXTRACT_XML_REPORT {
 
-    errorStrategy 'ignore'
+    errorStrategy 'retry'
 
     input:
     file compressed_xml
