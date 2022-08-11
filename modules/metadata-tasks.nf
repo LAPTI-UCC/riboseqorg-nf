@@ -13,13 +13,13 @@ process GET_GSE_REPORT {
 /// slicing the GSE so it does not have the /n inside (the /n is added by the splitText operator, see workflow)
     GSE = "${GSE_WNL[0..-2]}"
 /// sleep_GSE introduces a random delay in the download of the files.
-    sleep_GSE = "${GSE[-1]}"
-    if (sleep_GSE == "0" || sleep_GSE == "1" || sleep_GSE == "3" ){
-        sleep_GSE = "5"
-    }
+    def z = ["4", "5", "6", "7", "8", "9"]
+    Random rnd = new Random()
+
+    Sleep_time = (z[rnd.nextInt(z.size)])
 
 	"""
-    sleep ${sleep_GSE}
+    sleep ${Sleep_time}
     wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/${GSE[0..-4]}nnn/${GSE}/miniml/${GSE}_family.xml.tgz
     tar -zxvf ${GSE}_family.xml.tgz
     """
