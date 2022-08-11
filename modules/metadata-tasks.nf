@@ -25,7 +25,7 @@ process GET_GSE_REPORT {
 
 process EXTRACT_XML_REPORT {
 
-    errorStrategy { task.exitStatus == 2 ? echo "NOOOPE" }
+    errorStrategy { task.exitStatus == 2 ? 'retry' : 'terminate' }
 
     input:
     file compressed_xml
