@@ -1,8 +1,7 @@
 
 process GET_GSE_REPORT {
 
-    errorStrategy {sleep 'retry'}
-    maxRetries 3
+    errorStrategy {sleep 1 : 'retry'}
         
     input:
     val GSE_WNL
@@ -15,8 +14,8 @@ process GET_GSE_REPORT {
     GSE = "${GSE_WNL[0..-2]}"
 /// sleep_GSE introduces a random delay in the download of the files.
     sleep_GSE = "${GSE[-1]}"
-    if (sleep_GSE == "0" || sleep_GSE == "1" ){
-        sleep_GSE = "2"
+    if (sleep_GSE == "0" || sleep_GSE == "1" || sleep_GSE == "3" ){
+        sleep_GSE = "5"
     }
 
 	"""
