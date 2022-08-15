@@ -210,7 +210,7 @@ def check_and_assign_header_from_file(path_to_sra_run_info):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Lorem Ipsum")
+    parser = argparse.ArgumentParser(description="Checks the presence of the header of the csv file and eventually assigns it")
     parser.add_argument("Path", type = str, help = "Path to the location of the '*RunInfo.csv' file")
     args = parser.parse_args()
 
