@@ -28,7 +28,7 @@ process GET_GSE_REPORT {
 process GET_CSV_FROM_XML {
     /// VERY provisional, I just need to  check the result (and thus having a single folder makes it easier)
     /// The publishing directory will be the one of the study in exam
-    publishDir "/home/121109636/CSV_reports"
+    ///publishDir "/home/121109636/CSV_reports"
 
     input:
     path xml_report
@@ -42,14 +42,33 @@ process GET_CSV_FROM_XML {
     """
 }
 
+process ASSESS_LIBRARY_STRATEGY {
+    /// TEMPORARY! NEED TO UPDATE IT WHEN RUNNING FROM WGB
+    publishDir "/home/gionmattia/Desktop/ResearchProject/CSV_reports", mode: "copy"
+
+    input:
+    path csv
+
+    output:
+    path csv
+
+    script:
+    """
+    python3 $projectDir/../scripts/library_strategy_definer.py ${csv}
+    """
+
+}
+
 
 workflow {
 
-    params.path_to_txt = 
+    ///params.path_to_txt = 
     input = Channel
-        .fromPath("/home/121109636/CSV_reports/GSEs.txt")
+        ///.fromPath("/home/121109636/CSV_reports/GSEs.txt")
+        .fromPath("/home/gionmattia/Desktop/ResearchProject/CSV_reports/GSEs.txt")
         .splitText()
 
     GET_GSE_REPORT          ( input )
     GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
+    ASSESS_LIBRARY_STRATEGY ( GET_CSV_FROM_XML.out )
 }
