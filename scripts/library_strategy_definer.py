@@ -4,7 +4,8 @@ import argparse
 # Each dictionary stores the words for each library strategy and a score.
 Ribo_seq = {'ribo-seq': 1, 'ribosome profil': 1, 'fp': 1, 'rpf': 1,  'ribolace': 1, 'riboseq': 1, 'ribosome protected fragments': 1, 'ribo': 0.5, 'footprint': 1}
 RNA_seq = {'rna-seq': 1, 'mrna': 1, 'rnaseq': 1, 'rna': 0.5}
-
+Initiating_ribo = {"harringtonine": 1,"lactimidomycin": 1, "initiating": 1,"pateamine" : 1,"harr": 1, "lac": 1}
+Elongating_ribo = {"Cyclohexamide": 1}
 
 def get_score(field, terms_set):
     '''
@@ -57,6 +58,25 @@ def scores_evaluator(n, df):
     elif RNA_titl_score < ribo_titl_score:
         return("Ribo-seq study")
 
+def define_ribosome_position(n,df):
+    '''
+    If the study is ribo-seq, checks for info about the ribosome position (stalling or elongating) using some keywords.
+    '''
+    prot = df.at[n,"Extraction_Protocol"].lower()
+
+    initiating_score = 0
+    elongating_score = 0
+    initiating_score = get_score(prot, Initiating_ribo)
+    elongating_score = get_score(prot, Elongating_ribo)
+
+    if initiating_score > elongating_score:
+        return ("Ribo-seq study - Initiating")
+    elif initiating_score <= elongating_score:
+        return ("Ribo-seq study - Elongating")
+
+
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Retrieves the Library Strategy for a sepcific study, based on keywords")
@@ -72,6 +92,9 @@ if __name__ == "__main__":
 
     for n in df.index:
         df.at[n,"Library_Strategy"] = scores_evaluator(n, df)
+        if df.at[n,"Library_Strategy"] == "Ribo-seq study":
+            df.at[n,"Library_Strategy"] = define_ribosome_position(n, df)
+
     df.to_csv(file_path, index= False)
     
 
