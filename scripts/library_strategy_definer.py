@@ -73,6 +73,7 @@ def define_ribosome_position(n,df):
         return ("Ribo-seq study","Initiating")
     elif initiating_score <= elongating_score:
         return ("Ribo-seq study","Elongating")
+    
 
 
 # function so that the new column is considered
