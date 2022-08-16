@@ -62,7 +62,7 @@ def define_ribosome_position(n,df):
     '''
     If the study is ribo-seq, checks for info about the ribosome position (stalling or elongating) using some keywords.
     '''
-    prot = df.at[n,"Extraction_Protocol"].lower()
+    prot = str(df.at[n,"Extraction_Protocol"]).lower()
 
     initiating_score = 0
     elongating_score = 0
