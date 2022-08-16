@@ -1,0 +1,2 @@
+task_id, status, exit_status, workdir, script
+"${task_id}","${status}","${exit}","${workdir}",  """${script}"""
