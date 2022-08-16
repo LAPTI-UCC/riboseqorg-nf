@@ -1,1 +1,1 @@
-"${task_id}","${status}","${exit}","${workdir}", "${script[-35..-3]}"
+${task_id},${status},${exit},${workdir}, ${script[-35..-3]}
