@@ -109,11 +109,11 @@ def get_strain_info(tags_list):
     return strain_info
 
 
-def lister(Title, Organism, Source, Strain_Genotype, Cell_Tissue, Description = "None_Available", Library_strategy = "None_Available", Protocol = "None_Available", Tags = "None"):
+def lister(Title, Organism, Source, Strain_Genotype, Cell_Tissue, Description, Library_strategy, Ribosome_position = "",Protocol = "None_Available", Tags = "None"):
     '''
     Creates a list with the given arguments, allows for some of the to be optional.
     '''
-    inner_list = [Title, Organism, Source, Strain_Genotype, Cell_Tissue, Description, Library_strategy, Protocol, Tags]
+    inner_list = [Title, Organism, Source, Strain_Genotype, Cell_Tissue, Description, Library_strategy, Ribosome_position, Protocol, Tags]
     return inner_list
 
 
@@ -143,8 +143,8 @@ def parse_xml(xml_path):
 
                     for sample in sample_list:
                         GSM_id, title, organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags = get_sample_info(sample)
-
-                        inner = lister(title,organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags)
+                        rib_pos = ""
+                        inner = lister(title,organism, source, strain, cell, desc, Lib_Strat, rib_pos, protocol, final_tags)
                         output_dictionary[GSM_id] = inner
 
     return  output_dictionary 
@@ -155,7 +155,7 @@ def compile_df(dictionary):
     Creates a df from a dictionary. GSM are keys and relative fields are the values, given as a list.
     '''
     df = pd.DataFrame.from_dict(dictionary, orient="index")
-    df.columns = ["Title", "Organism", "Source", "Strain/Genotype","Cell/Tissue", "Description", "Library_Strategy", "Extraction_Protocol", "Tags"]
+    df.columns = ["Title", "Organism", "Source", "Strain/Genotype","Cell/Tissue", "Description", "Library_Strategy", "Ribosome_position", "Extraction_Protocol", "Tags"]
     return df
 
 
