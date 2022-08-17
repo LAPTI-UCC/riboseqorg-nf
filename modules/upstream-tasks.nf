@@ -121,6 +121,6 @@ process WRITE_PARAMTERS_YAML {
 
     script:
         """
-        python3 $projectDir/scripts/write_parameters_yaml.py -a "$project_dir/$params.data_dir/$find_adapters.simpleName/adapter_reports" -s $project_dir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
+        python3 $projectDir/scripts/write_parameters_yaml.py -a "$projectDir/$params.data_dir/$find_adapters.simpleName/adapter_reports" -s $projectDir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
         """
 }
