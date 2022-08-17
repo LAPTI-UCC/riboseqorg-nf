@@ -181,3 +181,6 @@ less_rRNA_fastq_files/*
 rRNA_alignment_stats/*
 bedGraphToBigWig/*
 trips_alignment_stats/*
+
+readme.txt
+scripts/csv_superset_filter.py

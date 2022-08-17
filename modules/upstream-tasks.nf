@@ -2,14 +2,18 @@
 process GET_RUN_INFO {
 
     input:
-        val GSE
+        tuple val(GSE),val(srp)
 
     output:
         path "${GSE}_sraRunInfo.csv"
 
     script:
+
+        /// python3 $projectDir/scripts/get_runInfo.py $projectDir/${params.ribosome_prof_superset} $projectDir/${params.data_dir} "${GSE}_sraRunInfo.csv" "${GSE}"
         """
-        python3 $projectDir/scripts/get_runInfo.py $projectDir/${params.ribosome_prof_superset} $projectDir/${params.data_dir} "${GSE}_sraRunInfo.csv" "${GSE}"
+ 
+
+        f"esearch -db sra -query ${srp} | efetch -format runinfo -mode text | cat > ${GSE}_sraRunInfo.csv"
         """
 }
 
