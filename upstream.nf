@@ -37,7 +37,7 @@ workflow upstream_flow {
         RUN_FFQ                 ( GET_INDIVIDUAL_RUNS.out ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
         WGET_FASTQ              ( RUN_FFQ.out.flatten() ) // This will not be optimal similar to above
 
-        FIND_ADAPTERS           ( WGET_FASTQ.out, project_dir )
+        FIND_ADAPTERS           ( WGET_FASTQ.out )
         WRITE_PARAMTERS_YAML    ( GET_RUN_INFO.out, FIND_ADAPTERS.out )
 
 }
