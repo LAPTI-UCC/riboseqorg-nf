@@ -31,7 +31,7 @@ def write_output_to_txt(GSEs_list, path = 'GSEs_not_downloaded.txt'):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Retrieves the GSEs that have not been downloaded correctly")
-    parser.add_argument("path_to_report_run", type = str, help = "Path to the location of the run report, a csv file")
+    parser.add_argument("path_to_report_run", type = str, help = "Path to the the run report, a csv file")
     parser.add_argument("txt_report_path", type = str, help = "Path the output txt file")
     args = parser.parse_args()
 
