@@ -18,7 +18,7 @@ workflow metadata_flow {
     take: GSE_inputs
 
     main:
-        GET_GSE_REPORT          ( GSE_inputs[0] )
+        GET_GSE_REPORT          ( GSE_inputs )
         GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
         ASSESS_LIBRARY_STRATEGY ( GET_CSV_FROM_XML.out )
 

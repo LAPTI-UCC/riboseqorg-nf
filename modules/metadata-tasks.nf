@@ -4,7 +4,7 @@ process GET_GSE_REPORT {
     errorStrategy 'retry'
         
     input:
-        val GSE_WNL
+        tuple val(GSE_WNL), val(srp)
 
     output:
         path "*.xml"
