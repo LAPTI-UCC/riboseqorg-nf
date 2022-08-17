@@ -16,13 +16,26 @@ def get_GSE_not_downloaded(df):
 
     return not_downloaded_list
 
-# Need to write this output to a txt file?
+
+def write_output_to_txt(GSEs_list, path = 'GSEs_not_downloaded.txt'):
+    '''
+    Given as input a list of GSEs, writes them to a txt file (whose path is given as second input).
+    '''
+    with open(path, 'w') as f:
+        for GSE in GSEs_list:
+            f.write(GSE)
+            if GSEs_list.index(GSE) != len(GSEs_list)-1:
+                f.write('\n')
+    f.close()
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Retrieves the GSEs that have not been downloaded correctly")
-    parser.add_argument("path_to_run_report", type = str, help = "Path to the location of the run report, a csv file")
+    parser.add_argument("path_to_report_run", type = str, help = "Path to the location of the run report, a csv file")
+    parser.add_argument("txt_report_path", type = str, help = "Path the output txt file")
     args = parser.parse_args()
 
-    df = pd.read_csv(args.path_to_run_report, header = None, names = ["name", "status", "exit", "workdir", "raw_GSE"])
-    get_GSE_not_downloaded(df)
+    df = pd.read_csv(args.path_to_report_run, header = None, names = ["name", "status", "exit", "workdir", "raw_GSE"])
 
+    GSEs_list = get_GSE_not_downloaded(df)
+    write_output_to_txt(GSEs_list, args.txt_report_path)
