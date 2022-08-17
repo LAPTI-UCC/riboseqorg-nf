@@ -5,26 +5,57 @@ params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
 params.data_dir = "data"
 project_dir = projectDir 
 
+
+/// Processes necessary for metadata_flow
+include { GET_GSE_REPORT; GET_CSV_FROM_XML; ASSESS_LIBRARY_STRATEGY} from './modules/metadata-tasks.nf'
+/// Processes necessary for upstream_flow
 include { GET_RUN_INFO; GET_INDIVIDUAL_RUNS; RUN_FFQ; WGET_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML } from './modules/upstream-tasks.nf'
 
 
-workflow {
-    gses = ["GSE152556", "GSE112305"]
-    GSE_inputs = Channel.fromList(gses)  /* a GSE I want to test. Another candidate is GSE152556*/
-    GET_RUN_INFO(GSE_inputs)
+/// Workflow to get metadata. Returns a .csv for each GSE with info on their runs.
+workflow metadata_flow {
 
-    GET_INDIVIDUAL_RUNS(GET_RUN_INFO.out) 
-    RUN_FFQ(GET_INDIVIDUAL_RUNS.out) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
-    WGET_FASTQ(RUN_FFQ.out.flatten()) // This will not be optimal similar to above
+    take: GSE_inputs
 
-    FIND_ADAPTERS(WGET_FASTQ.out)
-    WRITE_PARAMTERS_YAML(GET_RUN_INFO.out, FIND_ADAPTERS.out)
+    main:
+        GET_GSE_REPORT          ( GSE_inputs )
+        GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
+        ASSESS_LIBRARY_STRATEGY ( GET_CSV_FROM_XML.out )
+
 }
 
 
+/// workflow to get the info for the .yaml file.
+workflow upstream_flow {
+
+    take: GSE_inputs
+
+    main:
+        GET_RUN_INFO            ( GSE_inputs )
+
+        GET_INDIVIDUAL_RUNS     ( GET_RUN_INFO.out ) 
+        RUN_FFQ                 ( GET_INDIVIDUAL_RUNS.out ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
+        WGET_FASTQ              ( RUN_FFQ.out.flatten() ) // This will not be optimal similar to above
+
+        FIND_ADAPTERS           ( WGET_FASTQ.out )
+        WRITE_PARAMTERS_YAML    ( GET_RUN_INFO.out, FIND_ADAPTERS.out )
+
+}
+
+workflow {
+
+    ///NB. We could parse through the superset.csv to get the GSEs, instead of relying on this
+    GSE_inputs = Channel
+        .fromPath("/home/121109636/CSV_reports/GSEs.txt")
+        .splitText()
+
+    main:
+        metadata_flow(GSE_inputs)
+        ///upstream_flow(GSE_inputs)
+
+
+}
 /*
-The way this is structured, we want (and It should) process all elements (the GSEs) given as input.
-Such inputs can be emitted from a channel (as a start, try to just give here a list to process)
 
 Now, there are several aspects to consider:
 1) Is the script "get_runInfo.py" still publishing the directories for each study with the csv inside?
