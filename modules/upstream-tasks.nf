@@ -76,7 +76,7 @@ import os
 import time
 import random
 
-wait_time = random.choice([5,15,25,35,45,55,60])
+wait_time = random.choice([5,6,7,8,9,10,11,12])
 time.sleep(wait_time)
 
 with open('${ffq_json}', 'r') as f:
