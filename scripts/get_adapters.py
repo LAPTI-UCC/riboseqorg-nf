@@ -40,9 +40,11 @@ def check_adapter(adapter, fastq_path, number_of_reads=2000000, verbose=False):
                 f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq",
                 shell=True,
             )
+
     except subprocess.CalledProcessError as e:
-        raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
-        
+        adapter_count_raw = e.output
+        # raise RuntimeError(f"command {e.cmd} return with error (code {e.returncode}): {e.output}")
+
     adapter_count = float(adapter_count_raw.decode('utf-8').strip('\n'))
 
     percentage_contamination = float((adapter_count / number_of_reads) * 100)
