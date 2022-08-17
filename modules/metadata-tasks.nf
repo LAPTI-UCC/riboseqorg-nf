@@ -25,6 +25,7 @@ process GET_GSE_REPORT {
     """
 }
 
+
 process GET_CSV_FROM_XML {
 
     input:
@@ -38,6 +39,7 @@ process GET_CSV_FROM_XML {
     python3 $projectDir/../scripts/xml_parsing.py  ${xml_report}
     """
 }
+
 
 process ASSESS_LIBRARY_STRATEGY {
     /// TEMPORARY! NEED TO UPDATE IT TO HAVE REPORTS PUBLISHED IN THE STUDY DIRECTORY ITSELF
@@ -56,7 +58,7 @@ process ASSESS_LIBRARY_STRATEGY {
 
 }
 
-
+/*
 workflow {
 
     ///params.path_to_txt = 
@@ -69,3 +71,4 @@ workflow {
     GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
     ASSESS_LIBRARY_STRATEGY ( GET_CSV_FROM_XML.out )
 }
+*/
