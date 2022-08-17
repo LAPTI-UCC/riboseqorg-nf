@@ -47,7 +47,7 @@ workflow {
     ///NB. We could parse through the superset.csv to get the GSEs, instead of relying on this
     GSE_inputs = Channel
         .fromPath("/home/121109636/CSV_reports/GSEs.txt")
-        .splitText()
+        .splitCsv(header: true)
 
     main:
         metadata_flow(GSE_inputs)
