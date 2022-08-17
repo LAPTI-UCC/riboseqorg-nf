@@ -11,9 +11,7 @@ process GET_RUN_INFO {
 
         /// python3 $projectDir/scripts/get_runInfo.py $projectDir/${params.ribosome_prof_superset} $projectDir/${params.data_dir} "${GSE}_sraRunInfo.csv" "${GSE}"
         """
- 
-
-        f"esearch -db sra -query ${srp} | efetch -format runinfo -mode text | cat > ${GSE}_sraRunInfo.csv"
+        esearch -db sra -query ${srp} | efetch -format runinfo -mode text | cat > ${GSE}_sraRunInfo.csv
         """
 }
 
