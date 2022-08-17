@@ -41,7 +41,7 @@ def check_adapter(adapter, fastq_path, number_of_reads=2000000, verbose=False):
                 shell=True,
             )
 
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError as e: # When agrep finds no cases it returns with code 1 but 0 is a valid resuly 
         adapter_count_raw = e.output
         # raise RuntimeError(f"command {e.cmd} return with error (code {e.returncode}): {e.output}")
 
