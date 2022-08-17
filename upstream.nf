@@ -51,7 +51,7 @@ workflow {
 
     main:
         metadata_flow(GSE_inputs)
-        ///upstream_flow(GSE_inputs)
+        upstream_flow(GSE_inputs)
 
 
 }
