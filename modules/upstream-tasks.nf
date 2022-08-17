@@ -9,7 +9,7 @@ process GET_RUN_INFO {
 
     script:
         """
-        python3 $projectDir/scripts/get_runInfo.py $projectDir/${params.ribosome_prof_superset} $projectDir/${params.data_dir} "/${GSE}" "${GSE}_sraRunInfo.csv"
+        python3 $projectDir/scripts/get_runInfo.py $projectDir/${params.ribosome_prof_superset} $projectDir/${params.data_dir} "${GSE}_sraRunInfo.csv" "${GSE}"
         """
 }
 
