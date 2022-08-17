@@ -20,7 +20,7 @@ process GET_GSE_REPORT {
 
         """
         sleep ${Sleep_time}
-        wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/${GSE[..-4]}nnn/${GSE}/miniml/${GSE}_family.xml.tgz
+        wget ftp://ftp.ncbi.nlm.nih.gov/geo/series/${GSE[0..-4]}nnn/${GSE}/miniml/${GSE}_family.xml.tgz
         tar -zxvf ${GSE}_family.xml.tgz
         """
 }
