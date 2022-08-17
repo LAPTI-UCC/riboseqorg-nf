@@ -29,17 +29,20 @@ def check_adapter(adapter, fastq_path, number_of_reads=2000000, verbose=False):
     '''
     For a given adapter sequence check for its presence in the given FASTQ file 
     '''
-    if fastq_path.split('.')[-1] == 'gz': 
-        adapter_count_raw = subprocess.check_output(
-            f"gzip -cd {fastq_path} | head -{number_of_reads} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq",
-            shell=True, 
-        )
-    elif fastq_path.split('.')[-1] == 'fastq' or fastq_path.split('.')[-1] == 'fq':
-        adapter_count_raw = subprocess.check_output(
-            f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq",
-            shell=True,
-        )
-
+    try:
+        if fastq_path.split('.')[-1] == 'gz': 
+            adapter_count_raw = subprocess.check_output(
+                f"gzip -cd {fastq_path} | head -{number_of_reads} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq",
+                shell=True, 
+            )
+        elif fastq_path.split('.')[-1] == 'fastq' or fastq_path.split('.')[-1] == 'fq':
+            adapter_count_raw = subprocess.check_output(
+                f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq",
+                shell=True,
+            )
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+        
     adapter_count = float(adapter_count_raw.decode('utf-8').strip('\n'))
 
     percentage_contamination = float((adapter_count / number_of_reads) * 100)
