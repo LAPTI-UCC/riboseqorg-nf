@@ -50,7 +50,7 @@ workflow {
         .splitCsv(header: true)
         .map { row -> val(row.GSE) }
     
-    GSE_inputs.view
+    GSE_inputs.view()
   
     main:
         metadata_flow(GSE_inputs)
