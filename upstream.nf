@@ -48,7 +48,7 @@ workflow {
     GSE_inputs = Channel
         .fromPath("/home/121109636/CSV_reports/GSEs.txt")
         .splitCsv(header: true)
-        .map { row -> val(row.GSE) }
+        .map { row -> "${row.GSE}" }
     
     GSE_inputs.view()
   
