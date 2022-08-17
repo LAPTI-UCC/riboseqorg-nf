@@ -36,7 +36,7 @@ process GET_CSV_FROM_XML {
 
     script:
     """
-    python3 $projectDir/../scripts/xml_parsing.py  ${xml_report}
+    python3 $projectDir/scripts/xml_parsing.py  ${xml_report}
     """
 }
 
@@ -53,7 +53,7 @@ process ASSESS_LIBRARY_STRATEGY {
 
     script:
     """
-    python3 $projectDir/../scripts/library_strategy_definer.py ${csv}
+    python3 $projectDir/scripts/library_strategy_definer.py ${csv}
     """
 
 }
