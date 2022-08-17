@@ -50,6 +50,8 @@ with open('${SRR}', 'r') as f:
         line = line.strip('\\n')
         os.system(f"ffq --ftp {line} | jq -r .[].url | cat > ./{line}.json")
 
+        if os.path.getsize(f"./{line}.json") < 1:
+            raise Exception("ffq returned an empty file")
 
     """
     }
@@ -57,6 +59,8 @@ with open('${SRR}', 'r') as f:
 
 process WGET_FASTQ {
     publishDir "$projectDir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+
+    errorStrategy 'ignore'
 
     input:
         path ffq_json
