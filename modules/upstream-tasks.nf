@@ -94,19 +94,20 @@ with open('${ffq_json}', 'r') as f:
 
 
 process FIND_ADAPTERS {
-    publishDir "$projectDir/$params.data_dir/$find_adapters.simpleName/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "$projectDir/$params.data_dir/$GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
 
 
     input:
         file raw_fastq
+        tuple val(GSE),val(srp)
 
     output:
-        file "${raw_fastq}.fa"
+        file "${raw_fastq}_adpater_report.tsv"
 
     script:
     
         """
-        python3 $projectDir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}.fa"
+        python3 $projectDir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adpater_report.tsv"
         """
 }
 
@@ -117,13 +118,13 @@ process WRITE_PARAMTERS_YAML {
 
     input:
         file sraRunInfo
-        path find_adapters
+        tuple val(GSE),val(srp)
 
     output:
         file "parameters.yaml"
 
     script:
         """
-        python3 $projectDir/scripts/write_parameters_yaml.py -a "$projectDir/$params.data_dir/$find_adapters.simpleName/adapter_reports" -s $projectDir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
+        python3 $projectDir/scripts/write_parameters_yaml.py -a "$projectDir/$params.data_dir/$GSE/fastq" -s $projectDir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
         """
 }
