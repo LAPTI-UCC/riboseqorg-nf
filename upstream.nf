@@ -72,4 +72,4 @@ workflow {
 
 }
 ///  IMPORTANT! we need to figure out how to execute processes in the right order: if the yamls is created too son, some info will be missing.
-/// 
+///  We can use .collect() to make sure all the outputs of a process are collected before being set to the following one in the pipeline.
