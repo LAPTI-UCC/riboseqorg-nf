@@ -46,11 +46,11 @@ workflow upstream_flow {
 workflow yaml_flow {
 
     take:
-        upstream_flow.out 
+        upstream 
         GSE_inputs
 
     main:
-        WRITE_PARAMTERS_YAML    ( upstream_flow.out, GSE_inputs )
+        WRITE_PARAMTERS_YAML    ( upstream, GSE_inputs )
 
 }
 
