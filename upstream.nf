@@ -45,7 +45,8 @@ workflow upstream_flow {
 
 workflow yaml_flow {
 
-    take: 
+    take:
+        upstream_flow.out 
         GSE_inputs
 
     main:
