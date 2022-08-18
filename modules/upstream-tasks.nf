@@ -91,7 +91,7 @@ with open('${ffq_json}', 'r') as f:
 
 
 process FIND_ADAPTERS {
-    publishDir "$projectDir/$params.data_dir/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
+    publishDir "$projectDir/$params.data_dir/$find_adapters.simpleName/adapter_reports", mode: 'copy', pattern: '*_adpater_report.fa'
 
 
     input:
