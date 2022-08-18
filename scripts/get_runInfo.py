@@ -90,7 +90,7 @@ def download_sra_run_table(
         outfile = superset_row_to_outfile_name(row)
         if not os.path.isdir(datadir + "/" + outfile):
             os.makedirs(datadir + "/" + outfile)
-        # outfile_path = f"{datadir}/{outfile}/{outfile}_sraRunInfo.csv"
+
         get_sra_run_info_as_df(row["SRA"], outfile_path)
         print(f"File outputted to {outfile_path}")
 
