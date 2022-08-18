@@ -59,12 +59,14 @@ with open('${SRR}', 'r') as f:
 /// We want all the runs for a study to be published in the same study directory, identified by the GSE
 
 process WGET_FASTQ {
-    publishDir "$projectDir/$params.data_dir/.../fastq", mode: 'copy', pattern: '*.fastq.gz'
+    publishDir "$projectDir/$params.data_dir/$GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
     errorStrategy 'ignore'
 
     input:
         path ffq_json
+        tuple val(GSE),val(srp)
+
 
     output:
         file "*.fastq.gz"
