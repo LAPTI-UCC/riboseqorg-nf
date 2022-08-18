@@ -38,7 +38,18 @@ workflow upstream_flow {
         WGET_FASTQ              ( RUN_FFQ.out.flatten(), GSE_inputs ) // This will not be optimal similar to above
 
         FIND_ADAPTERS           ( WGET_FASTQ.out, GSE_inputs )
-        WRITE_PARAMTERS_YAML    ( GET_RUN_INFO.out, GSE_inputs )
+
+    emit:
+        GET_RUN_INFO.out
+}
+
+workflow yaml_flow {
+
+    take: 
+        GSE_inputs
+
+    main:
+        WRITE_PARAMTERS_YAML    ( upstream_flow.out, GSE_inputs )
 
 }
 
@@ -55,6 +66,7 @@ workflow {
     main:
         metadata_flow(GSE_inputs)
         upstream_flow(GSE_inputs)
+        yaml_flow(upstream_flow.out, GSE_inputs)
 
 
 }
