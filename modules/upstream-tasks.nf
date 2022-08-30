@@ -105,7 +105,7 @@ with open('${ffq_json}', 'r') as f:
 process FIND_ADAPTERS {
     publishDir "$projectDir/$params.data_dir/$GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
 
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
 
 
     input:
