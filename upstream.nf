@@ -58,7 +58,7 @@ workflow {
 
     ///NB. We could parse through the superset.csv to get the GSEs, instead of relying on this
     GSE_inputs = Channel
-        .fromPath("/home/121109636/CSV_reports/GSEs.txt")
+        .fromPath("/home/115316376/trips_superset.csv")
         .splitCsv(header: true)
         .map { row -> tuple("${row.Accession}", "${row.SRA}" )}
     
