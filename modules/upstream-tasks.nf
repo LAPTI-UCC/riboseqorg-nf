@@ -1,6 +1,9 @@
 
 process GET_RUN_INFO {
 
+    errorStrategy 'ignore'
+
+
     input:
         tuple val(GSE),val(srp)
 
@@ -18,6 +21,9 @@ process GET_RUN_INFO {
 
 process GET_INDIVIDUAL_RUNS {
 
+    errorStrategy 'ignore'
+
+
     input:
         path sraRunInfo
 
@@ -31,6 +37,9 @@ process GET_INDIVIDUAL_RUNS {
 }
 
 process RUN_FFQ {
+
+    errorStrategy 'ignore'
+
 
     input:
         file SRR
@@ -96,6 +105,8 @@ with open('${ffq_json}', 'r') as f:
 process FIND_ADAPTERS {
     publishDir "$projectDir/$params.data_dir/$GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
 
+    errorStrategy 'ignore'
+
 
     input:
         file raw_fastq
@@ -114,6 +125,8 @@ process FIND_ADAPTERS {
 
 
 process WRITE_PARAMTERS_YAML {
+
+    errorStrategy 'ignore'
 
 
     input:
