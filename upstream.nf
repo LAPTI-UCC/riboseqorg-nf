@@ -67,7 +67,7 @@ workflow {
     main:
         metadata_flow(GSE_inputs)
         upstream_flow(GSE_inputs)
-        yaml_flow(upstream_flow.out, GSE_inputs)
+        // yaml_flow(upstream_flow.out, GSE_inputs)
 
 
 }
