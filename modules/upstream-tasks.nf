@@ -32,8 +32,7 @@ process GET_INDIVIDUAL_RUNS {
 
     script:
     """
-    cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.tsv
-    split -l 1 srrs.tsv sample_ --additional-suffix .txt
+    cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.txt
     """
 }
 
@@ -59,9 +58,6 @@ with open('${SRR}', 'r') as f:
     for line in lines:
         line = line.strip('\\n')
         os.system(f"ffq --ftp {line} | jq -r .[].url | cat > ./{line}.json")
-
-        if os.path.getsize(f"./{line}.json") < 1:
-            raise Exception("ffq returned an empty file")
 
     """
     }
