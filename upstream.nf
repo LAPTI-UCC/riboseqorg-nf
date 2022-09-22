@@ -34,7 +34,7 @@ workflow upstream_flow {
         GET_RUN_INFO            ( GSE_inputs )
 
         GET_INDIVIDUAL_RUNS     ( GET_RUN_INFO.out ) 
-        RUN_FFQ                 ( GET_INDIVIDUAL_RUNS.out ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
+        RUN_FFQ                 ( Channel.of(GET_INDIVIDUAL_RUNS.out) ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
         WGET_FASTQ              ( RUN_FFQ.out.flatten(), GSE_inputs ) // This will not be optimal similar to above
 
         FIND_ADAPTERS           ( WGET_FASTQ.out, GSE_inputs )
