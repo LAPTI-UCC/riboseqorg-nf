@@ -32,8 +32,8 @@ process GET_INDIVIDUAL_RUNS {
 
     script:
     """
-    cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.txt
-    split -l 1 srrs.txt sample_ --additional-suffix .txt
+    cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.tsv
+    split -l 1 srrs.tsv sample_ --additional-suffix .txt
     """
 }
 
