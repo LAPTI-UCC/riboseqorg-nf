@@ -184,3 +184,4 @@ trips_alignment_stats/*
 
 readme.txt
 scripts/csv_superset_filter.py
+CSV_reports/*
