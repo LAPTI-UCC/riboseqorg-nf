@@ -44,7 +44,7 @@ process GET_CSV_FROM_XML {
 
 process ASSESS_LIBRARY_STRATEGY {
     /// TEMPORARY! NEED TO UPDATE IT TO HAVE REPORTS PUBLISHED IN THE STUDY DIRECTORY ITSELF
-    publishDir "$projectDir/CSV_reports", mode: "copy"
+    publishDir "$projectDir/data/CSV_reports", mode: "copy"
 
     errorStrategy 'ignore'
 
