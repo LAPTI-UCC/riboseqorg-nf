@@ -40,7 +40,7 @@ workflow {
 		GENOME_MAPPING        ( rRNA_MAPPING.out.fastq_less_rRNA )
 		/// This block is for RNA-Seq studies only. It's executed depending on a parameter, which defines the type of study we are working with.
 			/// It can either be "RNA-seq study" or "Ribo-seq study" (see the GSE*_family.csv file for each study).
-			
+
 		params.x = "RNA-seq study"
 		if (params.x != "RNA-seq study") {
 			INDEX_BAM   	  ( GENOME_MAPPING.out.genome_sorted_bam )

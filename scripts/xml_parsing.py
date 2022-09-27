@@ -57,15 +57,26 @@ def get_sample_info(sample):
                     tags = sample["Channel"]["Characteristics"]
                     if type(tags) != list:
                         tags = [tags]
-                    if type(tags[0]) != str:
-                        for key in tags:
-                            new_key = key["@tag"]
-                            final_tags[new_key] = key["#text"]
-                    elif type(tags[0]) == str:
 
-                        final_tags = set(final_tags)
-                        for each in tags:
-                            final_tags.add(each)
+                    for tag in tags:
+                        if type(tag) == dict:
+                            new_key = tag["@tag"]
+                            final_tags[new_key] = tag["#text"]
+                        elif type(tag) == str:
+                            print(tag)
+                            print(final_tags)
+                            final_tags["tag1"] = tag 
+
+                    # if type(tags[0]) != str:
+                    #     for key in tags:
+                    #         new_key = key["@tag"]
+                    #         final_tags[new_key] = key["#text"]
+                    # elif type(tags[0]) == str:
+
+                    #     final_tags = set(final_tags)
+                    #     for each in tags:
+                    #         print(each, type(each))
+                    #         # final_tags.add(each)
 
     return (GSM_id, title, organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags)
 
@@ -154,6 +165,10 @@ def compile_df(dictionary):
     '''
     Creates a df from a dictionary. GSM are keys and relative fields are the values, given as a list.
     '''
+    
+    #remove all new lines form the description section
+    for key in dictionary:
+        dictionary[key][5] = dictionary[key][5].replace('\n', ' ').replace('\r', ' ')
     df = pd.DataFrame.from_dict(dictionary, orient="index")
     df.columns = ["Title", "Organism", "Source", "Strain/Genotype","Cell/Tissue", "Description", "Library_Strategy", "Ribosome_position", "Extraction_Protocol", "Tags"]
     return df

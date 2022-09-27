@@ -1,8 +1,9 @@
 
 process GET_GSE_REPORT {
 
-    errorStrategy 'retry'
-        
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+    publishDir "$projectDir/CSV_reports", mode: "copy"
+     
     input:
         tuple val(GSE_WNL), val(srp)
 
@@ -11,7 +12,7 @@ process GET_GSE_REPORT {
 
 	script: 
 /// slicing the GSE so it does not have the /n inside (the /n is added by the splitText operator, see workflow)
-        GSE = "${GSE_WNL[0..-2]}"
+        GSE = "${GSE_WNL[0..-1]}"
     /// sleep_GSE introduces a random delay in the download of the files.
         def z = ["4", "5", "6", "7", "8", "9"]
         Random rnd = new Random()
@@ -27,6 +28,7 @@ process GET_GSE_REPORT {
 
 
 process GET_CSV_FROM_XML {
+    // errorStrategy 'ignore'
 
     input:
     path xml_report
@@ -43,7 +45,10 @@ process GET_CSV_FROM_XML {
 
 process ASSESS_LIBRARY_STRATEGY {
     /// TEMPORARY! NEED TO UPDATE IT TO HAVE REPORTS PUBLISHED IN THE STUDY DIRECTORY ITSELF
-    publishDir "/home/121109636/CSV_reports", mode: "copy"
+    publishDir "$projectDir/CSV_reports", mode: "copy"
+
+    errorStrategy 'ignore'
+
 
     input:
     path csv

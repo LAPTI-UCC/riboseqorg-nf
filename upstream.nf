@@ -58,15 +58,17 @@ workflow {
 
     ///NB. We could parse through the superset.csv to get the GSEs, instead of relying on this
     GSE_inputs = Channel
-        .fromPath("/home/115316376/trips_superset_n3.csv")
+        .fromPath("/home/jack/projects/riboseq_data_processing/data/trips_human_studies.csv")
         .splitCsv(header: true)
-        .map { row -> tuple("${row.Accession}", "${row.SRA}" )}
+        .map { row -> tuple("${row.GSE}", "${row.SRP}" )}
+
+        // .map { row -> tuple("${row.Accession}", "${row.SRA}" )}
     
     GSE_inputs.view()
   
     main:
         metadata_flow(GSE_inputs)
-        upstream_flow(GSE_inputs)
+        // upstream_flow(GSE_inputs)
         // yaml_flow(upstream_flow.out, GSE_inputs)
 
 

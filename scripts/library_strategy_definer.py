@@ -2,7 +2,7 @@ import pandas as pd
 import argparse
 
 # Each dictionary stores the words for each library strategy and a score.
-Ribo_seq = {'ribo-seq': 1, 'ribosome profil': 1, 'fp': 1, 'rpf': 1,  'ribolace': 1, 'riboseq': 1, 'ribosome protected fragments': 1, 'ribo': 1, 'footprint': 1}
+Ribo_seq = {'ribo-seq': 1, 'ribosome profil': 1, 'fp': 1, 'rpf': 1,  'ribolace': 1, 'riboseq': 1, 'ribosome protected fragments': 1, 'ribo': 1, 'footprint': 1, "harringtonine": 1,"lactimidomycin": 1, "initiating": 1,"pateamine" : 1,"harr": 1, "lac": 1, "cycloheximide": 1}
 RNA_seq = {'rna-seq': 1, 'mrna': 1, 'rnaseq': 1, 'rna': 1}
 Initiating_ribo = {"harringtonine": 1,"lactimidomycin": 1, "initiating": 1,"pateamine" : 1,"harr": 1, "lac": 1}
 Elongating_ribo = {"Cyclohexamide": 1}
@@ -15,10 +15,9 @@ def get_score(field, terms_set):
     field_score = 0
 
     for term in terms_set:
-        if term in field:
-            #print("found term: ", term)
+        if term.casefold() in field.casefold():
             field_score += terms_set[term]
-            #print(field_score)
+            print("found term: ", term, field, field_score)
     
     return(field_score)
 
@@ -36,9 +35,11 @@ def scores_evaluator(n, df):
 
     ribo_titl_score = get_score(titl, Ribo_seq)
     RNA_titl_score = get_score(titl, RNA_seq)
-
     ribo_des_score = None
     RNA_des_score = None
+
+    print(RNA_titl_score, ribo_titl_score, titl, des)
+
 
     #  If there is a difference of less-than-one among the two scores, the description is also evaluated.
     if abs(ribo_titl_score - RNA_titl_score) < 1:
