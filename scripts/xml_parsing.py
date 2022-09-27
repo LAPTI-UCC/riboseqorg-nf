@@ -168,7 +168,9 @@ def compile_df(dictionary):
     
     #remove all new lines form the description section
     for key in dictionary:
-        dictionary[key][5] = dictionary[key][5].replace('\n', ' ').replace('\r', ' ')
+        for idx, item in enumerate(dictionary[key]):
+            if type(item) == str:
+                dictionary[key][idx] = dictionary[key][idx].replace('\n', ' ').replace('\r', ' ')
     df = pd.DataFrame.from_dict(dictionary, orient="index")
     df.columns = ["Title", "Organism", "Source", "Strain/Genotype","Cell/Tissue", "Description", "Library_Strategy", "Ribosome_position", "Extraction_Protocol", "Tags"]
     return df

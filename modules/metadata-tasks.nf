@@ -2,7 +2,6 @@
 process GET_GSE_REPORT {
 
     errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
-    publishDir "$projectDir/CSV_reports", mode: "copy"
      
     input:
         tuple val(GSE_WNL), val(srp)
