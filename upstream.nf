@@ -58,11 +58,11 @@ workflow {
 
     ///NB. We could parse through the superset.csv to get the GSEs, instead of relying on this
     GSE_inputs = Channel
-        .fromPath("/home/jack/projects/riboseq_data_processing/data/trips_human_studies.csv")
+        .fromPath("/home/jack/projects/riboseq_data_processing/data/ribosome_profiling_superset.csv")
         .splitCsv(header: true)
-        .map { row -> tuple("${row.GSE}", "${row.SRP}" )}
+        // .map { row -> tuple("${row.GSE}", "${row.SRP}" )} // use for CSV from trips
 
-        // .map { row -> tuple("${row.Accession}", "${row.SRA}" )}
+        .map { row -> tuple("${row.Accession}", "${row.SRA}" )} // use for superset
     
     GSE_inputs.view()
   

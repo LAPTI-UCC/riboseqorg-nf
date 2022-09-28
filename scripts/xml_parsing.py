@@ -67,17 +67,6 @@ def get_sample_info(sample):
                             print(final_tags)
                             final_tags["tag1"] = tag 
 
-                    # if type(tags[0]) != str:
-                    #     for key in tags:
-                    #         new_key = key["@tag"]
-                    #         final_tags[new_key] = key["#text"]
-                    # elif type(tags[0]) == str:
-
-                    #     final_tags = set(final_tags)
-                    #     for each in tags:
-                    #         print(each, type(each))
-                    #         # final_tags.add(each)
-
     return (GSM_id, title, organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags)
 
 
