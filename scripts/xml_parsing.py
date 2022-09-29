@@ -61,8 +61,6 @@ def get_sample_info(sample):
                             new_key = tag["@tag"]
                             final_tags[new_key] = tag["#text"]
                         elif type(tag) == str:
-                            print(tag)
-                            print(final_tags)
                             final_tags["tag1"] = tag 
 
     return (GSM_id, title, organism, source, strain, cell, desc, Lib_Strat, protocol, final_tags)
@@ -152,9 +150,7 @@ def compile_df(dictionary):
     '''
     Creates a df from a dictionary. GSM are keys and relative fields are the values, given as a list.
     '''
-    
     #remove all new lines form the description section
-    print(dictionary)
     for key in dictionary:
         dictionary[key].append('')
         dictionary[key].append('')

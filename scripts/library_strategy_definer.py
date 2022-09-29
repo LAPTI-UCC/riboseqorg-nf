@@ -19,8 +19,6 @@ def get_scores_and_terms(field, terms_set):
             field_score += terms_set[term]
             if term not in found_terms:
                 found_terms.append(term)
-
-            print("found term: ", term, field, field_score)
     
     return field_score, found_terms
 
@@ -40,8 +38,6 @@ def scores_evaluator(n, df):
     RNA_titl_score, RNA_titl_found_terms = get_scores_and_terms(titl, RNA_seq)
     ribo_des_score = None
     RNA_des_score = None
-
-    print(RNA_titl_score, ribo_titl_score, titl, des)
 
 
     #  If there is a difference of less-than-one among the two scores, the description is also evaluated.
@@ -112,7 +108,6 @@ if __name__ == "__main__":
 
         if df.at[n,"Library_Strategy"] == "Ribo-seq study":
             ribosome_position_results = define_ribosome_position(n, df)
-            print(ribosome_position_results)
             df.at[n,"Library_Strategy"], df.at[n,"Ribosome_position"] = ribosome_position_results[0], ribosome_position_results[1]
             df.at[n, "Ribosome_Position_Evidence"] = ribosome_position_results[2]
 
