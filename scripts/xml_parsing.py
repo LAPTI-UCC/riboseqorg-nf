@@ -1,6 +1,4 @@
-from re import sub
-from typing import final
-from numpy import inner
+
 import xmltodict
 import sys
 import pandas as pd
@@ -156,12 +154,16 @@ def compile_df(dictionary):
     '''
     
     #remove all new lines form the description section
+    print(dictionary)
     for key in dictionary:
+        dictionary[key].append('')
+        dictionary[key].append('')
+
         for idx, item in enumerate(dictionary[key]):
             if type(item) == str:
                 dictionary[key][idx] = dictionary[key][idx].replace('\n', ' ').replace('\r', ' ')
     df = pd.DataFrame.from_dict(dictionary, orient="index")
-    df.columns = ["Title", "Organism", "Source", "Strain/Genotype","Cell/Tissue", "Description", "Library_Strategy", "Ribosome_position", "Extraction_Protocol", "Tags"]
+    df.columns = ["Title", "Organism", "Source", "Strain/Genotype","Cell/Tissue", "Description", "Library_Strategy", "Ribosome_position", "Extraction_Protocol", "Tags", "Library_Strategy_Evidence", "Ribosome_Position_Evidence"]
     return df
 
 

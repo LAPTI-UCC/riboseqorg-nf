@@ -45,7 +45,7 @@ process GET_CSV_FROM_XML {
 process ASSESS_LIBRARY_STRATEGY {
     publishDir "$projectDir/data/CSV_reports", mode: "copy"
 
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
 
 
     input:
@@ -61,6 +61,18 @@ process ASSESS_LIBRARY_STRATEGY {
 
 }
 
+
+process CHECK_METADATA_REPORT {
+
+    input: 
+    path csv
+
+    script:
+    """
+    python3 $projectDir/scripts/metadata_completeness_checker.py ${csv}
+    """
+
+}
 /*
 workflow {
 
