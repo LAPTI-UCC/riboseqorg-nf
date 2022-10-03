@@ -170,7 +170,7 @@ plugins-prod
 sandbox
 
 # exclude all contents of the data folder 
-data/*
+# data/*
 ribopipe_scripts/*
 
 *alignment_stats.txt

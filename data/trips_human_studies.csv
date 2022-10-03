@@ -1,0 +1,37 @@
+Study name,GSE,Title,Year,Paper,SRP,PMID,Adapters
+Gawron16,GSE74279,Positional proteomics reveals differences in N-terminal proteoform stability.,2016,http://dx.doi.org/10.15252/msb.20156662,SRP065022,26893308,CTGTAGGCACCATCAAT
+Jakobsson17,GSE97140,Methylation of human eukaryotic elongation factor alpha (eEF1A) by a member of a novel protein lysine methyltransferase family modulates mRNA trans...,2017,http://dx.doi.org/10.1093/nar/gkx432,SRP102616,28520920,None
+Battle15,GSE61742,Genomic variation. Impact of regulatory variation from RNA to protein.,2015,http://dx.doi.org/10.1126/science.1260793,SRP047476,25657249,None
+Xu16,GSE64962,Improved transcription and translation with L-leucine stimulation of mTORC1 in Roberts syndrome.,2016,http://dx.doi.org/10.1186/s12864-015-2354-y,SRP052229,26729373,AGATCGGAAGAGCACAC
+Park17,GSE97384,mTORC1 Balances Cellular Amino Acid Supply with Demand for Protein Synthesis through Post-transcriptional Control of ATF4.,2017,http://dx.doi.org/10.1016/j.celrep.2017.04.042,SRP103009,28494858,CTGTAGGCACCATCAATAGATCGGAAGAGCACAC
+Park16,GSE79664,Regulation of Poly(A) Tail and Translation during the Somatic Cell Cycle.,2016,http://dx.doi.org/10.1016/j.molcel.2016.04.007,SRP072459,27153541,TGGAATTCTCGGGTGCC
+Werner15,GSE62247,Cell-fate determination by ubiquitin-dependent regulation of translation.,2015,http://dx.doi.org/10.1038/nature14978,SRP048825,26399832,CTGTAGGCACCATCAATAGATCGGAAGAGCACAC
+Andreev15,GSE55195,Translation of 5' leaders is pervasive in genes resistant to eIF2 repression.,2015,https://doi.org/10.7554/eLife.03971,SRP038695,25621764,CTGTAGGCACCATCAATAGATCGGAAGAGCACAC
+Shi17,GSE86214,YTHDF3 facilitates translation and decay of N6-methyladenosine-modified RNA.,2017,http://dx.doi.org/10.1038/cr.2017.15,SRP083699,28106072,AGATCGGAAGAGCACACCAGATCGGAAGAGCACA
+Ji16,GSE65885,Transcriptome-scale RNase-footprinting of RNA-protein complexes.,2016,http://dx.doi.org/10.1038/nbt.3441,SRP054971,"26900662, 26687005",CTGTAGGCACCATCAAT
+Elkon15,GSE66927,Myc coordinates transcription and translation to enhance transformation and suppress invasiveness.,2015,http://dx.doi.org/10.15252/embr.201540717,SRP056200,26538417,TGGAATTCTCGGGTGCC
+Calviello16,GSE73136,Detecting actively translated open reading frames in ribosome profiling data.,2016,http://dx.doi.org/10.1038/nmeth.3688,SRP063852,26657557,None
+Guo14,GSE51584,Expanded identification and characterization of mammalian circular RNAs.,2014,http://dx.doi.org/10.1186/s13059-014-0409-z,SRP031849,25070500,TCGTATGCCGTCTTCTG
+Kirchner17,GSE74365,Alteration of protein function by a silent polymorphism linked to tRNA abundance.,2017,http://dx.plos.org/10.1371/journal.pbio.2000779,SRP065282,28510592,TGGAATTCTCGGGTGCC
+Iwasaki16,GSE70211,Rocaglates convert DEAD-box protein eIF4A into a sequence-selective translational repressor.,2016,http://dx.doi.org/10.1038/nature17978,SRP059825,27309803,CTGTAGGCACCATCAAT
+Crappe15,GSE58207,PROTEOFORMER: deep proteome coverage through ribosome profiling and MS integration.,2015,http://dx.doi.org/10.1093/nar/gku1283,SRP042937,25510491,AGATCGGAAGAGCACAC
+Sidrauski15,GSE65778,The small molecule ISRIB reverses the effects of eIF2Î± phosphorylation on translation and stress granule assembly.,2015,https://doi.org/10.7554/eLife.05033,SRP053402,25719440,CTGTAGGCACCATCAAT
+Tirosh15,GSE69906,The Transcription and Translation Landscapes during Human Cytomegalovirus Infection Reveal Novel Host-Pathogen Interactions.,2015,http://dx.doi.org/10.1371/journal.ppat.1005288,SRP059531,26599541,"CTGTAGGCACCATCAAT,"
+Cenik15,GSE65912,"Integrative analysis of RNA, translation, and protein levels reveals distinct regulatory variation across humans.",2015,http://dx.doi.org/10.1101/gr.193342.115,SRP055009,26297486,CTGTAGGCACCATCAAT
+Zur16,GSE73565,Complementary Post Transcriptional Regulatory Information is Detected by PUNCH-P and Ribosome Profiling.,2016,http://dx.doi.org/10.1038/srep21635,SRP064313,26898226,"CTGTAGGCACCATCAAT,ATCTCGTATGCCGTCT,"
+Zhang17,GSE94460,Genome-wide identification and differential analysis of translational initiation.,2017,http://dx.doi.org/10.1038/s41467-017-01981-8,SRP098797,29170441,"AGATCGGAAGAGCACAC,CAGATCGGAAGAGCACA,"
+Oh16,GSE70804,Medulloblastoma-associated DDX3 variant selectively alters the translational response to stress.,2016,http://dx.doi.org/10.18632/oncotarget.8612,SRP060676,27058758,"AGATCGGAAGAGCACAC,CAGATCGGAAGAGCACA,"
+LoayzaPuch16,GSE59821,Tumour-specific proline vulnerability uncovered by differential ribosome codon reading.,2016,http://dx.doi.org/10.1038/nature16982,SRP065530,26878238,None
+Khajuria18,GSE89183,Ribosome Levels Selectively Regulate Translation and Lineage Commitment in Human Hematopoiesis.,2018,http://dx.doi.org/10.1016/j.cell.2018.02.036,SRP092068,29551269,"(AGATCGGAAGAGCACAC, 496210.0), (CAGATCGGAAGAGCACA, 452500.0)"
+Lauria18,GSE111866,riboWaltz: Optimization of ribosome P-site positioning in ribosome profiling data.,2018,http://dx.doi.org/10.1371/journal.pcbi.1006169,SRP135757,30102689,NULL
+Fijalkowska17,GSE87328,eIF1 modulates the recognition of suboptimal translation initiation sites and steers gene expression via uORFs.,2017,http://dx.doi.org/10.1093/nar/gkx469,SRP090415,28541577,NULL
+Rubio14,GSE61375,Transcriptome-wide characterization of the eIF4A signature highlights plasticity in translation regulation.,2014,http://dx.doi.org/10.1186/s13059-014-0476-1,SRP047065,25273840,NULL
+Gameiro18,GSE114794,Nutrient Deprivation Elicits a Transcriptional and Translational Inflammatory Response Coupled to Decreased Protein Synthesis.,2018,http://dx.doi.org/10.1016/j.celrep.2018.07.021,SRP148767,30089253,NULL
+Goodarzi16,GSE77347,Modulated Expression of Specific tRNAs Drives Gene Expression and Cancer Progression.,2016,http://dx.doi.org/10.1016/j.cell.2016.05.046,SRP069011,27259150,NULL
+Arango18,GSE102113,Acetylation of Cytidine in mRNA Promotes Translation Efficiency,2018,http://dx.doi.org/10.1016/j.cell.2018.10.030,SRP114504,30449621,NULL
+Wolfe14,GSE56887,RNA G-quadruplexes cause eIF4A-dependent oncogene translation in cancer.,2014,https://doi.org/10.1038/nature13485,SRP041255,25079319,NULL
+SternGinossar12,GSE41605,Decoding human cytomegalovirus,2012,http://dx.doi.org/10.1126/science.1227919,SRP016143,23180859,NULL
+BerkovichKinori16,GSE82232,A systematic view on influenza induced host shutoff.,2016,https://doi.org/10.7554/eLife.18311,SRP076102,27525483,NULL
+Reid18,GSE69602,Dengue Virus Selectively Annexes Endoplasmic Reticulum-Associated Translation Machinery as a Strategy for Co-opting Host Cell Protein Synthesis.,2018,http://dx.doi.org/10.1128/JVI.01766-17,SRP059187,29321322,NULL
+Iwasaki19,GSE102720,The Translation Inhibitor Rocaglamide Targets a Bimolecular Cavity between eIF4A and Polypurine RNA.,2019,http://dx.doi.org/10.1016/j.molcel.2018.11.026,SRP115648,30595437,NULL
+
