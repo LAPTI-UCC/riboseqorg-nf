@@ -11,7 +11,13 @@ process GET_RUN_INFO {
         file "*_sraRunInfo.csv"
 
     script:
+
+        def z = ["4", "5", "6", "7", "8", "9"]
+        Random rnd = new Random()
+
+        Sleep_time = (z[rnd.nextInt(z.size)])
         """
+        sleep ${Sleep_time}
         esearch -db sra -query ${srp} | efetch -format runinfo -mode text | cat > ${GSE}_sraRunInfo.csv
         """
 }
@@ -26,11 +32,12 @@ process GET_INDIVIDUAL_RUNS {
         path sraRunInfo
 
     output:
-        file '*.txt'
+        file 'run_*'
 
     script:
     """
-    cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srrs.txt
+    cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srr.txt 
+    split -l 1 srr.txt run_
     """
 }
 
@@ -65,7 +72,7 @@ with open('${SRR}', 'r') as f:
 process WGET_FASTQ {
     publishDir "$projectDir/$params.data_dir/$GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
 
     input:
         path ffq_json

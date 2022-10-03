@@ -34,10 +34,11 @@ workflow upstream_flow {
     main:
         run_info_ch = GET_RUN_INFO                  ( GSE_inputs )
         runs_ch = GET_INDIVIDUAL_RUNS               ( run_info_ch ) 
-        // fq_urls_ch = RUN_FFQ                        ( GET_INDIVIDUAL_RUNS.out ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
-        // fastq_path_ch = WGET_FASTQ                  ( RUN_FFQ.out.flatten(), GSE_inputs ) // This will not be optimal similar to above
 
-        // adapter_report_ch = FIND_ADAPTERS           ( WGET_FASTQ.out, GSE_inputs )
+        fq_urls_ch = RUN_FFQ                        ( runs_ch.flatten() ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
+        fastq_path_ch = WGET_FASTQ                  ( RUN_FFQ.out.flatten(), GSE_inputs ) // This will not be optimal similar to above
+
+        adapter_report_ch = FIND_ADAPTERS           ( WGET_FASTQ.out, GSE_inputs )
 
     emit:
         run_info_ch
