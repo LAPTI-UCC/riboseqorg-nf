@@ -18,11 +18,12 @@ workflow metadata_flow {
     take: GSE_inputs
 
     main:
-        GET_GSE_REPORT          ( GSE_inputs )
-        GET_CSV_FROM_XML        ( GET_GSE_REPORT.out )
-        ASSESS_LIBRARY_STRATEGY ( GET_CSV_FROM_XML.out )
+        gse_report_ch = GET_GSE_REPORT( GSE_inputs )
+        csv_ch = GET_CSV_FROM_XML( gse_report_ch )
+        ASSESS_LIBRARY_STRATEGY ( csv_ch )
 
 }
+
 
 
 /// workflow to get the info for the .yaml file.
@@ -31,16 +32,15 @@ workflow upstream_flow {
     take: GSE_inputs
 
     main:
-        GET_RUN_INFO            ( GSE_inputs )
+        run_info_ch = GET_RUN_INFO                  ( GSE_inputs )
+        runs_ch = GET_INDIVIDUAL_RUNS               ( run_info_ch ) 
+        // fq_urls_ch = RUN_FFQ                        ( GET_INDIVIDUAL_RUNS.out ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
+        // fastq_path_ch = WGET_FASTQ                  ( RUN_FFQ.out.flatten(), GSE_inputs ) // This will not be optimal similar to above
 
-        GET_INDIVIDUAL_RUNS     ( GET_RUN_INFO.out ) 
-        RUN_FFQ                 ( GET_INDIVIDUAL_RUNS.out ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
-        WGET_FASTQ              ( RUN_FFQ.out.flatten(), GSE_inputs ) // This will not be optimal similar to above
-
-        FIND_ADAPTERS           ( WGET_FASTQ.out, GSE_inputs )
+        // adapter_report_ch = FIND_ADAPTERS           ( WGET_FASTQ.out, GSE_inputs )
 
     emit:
-        GET_RUN_INFO.out
+        run_info_ch
 }
 
 workflow yaml_flow {
@@ -58,20 +58,21 @@ workflow {
 
     ///NB. We could parse through the superset.csv to get the GSEs, instead of relying on this
     GSE_inputs = Channel
-        .fromPath("/home/jack/projects/riboseq_data_processing/data/trips_human_studies.csv")
+        .fromPath("/home/jack/projects/riboseq_data_processing/data/trips_human_studies_3.csv")
         .splitCsv(header: true)
         .map { row -> tuple("${row.GSE}", "${row.SRP}" )} // use for CSV from trips
 
-        // .map { row -> tuple("${row.Accession}", "${row.SRA}" )} // use for superset
-    
-    GSE_inputs.view()
-  
+        // .map { row -> tuple("${row.Accession}", "${row.SRA}" )} // use for superset  
     main:
-        metadata_flow(GSE_inputs)
-        // upstream_flow(GSE_inputs)
+        // metadata_flow(GSE_inputs)
+        upstream_flow(GSE_inputs)
         // yaml_flow(upstream_flow.out, GSE_inputs)
 
 
 }
 ///  IMPORTANT! we need to figure out how to execute processes in the right order: if the yamls is created too son, some info will be missing.
 ///  We can use .collect() to make sure all the outputs of a process are collected before being set to the following one in the pipeline.
+
+workflow.onComplete{
+    println "Pipeline completed at: $workflow.complete"
+}

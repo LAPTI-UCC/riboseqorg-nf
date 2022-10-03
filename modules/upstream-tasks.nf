@@ -1,18 +1,16 @@
 
 process GET_RUN_INFO {
 
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
 
 
     input:
         tuple val(GSE),val(srp)
 
     output:
-        path "${GSE}_sraRunInfo.csv"
+        file "*_sraRunInfo.csv"
 
     script:
-
-        /// python3 $projectDir/scripts/get_runInfo.py $projectDir/${params.ribosome_prof_superset} $projectDir/${params.data_dir} "${GSE}_sraRunInfo.csv" "${GSE}"
         """
         esearch -db sra -query ${srp} | efetch -format runinfo -mode text | cat > ${GSE}_sraRunInfo.csv
         """
@@ -21,7 +19,7 @@ process GET_RUN_INFO {
 
 process GET_INDIVIDUAL_RUNS {
 
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
 
 
     input:
@@ -38,8 +36,8 @@ process GET_INDIVIDUAL_RUNS {
 
 process RUN_FFQ {
 
-    errorStrategy 'ignore'
-
+    // errorStrategy 'ignore'
+    tag "FFQ on ${SRR}"
 
     input:
         file SRR
