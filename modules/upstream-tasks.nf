@@ -25,46 +25,52 @@ process GET_RUN_INFO {
 
 process GET_INDIVIDUAL_RUNS {
 
-    // errorStrategy 'ignore'
+    errorStrategy 'ignore'
 
 
     input:
         path sraRunInfo
 
     output:
-        file 'run_*'
+        // file 'run_*'
+        stdout
 
     script:
     """
     cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srr.txt 
-    split -l 1 srr.txt run_
+    cat srr.txt 
     """
 }
 
 process RUN_FFQ {
 
     // errorStrategy 'ignore'
-    tag "FFQ on ${SRR}"
 
     input:
-        file SRR
+        val SRR
 
     output:
-        file "*.json"
+        // file "*.json"
+        stdout
 
-    shell:
-    """
-    #!/usr/bin/python3
-
-import os
-
-with open('${SRR}', 'r') as f:
-    lines = f.readlines()
-    for line in lines:
-        line = line.strip('\\n')
-        os.system(f"ffq --ftp {line} | jq -r .[].url | cat > ./{line}.json")
+    script:
+    trimmed_string = "${SRR[0..-2]}"
 
     """
+     ffq --ftp $trimmed_string | jq -r .[].url
+    """
+//     """
+//     #!/usr/bin/python3
+
+// import os
+
+// with open('${SRR}', 'r') as f:
+//     lines = f.readlines()
+//     for line in lines:
+//         line = line.strip('\\n')
+//         os.system(f"ffq --ftp {line} | jq -r .[].url | echo")
+
+//     """
     }
 
 /// We want all the runs for a study to be published in the same study directory, identified by the GSE
@@ -72,7 +78,7 @@ with open('${SRR}', 'r') as f:
 process WGET_FASTQ {
     publishDir "$projectDir/$params.data_dir/$GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
-    // errorStrategy 'ignore'
+    errorStrategy 'ignore'
 
     input:
         path ffq_json
