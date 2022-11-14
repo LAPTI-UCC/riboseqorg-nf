@@ -44,33 +44,19 @@ process GET_INDIVIDUAL_RUNS {
 
 process RUN_FFQ {
 
-    // errorStrategy 'ignore'
+    errorStrategy 'ignore'
 
     input:
         val SRR
 
     output:
-        // file "*.json"
         stdout
 
     script:
     trimmed_string = "${SRR[0..-2]}"
-
     """
-     ffq --ftp $trimmed_string | jq -r .[].url
+     ffq --ftp $trimmed_string | jq -r .[].url | tr -d '\n'
     """
-//     """
-//     #!/usr/bin/python3
-
-// import os
-
-// with open('${SRR}', 'r') as f:
-//     lines = f.readlines()
-//     for line in lines:
-//         line = line.strip('\\n')
-//         os.system(f"ffq --ftp {line} | jq -r .[].url | echo")
-
-//     """
     }
 
 /// We want all the runs for a study to be published in the same study directory, identified by the GSE
@@ -88,6 +74,15 @@ process WGET_FASTQ {
     output:
         file "*.fastq.gz"
 
+    script:
+        def z = ["4", "5", "6", "7", "8", "9"]
+        Random rnd = new Random()
+
+        Sleep_time = (z[rnd.nextInt(z.size)])
+        """
+        sleep ${Sleep_time}
+        wget ${url} -P ./
+        """
     shell:
     """
     #!/usr/bin/python3

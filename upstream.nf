@@ -5,9 +5,18 @@ params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
 params.data_dir = "data"
 project_dir = projectDir 
 
+log.info """\
+    R I B O - S E Q    N F    P I P E L I N E
+    =========================================
+    
+
+
+
+"""
+.stripIndent()
 
 /// Processes necessary for metadata_flow
-include { GET_GSE_REPORT; GET_CSV_FROM_XML; ASSESS_LIBRARY_STRATEGY} from './modules/metadata-tasks.nf'
+include { GET_GSE_REPORT; GET_CSV_FROM_XML; ASSESS_LIBRARY_STRATEGY; CHECK_METADATA_REPORT } from './modules/metadata-tasks.nf'
 /// Processes necessary for upstream_flow
 include { GET_RUN_INFO; GET_INDIVIDUAL_RUNS; RUN_FFQ; WGET_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML } from './modules/upstream-tasks.nf'
 
@@ -20,7 +29,8 @@ workflow metadata_flow {
     main:
         gse_report_ch = GET_GSE_REPORT( GSE_inputs )
         csv_ch = GET_CSV_FROM_XML( gse_report_ch )
-        ASSESS_LIBRARY_STRATEGY ( csv_ch )
+        lib_strat_csv = ASSESS_LIBRARY_STRATEGY ( csv_ch )
+        CHECK_METADATA_REPORT ( lib_strat_csv )
 
 }
 
@@ -34,9 +44,9 @@ workflow upstream_flow {
     main:
         run_info_ch = GET_RUN_INFO                  ( GSE_inputs )
         runs_ch = GET_INDIVIDUAL_RUNS               ( run_info_ch ) 
-        fq_urls_ch = RUN_FFQ                        ( runs_ch.splitText( by: 1 ) ) // This will not be the optimal method. I resorted to python because I could not manage I/O with nf or shell 
-        fq_urls_ch.view()
-        // fastq_path_ch = WGET_FASTQ                  ( RUN_FFQ.out.flatten(), GSE_inputs ) // This will not be optimal similar to above
+        fq_urls_ch = RUN_FFQ                        ( runs_ch.splitText( by: 1 ) ) 
+
+        fastq_path_ch = WGET_FASTQ                  ( fq_urls_ch, GSE_inputs ) 
 
         // adapter_report_ch = FIND_ADAPTERS           ( WGET_FASTQ.out, GSE_inputs )
 
@@ -59,14 +69,15 @@ workflow {
 
     ///NB. We could parse through the superset.csv to get the GSEs, instead of relying on this
     GSE_inputs = Channel
-        .fromPath("data/trips_human_studies_3.csv")
+        .fromPath("data/ribosome_profiling_superset.csv")
         .splitCsv(header: true)
-        .map { row -> tuple("${row.GSE}", "${row.SRP}" )} // use for CSV from trips
+        .map { row -> tuple("${row.Accession}", "${row.SRA}" )} // use for superset  
 
-        // .map { row -> tuple("${row.Accession}", "${row.SRA}" )} // use for superset  
+        // .map { row -> tuple("${row.GSE}", "${row.SRP}" )} // use for CSV from trips
+
     main:
-        // metadata_flow(GSE_inputs)
-        upstream_flow(GSE_inputs)
+        metadata_flow(GSE_inputs)
+        // upstream_flow(GSE_inputs)
         // yaml_flow(upstream_flow.out, GSE_inputs)
 
 

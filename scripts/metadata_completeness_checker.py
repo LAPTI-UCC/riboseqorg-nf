@@ -23,8 +23,8 @@ def count_empty_cells_library_strategy(df):
             count += 1
     num_rows = len(df.index)
     prop = count/num_rows
-    if prop != 1:
-        return Exception (f"Incomplete Library Strategy. {round(prop *100,2)}% complete")
+    # if prop != 1:
+    #     return Exception (f"Incomplete Library Strategy. {round(prop *100,2)}% complete")
     
     return prop
 
@@ -36,9 +36,13 @@ def main(args):
 
     df = load_csv(args.Path)
     ls_check = count_empty_cells_library_strategy(df)
-    if type(ls_check) == Exception:
-        print(args.Path)
-        raise ls_check
+    sample = args.Path.split("/")[-1].split("_")[0]
+    file_object = open('/home/jack/projects/riboseq_data_processing/data/sample_metadata_completeness.csv', 'a')
+    file_object.write(f'{sample}, {ls_check}')
+    file_object.close()
+
+    # if type(ls_check) == Exception:
+    #     raise ls_check
 
 
 if __name__ == "__main__":
