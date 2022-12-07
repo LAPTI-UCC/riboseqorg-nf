@@ -2,10 +2,11 @@
 process GET_RUN_INFO {
 
     // errorStrategy 'ignore'
-
+    publishDir "$projectDir/$params.data_dir/runInfos", mode: 'copy'
 
     input:
         tuple val(GSE),val(srp)
+
 
     output:
         file "*_sraRunInfo.csv"
@@ -23,87 +24,76 @@ process GET_RUN_INFO {
 }
 
 
-process GET_INDIVIDUAL_RUNS {
 
-    errorStrategy 'ignore'
-
-
-    input:
-        path sraRunInfo
-
-    output:
-        // file 'run_*'
-        stdout
-
-    script:
-    """
-    cut -f1 -d, ${sraRunInfo} | tail -n+2 | cat > srr.txt 
-    cat srr.txt 
-    """
-}
 
 process RUN_FFQ {
 
-    // errorStrategy 'ignore'
+    // errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
-        val SRR
+        tuple val(GSE),val(srp)
 
     output:
         // file "*.json"
-        stdout
+        path "*.txt"
 
     script:
-    trimmed_string = "${SRR[0..-2]}"
+    """
+     ffq --ftp $GSE | cat > ${GSE}.json
+     cat ${GSE}.json | jq -r .[].url > outfile.txt
 
     """
-     ffq --ftp $trimmed_string | jq -r .[].url
-    """
-//     """
-//     #!/usr/bin/python3
+}
 
-// import os
+process GET_URL {
 
-// with open('${SRR}', 'r') as f:
-//     lines = f.readlines()
-//     for line in lines:
-//         line = line.strip('\\n')
-//         os.system(f"ffq --ftp {line} | jq -r .[].url | echo")
-
-//     """
-    }
-
-/// We want all the runs for a study to be published in the same study directory, identified by the GSE
-
-process WGET_FASTQ {
-    publishDir "$projectDir/$params.data_dir/$GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
-
-    errorStrategy 'ignore'
+    // errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
-        path ffq_json
-        tuple val(GSE),val(srp)
-
+        path json
+        // tuple val(GSE),val(srp)
 
     output:
-        file "*.fastq.gz"
+        path "*.txt"
 
     shell:
     """
-    #!/usr/bin/python3
+    #!/bin/python3
 
-import os
-import time
-import random
+    import json
 
-wait_time = random.choice([5,6,7,8,9,10,11,12])
-time.sleep(wait_time)
+    with open('${json}', 'r', encoding='utf-8') as jsonfile:
+        jsonfile.seek(0)
+        data = json.load(jsonfile)
 
-with open('${ffq_json}', 'r') as f:
-    url = f.readlines()[0].strip('\\n')
-    os.system(f"wget {url} -P ./")
+        url = data[0]["url"]
 
+    outfile = open("outfile.txt", 'w')
+
+    outfile.write(url)
+    outfile.close()
     """
+
+}
+
+
+process WGET_FASTQ {
+    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+
+    input:
+        path fastq_url
+        // tuple val(GSE),val(srp)
+
+
+    output:
+        path "*.fastq.gz"
+
+    script:
+        """
+        wget -i $fastq_url
+        """
 
 }
 
@@ -111,14 +101,14 @@ with open('${ffq_json}', 'r') as f:
 
 
 process FIND_ADAPTERS {
-    publishDir "$projectDir/$params.data_dir/$GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
+    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
 
     // errorStrategy 'ignore'
 
 
     input:
         file raw_fastq
-        tuple val(GSE),val(srp)
+        // tuple val(GSE),val(srp)
 
     output:
         file "${raw_fastq}_adpater_report.tsv"
@@ -133,11 +123,12 @@ process FIND_ADAPTERS {
 
 
 process WRITE_PARAMTERS_YAML {
+    publishDir "$projectDir/$params.data_dir/$params.GSE", mode: 'copy', pattern: '*.yaml'
 
     errorStrategy 'ignore'
 
-
     input:
+        path adapter_report_ch
         file sraRunInfo
         tuple val(GSE),val(srp)
 

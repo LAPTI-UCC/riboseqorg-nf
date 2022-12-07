@@ -5,6 +5,8 @@
 PRE-PROCESSING BRANCH
 --------------------- */
 
+nextflow.enable.dsl=2
+
 
 
 project_dir = projectDir  /// specify a new variable, the project directory ///
@@ -14,7 +16,7 @@ include { TRANSCRIPTOME_MAPPING; TRANSCRIPTOME_SAM_TO_BAM; BAM_TO_SQLITE; RIBO_Q
 include { GENOME_MAPPING; INDEX_BAM; BAM_TO_COVBED; GENOME_BAM_TO_BED; BED_TO_BIGWIG} from "./modules/processing-tasks.nf"
 include { BED_TO_BIGWIG as BED_TO_COV_BIGWIG } from "./modules/processing-tasks.nf"
 
-
+params.fastq_files = "/home/jack/projects/riboseq_data_processing/data/GSE131650/fastq/*"
 
 workflow {
 
