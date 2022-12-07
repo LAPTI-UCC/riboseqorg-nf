@@ -28,6 +28,7 @@ TODO: I need to find a way to raise an error if the output file is empty
 
 Sometimes a brokenPipe error leads to the file being empty. 
 This appears to be a bug in the ffq package. I had a similar issue with piping to cat in the command line. 
+I cannot tell what determines what causes ffq to fail 
 
 """
 
