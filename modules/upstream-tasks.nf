@@ -26,6 +26,9 @@ process GET_RUN_INFO {
 """
 TODO: I need to find a way to raise an error if the output file is empty
 
+Sometimes a brokenPipe error leads to the file being empty. 
+This appears to be a bug in the ffq package. I had a similar issue with piping to cat in the command line. 
+
 """
 
 process RUN_FFQ {
@@ -45,6 +48,7 @@ process RUN_FFQ {
 
     """
 }
+
 
 process GET_URL {
     errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
