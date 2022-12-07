@@ -40,10 +40,8 @@ workflow upstream_flow {
 
     main:
         run_info_ch         = GET_RUN_INFO            ( GSE_inputs )
-        runs_ch = run_info_ch
-            .splitCsv(header: true)
-            .map { row -> tuple("${row.Run}", params.GSE )}
-        ffq_ch          = RUN_FFQ                 ( runs_ch ) 
+        runs_ch             = run_info_ch.splitCsv(header: true).map { row -> tuple("${row.Run}", params.GSE )}
+        ffq_ch              = RUN_FFQ                 ( runs_ch ) 
         fastq_path_ch       = WGET_FASTQ              ( ffq_ch ) 
         adapter_report_ch   = FIND_ADAPTERS           ( fastq_path_ch )
         params_ch           = WRITE_PARAMTERS_YAML    (adapter_report_ch.collect(), run_info_ch, GSE_inputs ) 

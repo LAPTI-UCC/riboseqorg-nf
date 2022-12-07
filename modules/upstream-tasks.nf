@@ -7,7 +7,6 @@ process GET_RUN_INFO {
     input:
         tuple val(GSE),val(srp)
 
-
     output:
         file "*_sraRunInfo.csv"
 
@@ -24,7 +23,10 @@ process GET_RUN_INFO {
 }
 
 
+"""
+TODO: I need to find a way to raise an error if the output file is empty
 
+"""
 
 process RUN_FFQ {
 
@@ -94,8 +96,6 @@ process FIND_ADAPTERS {
         python3 $projectDir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adpater_report.tsv"
         """
 }
-
-
 
 process WRITE_PARAMTERS_YAML {
     publishDir "$projectDir/$params.data_dir/$params.GSE", mode: 'copy', pattern: '*.yaml'
