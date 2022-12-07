@@ -7,11 +7,18 @@ params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
 params.data_dir = "data"
 project_dir = projectDir 
 
+log.info """\
+    R I B O - S E Q    N F    P I P E L I N E
+    =========================================
+    
 
-/// Processes necessary for metadata_flow
-include { GET_GSE_REPORT; GET_CSV_FROM_XML; ASSESS_LIBRARY_STRATEGY} from './modules/metadata-tasks.nf'
+"""
+
+
+/// Processes necessary for metadata_flow and upstream_flow
+include { GET_GSE_REPORT; GET_CSV_FROM_XML; ASSESS_LIBRARY_STRATEGY                         } from './modules/metadata-tasks.nf'
 /// Processes necessary for upstream_flow
-include { GET_RUN_INFO; GET_URL; RUN_FFQ; WGET_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML } from './modules/upstream-tasks.nf'
+include { GET_RUN_INFO; RUN_FFQ; WGET_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML            } from './modules/upstream-tasks.nf'
 
 
 /// Workflow to get metadata. Returns a .csv for each GSE with info on their runs.
@@ -27,7 +34,6 @@ workflow metadata_flow {
 
 
 
-/// workflow to get the info for the .yaml file.
 workflow upstream_flow {
 
     take: GSE_inputs
@@ -40,7 +46,6 @@ workflow upstream_flow {
         ffq_ch          = RUN_FFQ                 ( runs_ch ) 
         fastq_path_ch       = WGET_FASTQ              ( ffq_ch ) 
         adapter_report_ch   = FIND_ADAPTERS           ( fastq_path_ch )
-
         params_ch           = WRITE_PARAMTERS_YAML    (adapter_report_ch.collect(), run_info_ch, GSE_inputs ) 
 
     emit:
@@ -58,13 +63,11 @@ workflow {
         // .map { row -> tuple("${row.GSE}", "${row.SRP}" )} // use for CSV from trips
 
     main:
-        // metadata_flow(GSE_inputs)
+        metadata_flow(GSE_inputs)
         upstream_flow( GSE_inputs )
 
 
 }
-///  IMPORTANT! we need to figure out how to execute processes in the right order: if the yamls is created too son, some info will be missing.
-///  We can use .collect() to make sure all the outputs of a process are collected before being set to the following one in the pipeline.
 
 workflow.onComplete{
     println "Pipeline completed at: $workflow.complete"

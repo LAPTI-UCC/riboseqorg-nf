@@ -1,8 +1,8 @@
 
 process GET_RUN_INFO {
-
-    // errorStrategy 'ignore'
     publishDir "$projectDir/$params.data_dir/runInfos", mode: 'copy'
+
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
         tuple val(GSE),val(srp)
@@ -28,13 +28,12 @@ process GET_RUN_INFO {
 
 process RUN_FFQ {
 
-    // errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
         tuple val(GSE),val(srp)
 
     output:
-        // file "*.json"
         path "*.txt"
 
     script:
@@ -46,35 +45,21 @@ process RUN_FFQ {
 }
 
 process GET_URL {
-
-    // errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
         path json
-        // tuple val(GSE),val(srp)
 
     output:
-        path "*.txt"
+        stdout
 
-    shell:
+    script:
+    trimmed_string = "${SRR[0..-2]}"
+
     """
-    #!/bin/python3
-
-    import json
-
-    with open('${json}', 'r', encoding='utf-8') as jsonfile:
-        jsonfile.seek(0)
-        data = json.load(jsonfile)
-
-        url = data[0]["url"]
-
-    outfile = open("outfile.txt", 'w')
-
-    outfile.write(url)
-    outfile.close()
+     ffq --ftp $trimmed_string | jq -r .[].url
     """
-
-}
+    }
 
 
 process WGET_FASTQ {
@@ -84,37 +69,28 @@ process WGET_FASTQ {
 
     input:
         path fastq_url
-        // tuple val(GSE),val(srp)
-
 
     output:
         path "*.fastq.gz"
 
-    script:
-        """
-        wget -i $fastq_url
-        """
+    shell:
+    """
+    wget -i $fastq_url
 
+    """
 }
-
-
 
 
 process FIND_ADAPTERS {
     publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
 
-    // errorStrategy 'ignore'
-
-
     input:
         file raw_fastq
-        // tuple val(GSE),val(srp)
 
     output:
         file "${raw_fastq}_adpater_report.tsv"
 
     script:
-    
         """
         python3 $projectDir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adpater_report.tsv"
         """
