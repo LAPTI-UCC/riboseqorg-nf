@@ -43,7 +43,7 @@ process RUN_FFQ {
 
     script:
     """
-     ffq --ftp $GSE | cat > ${GSE}.json
+     ffq --ftp $GSE 2>/dev/null | cat > ${GSE}.json
      cat ${GSE}.json | jq -r .[].url > outfile.txt
 
     """
