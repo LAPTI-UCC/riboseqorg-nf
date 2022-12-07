@@ -76,7 +76,6 @@ process WGET_FASTQ {
     shell:
     """
     wget -i $fastq_url
-
     """
 }
 
