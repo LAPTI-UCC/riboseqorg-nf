@@ -66,6 +66,8 @@ def calculate_triplet_periodicity_score(sqlite_dict, min_read_length=25, max_rea
     '''
     highest, second_highest = 0, 0
     for readlength in range(min_read_length, max_read_length+1):
+        if readlength not in sqlite_dict["fiveprime"]:
+            continue
         sorted_frame_counts = sorted([sqlite_dict["fiveprime"][readlength]['0'], 
                                         sqlite_dict["fiveprime"][readlength]['1'], 
                                         sqlite_dict["fiveprime"][readlength]['2']])
