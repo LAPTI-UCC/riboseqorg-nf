@@ -3,8 +3,7 @@
 
 from Bio import  SeqIO
 import pysam, os
-from sys import argv
-
+import argparse
 
 def run_weight_centered(all_reads):
 	'''
@@ -89,8 +88,6 @@ def main(bam_path, fasta_path, mode="offset", offset=0, create_bw=False):
 		seq_dict = SeqIO.to_dict(SeqIO.parse(in_seq_handle, "fasta"))
 		seq_dict_keys =  sorted(seq_dict.keys())
 
-
-
 	bed_path = str(bam_path) + ".bed"
 
 	bedfile = open(bed_path, "w")
@@ -115,26 +112,23 @@ def main(bam_path, fasta_path, mode="offset", offset=0, create_bw=False):
 	command = "sort -k1,1 -k2,2n %s > %s"%(bed_path, bed_path + ".sorted")
 	os.system(command)
 
-	if create_bw.casefold() == "True".casefold():
-		create_chrom_sizes(fasta_path)
-		bash_command = f"/home/jack/projects/tools_for_Galaxy/ribogalaxy-toolshed/tools/create_ribosome_profile/bedGraphToBigWig {bed_path}.sorted {fasta_path + '_chrom.sizes'} {bed_path}.sorted.bw"
-		os.system(bash_command)
-
 
 if __name__ == '__main__':
-	bam_path = str(argv[1]) 
-	offset = int(argv[2])
-	fasta_path = str(argv[3])
-	mode = argv[4]
-	create_bw = argv[5]
+    # Use the argparse module to parse the command-line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('bam_path', help='path to the BAM file')
+    parser.add_argument('offset', type=int, help='offset for aligning the ribosome footprints (applied to all read lengths)')
+    parser.add_argument('fasta_path', help='path to the FASTA file')
+    parser.add_argument('mode', help='\'offset\' or \'weight\' or \'calculate\'')
+    args = parser.parse_args()
 
-	if not os.path.exists(bam_path + ".bai"): 
-		print(bam_path)
-		pysam.index(bam_path)
-	
-	main(bam_path = bam_path, fasta_path = fasta_path, mode=mode, offset=offset, create_bw=create_bw)
+    # Check if the BAM file is indexed, and create the index if necessary
+    if not os.path.exists(args.bam_path + ".bai"):
+        print(args.bam_path)
+        pysam.index(args.bam_path)
 
-
+    # Call the main function to process the BAM LoCAM and create the BigWig file
+    main(bam_path=args.bam_path, fasta_path=args.fasta_path, mode=args.mode, offset=args.offset)
 
 
 
