@@ -43,7 +43,6 @@ workflow {
 		/// This block is for RNA-Seq studies only. It's executed depending on a parameter, which defines the type of study we are working with.
 			/// It can either be "RNA-seq study" or "Ribo-seq study" (see the GSE*_family.csv file for each study).
 
-		params.x = "RNA-seq study"
 		if (params.x != "RNA-seq study") {
 			INDEX_BAM   	  ( GENOME_MAPPING.out.genome_sorted_bam )
 			GENOME_BAM_TO_BED ( INDEX_BAM.out.genome_index_sorted_bam, INDEX_BAM.out.genome_index_sorted_bam_bai )
