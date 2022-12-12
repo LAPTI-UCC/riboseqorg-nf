@@ -95,7 +95,7 @@ process CLIP_FASTQ {
 	
 	script: 
 	"""
-    cutadapt --minimum-length=25 -a "file:$adapter_report" -o $raw_fastq"_clipped.fastq" $raw_fastq
+    cutadapt -j 5 --minimum-length=25 -a "file:$adapter_report" -o $raw_fastq"_clipped.fastq" $raw_fastq
     """
 }
 
