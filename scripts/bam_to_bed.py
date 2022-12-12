@@ -45,7 +45,7 @@ def process_chromosome(all_reads, offset):
 		protect_nts.sort()
 
 		# support for collapsed reads
-		print(read.qname)
+		print(int(read.qname.split("_x")[1]))
 
 		if "_x" in read.qname:
 			read_count = int(read.qname.split("_x")[1])
