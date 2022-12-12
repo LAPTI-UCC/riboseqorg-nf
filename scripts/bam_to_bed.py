@@ -44,6 +44,12 @@ def process_chromosome(all_reads, offset):
 		protect_nts = read.positions
 		protect_nts.sort()
 
+		# support for collapsed reads
+		if "_x" in read.qname:
+			read_count = int(read.qname.split("_x")[1])
+		else:
+			read_count = 1
+
 		# Aligns to forward strand
 
 		if not read.is_reverse:
@@ -51,9 +57,9 @@ def process_chromosome(all_reads, offset):
 		else:
 			Asite = protect_nts[-1 - offset] #  -1 for browser display.
 		if Asite in sequence:
-			sequence[Asite] += 1
+			sequence[Asite] += read_count
 		else:
-			sequence[Asite] = 1
+			sequence[Asite] = read_count
 		
 	return sequence
 
