@@ -68,24 +68,6 @@ process WGET_FASTQ {
 }
 
 
-process COLLAPSE_FASTQ {
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
-
-    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
-
-    input:
-        path fastq
-
-    output:
-        path "*.fastq.gz"
-
-    script:
-    """
-    python3 $projectDir/scripts/collapse_fastq.py -i $fastq -o ${fastq.baseName}_collapsed.fastq.gz
-
-    """
-}
-
 process FIND_ADAPTERS {
     publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
 
@@ -100,6 +82,43 @@ process FIND_ADAPTERS {
         python3 $projectDir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adpater_report.tsv"
         """
 }
+
+
+process CLIP_FASTQ {
+        
+    input:
+    file raw_fastq 
+    file adapter_report
+
+    output:
+    file '*_clipped.fastq' /// into clipped_fastq_channel  ///
+	
+	script: 
+	"""
+    cutadapt --minimum-length=25 -a "file:$adapter_report" -o $raw_fastq"_clipped.fastq" $raw_fastq
+    """
+}
+
+
+process COLLAPSE_FASTQ {
+    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+
+    input:
+        path fastq
+
+    output:
+        path "*.fastq.gz"
+
+    script:
+    """
+    python3 $projectDir/scripts/collapse_fastq.py -i $fastq -o ${fastq.baseName}.fastq.gz
+
+    """
+}
+
+
 
 process WRITE_PARAMTERS_YAML {
     publishDir "$projectDir/$params.data_dir/$params.GSE", mode: 'copy', pattern: '*.yaml'

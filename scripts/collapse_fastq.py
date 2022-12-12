@@ -23,13 +23,20 @@ def collapse(infile, outfile):
             if line.startswith('@'):
                 seq = next(f)
                 if seq in unique_reads:
-                    unique_reads[seq] += 1
+                    # unique_reads[seq] += 1
+                    unique_reads[seq]['count'] += 1
+                    # unique_reads[seq]['qual']
+                    next(f)
+
                 else:
-                    unique_reads[seq] = 1
+                    next(f)
+                    # unique_reads[seq] = 1
+                    unique_reads[seq] = {}
+                    unique_reads[seq]['count'] = 1
+                    unique_reads[seq]['qual'] = next(f)
                 # Skip the remaining lines for this read
                 next(f)
-                next(f)
-
+                # print(unique_reads[seq])
     # Open the FASTQ file for writing, handling gzip if necessary
     # by checking the magic number at the beginning of the file
     if outfile.endswith('.gz'):
@@ -39,11 +46,11 @@ def collapse(infile, outfile):
 
         # Write the unique reads to the file with their counts
     read_number = 1
-    for seq, count in unique_reads.items():
-        f.write(f'@read{read_number}_{count}\n')
+    for seq, vals in unique_reads.items():
+        f.write(f'@read{read_number}_x{vals["count"]}\n')
         f.write(seq)
         f.write('+\n')
-        f.write('\n')
+        f.write(f'{vals["qual"]}')
         read_number += 1
 
 

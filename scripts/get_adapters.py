@@ -84,7 +84,7 @@ def write_adapter_report(found_adapters, outfile_path):
 
         for direction in found_adapters:
             for adapter in found_adapters[direction]:
-                outfile.write(f'{direction}\t{adapter}\n')
+                outfile.write(f'>{direction}\n{adapter}\n')
 
 
 if __name__ == '__main__':

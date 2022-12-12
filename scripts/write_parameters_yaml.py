@@ -35,6 +35,18 @@ def merge_adapter_reports(fastq_dir):
                 for line in lines:
                     adapter = line.split('\t')[1].strip('\n')
                     if adapter not in all_adapters: all_adapters.append(adapter)
+                    
+        if i.endswith('adapter_report.fa'):
+            absolute_path = fastq_dir + '/' + i
+            with open(absolute_path, 'r') as report:
+                lines = report.readlines()
+                for line in lines:
+                    if line.startswith('>'):
+                        continue
+                    else:
+                        adapter = line.strip('\n')
+                        if adapter not in all_adapters: all_adapters.append(adapter)
+
     
     final_report_path = fastq_dir + '/final_adapter_report.fa'
     with open(final_report_path, 'w') as final_report:

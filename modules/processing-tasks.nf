@@ -1,17 +1,5 @@
 
-process CLIP_FASTQ {
-        
-    input:
-    file raw_fastq 
 
-    output:
-    file '*_clipped.fastq' /// into clipped_fastq_channel  ///
-	
-	script: 
-	"""
-    cutadapt --minimum-length=25 -a "file:$params.adapter_fasta" -o $raw_fastq"_clipped.fastq" $raw_fastq
-    """
-}
 
 process rRNA_MAPPING {
 

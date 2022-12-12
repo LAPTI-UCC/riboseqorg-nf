@@ -18,7 +18,7 @@ log.info """\
 /// Processes necessary for metadata_flow and upstream_flow
 include { GET_GSE_REPORT; GET_CSV_FROM_XML; ASSESS_LIBRARY_STRATEGY                         } from './modules/metadata-tasks.nf'
 /// Processes necessary for upstream_flow
-include { GET_RUN_INFO; RUN_FFQ; COLLAPSE_FASTQ; WGET_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML            } from './modules/upstream-tasks.nf'
+include { GET_RUN_INFO; RUN_FFQ; CLIP_FASTQ; COLLAPSE_FASTQ; WGET_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML            } from './modules/upstream-tasks.nf'
 
 
 /// Workflow to get metadata. Returns a .csv for each GSE with info on their runs.
@@ -43,8 +43,9 @@ workflow upstream_flow {
         runs_ch             = run_info_ch.splitCsv(header: true).map { row -> tuple("${row.Run}", params.GSE )}
         ffq_ch              = RUN_FFQ                 ( runs_ch ) 
         fastq_path_ch       = WGET_FASTQ              ( ffq_ch ) 
-        collapsed_ch       = COLLAPSE_FASTQ          ( fastq_path_ch )
-        adapter_report_ch   = FIND_ADAPTERS           ( collapsed_ch )
+        adapter_report_ch   = FIND_ADAPTERS           ( fastq_path_ch )
+        clipped_ch          = CLIP_FASTQ              ( fastq_path_ch, adapter_report_ch )
+        collapsed_ch       = COLLAPSE_FASTQ          ( clipped_ch )
         params_ch           = WRITE_PARAMTERS_YAML    (adapter_report_ch.collect(), run_info_ch, GSE_inputs ) 
 
     emit:
