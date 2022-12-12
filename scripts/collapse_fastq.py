@@ -60,7 +60,7 @@ def collapse(infile, outfile):
         f.write(f'@read{read_number}_x{vals["count"]}\n')
         f.write(f"{seq}\n")
         f.write('+\n')
-        f.write(f'\n')
+        f.write(f'{vals["qual"]}\n')
         read_number += 1
 
 
