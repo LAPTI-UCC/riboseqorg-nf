@@ -36,6 +36,10 @@ def run_offset(all_reads, offset):
 		if read.qlen < 25 : continue
 
 		protect_nts = sorted(read.positions)
+		if "_x" in read.qname:
+			read_count = int(read.qname.split("_x")[1])
+		else:
+			read_count = 1
 
 		if not read.is_reverse:
 			Asite = protect_nts[offset]
@@ -43,9 +47,9 @@ def run_offset(all_reads, offset):
 			Asite = protect_nts[-1 - offset]
 
 		if Asite in sequence:
-			sequence[Asite] += 1
+			sequence[Asite] += read_count
 		else:
-			sequence[Asite] = 1
+			sequence[Asite] = read_count
 	
 	return sequence
 
@@ -119,7 +123,7 @@ if __name__ == '__main__':
     parser.add_argument('bam_path', help='path to the BAM file')
     parser.add_argument('offset', type=int, help='offset for aligning the ribosome footprints (applied to all read lengths)')
     parser.add_argument('fasta_path', help='path to the FASTA file')
-    parser.add_argument('mode', help='\'offset\' or \'weight\' or \'calculate\'')
+    parser.add_argument('mode', help='\'offset\' or \'weight\'')
     args = parser.parse_args()
 
     # Check if the BAM file is indexed, and create the index if necessary
