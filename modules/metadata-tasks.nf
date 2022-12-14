@@ -45,6 +45,7 @@ process GET_CSV_FROM_XML {
 process ASSESS_LIBRARY_STRATEGY {
     publishDir "$projectDir/$params.data_dir/$params.GSE", mode: 'copy'
 
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     // errorStrategy 'ignore'
 

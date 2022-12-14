@@ -56,7 +56,7 @@ workflow upstream_flow {
 workflow {
 
     GSE_inputs = Channel
-        .fromPath("data/ribosome_profiling_superset_Specific_run.csv")
+        .fromPath("/home/jack/projects/riboseq_data_processing/data/ribosome_profiling_superset.csv")
         .splitCsv(header: true)
         .map { row -> tuple("${row.Accession}", "${row.SRA}" )} // use for superset  
 
@@ -64,7 +64,7 @@ workflow {
 
     main:
         metadata_flow(GSE_inputs)
-        upstream_flow( GSE_inputs )
+        // upstream_flow( GSE_inputs )
 
 
 }
