@@ -38,6 +38,7 @@ def run_offset(all_reads, offset):
 		protect_nts = sorted(read.positions)
 		if "_x" in read.qname:
 			read_count = int(read.qname.split("_x")[1])
+			print(read.qname, read_count)
 		else:
 			read_count = 1
 

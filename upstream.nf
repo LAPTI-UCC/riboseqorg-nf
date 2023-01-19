@@ -20,9 +20,6 @@ include { GET_RUN_INFO; RUN_FFQ; CLIP_FASTQ; COLLAPSE_FASTQ; WGET_FASTQ; FIND_AD
 
 
 
-
-
-
 workflow upstream_flow {
 
     take: GSE_inputs
@@ -45,15 +42,14 @@ workflow upstream_flow {
 workflow {
 
     GSE_inputs = Channel
-        .fromPath("/home/jack/projects/riboseq_data_processing/data/ribosome_profiling_superset.csv")
+        .fromPath("/home/jack/projects/riboseq_data_processing/data/GSE69921_test.csv")
         .splitCsv(header: true)
         .map { row -> tuple("${row.Accession}", "${row.SRA}" )} // use for superset  
 
         // .map { row -> tuple("${row.GSE}", "${row.SRP}" )} // use for CSV from trips
 
     main:
-        metadata_flow(GSE_inputs)
-        // upstream_flow( GSE_inputs )
+        upstream_flow( GSE_inputs )
 
 
 }
