@@ -13,7 +13,7 @@ import argparse
 from operator import add
 import sqlite3 
 import os
-from calculating_chrom_sizes import get_chrom_sizes
+# from calculating_chrom_sizes import get_chrom_sizes
 
 
 def get_parser():
@@ -29,7 +29,7 @@ def get_parser():
     parser.add_argument("-t", help="Path to transcritome bowtie indexes", type=str) 
     parser.add_argument("-g", help="Path to genome bowtie indexes", type=str) 
     parser.add_argument("-f", help="Path to genome fasta file", type=str) 
-    parser.add_argument("-s", help="Path to annotation inventory sqlite (default .annotation_inventory.sqlite)", type=str, default="annotation_inventory.sqlite") 
+    parser.add_argument("-s", help="Path to annotation inventory sqlite (default .annotation_inventory/annotation_inventory.sqlite)", type=str, default="annotation_inventory/annotation_inventory.sqlite") 
     parser.add_argument("-c", help="Path to chromosome sizes corresponding to genome fasta (-g)", type=str) 
 
     parser.add_argument("--scientific", help="Scientific name of the organism you want to set. Goes with '--operation ", type=str)
@@ -49,7 +49,7 @@ def is_organism_in_use(organism, curosr):
     '''
     Return a boolean response describing whether the organism name is unique or not 
     '''
-    organisms = curosr.execute(f"SELECT {organism} FROM annotation_inventory;").fetchall()
+    organisms = curosr.execute(f"SELECT organism FROM annotation_inventory;").fetchall()
     return organism in [i[0] for i in organisms]
 
 
@@ -69,7 +69,7 @@ def handle_chrom_sizes(fasta_path):
     return chrom_sizes_path
 
 
-def add_organism(organism, rRNA_index, transcriptome_index, genome_index, genome_fasta, annotation_sqlite, chrom_sizes_file, db="annotation_inventory.sqlite"):
+def add_organism(organism, rRNA_index, transcriptome_index, genome_index, genome_fasta, annotation_sqlite, chrom_sizes_file, db="annotation_inventory/annotation_inventory.sqlite"):
     '''
     Insert row with provided details into annotation inventory.
     '''
@@ -86,7 +86,7 @@ def add_organism(organism, rRNA_index, transcriptome_index, genome_index, genome
         raise Exception("This organism already exists in the database. Use existing entry or create a new one with a more specific name")
 
 
-def remove_organism(organism, db="annotation_inventory.sqlite"):
+def remove_organism(organism, db="annotation_inventory/annotation_inventory.sqlite"):
     '''
     Remove entry where organism = organism
     '''
@@ -100,10 +100,11 @@ def remove_organism(organism, db="annotation_inventory.sqlite"):
         connection.close()
 
     else:
-        raise Exception(f"{organism} isn't in the inventory. Maybe it is spelled differently?")
+        results = cursor.execute("SELECT organism FROM annotation_inventory;").fetchall()
+        raise Exception(f"{organism} isn't in the inventory. Maybe it is spelled differently?\n Choose from {results}")
 
 
-def update_organim(organism, db="annotation_inventory.sqlite", **kwargs):
+def update_organim(organism, db="annotation_inventory/annotation_inventory.sqlite", **kwargs):
     '''
     Update the entry for the given organims using the parameters provided
     '''
@@ -113,6 +114,7 @@ def update_organim(organism, db="annotation_inventory.sqlite", **kwargs):
 
         set_statement = "SET "
         for key, value in kwargs.items():
+            print(key, value)
             if key == 'r':
                 set_statement += f"rRNA_index='{value}',"
             elif key == 't':
@@ -126,7 +128,8 @@ def update_organim(organism, db="annotation_inventory.sqlite", **kwargs):
             elif key == 'c':
                 set_statement += f"chrom_sizes_file='{value}',"
 
-        set_statement = ''.join(set_statement.split(','))
+        set_statement = ''.join(set_statement)
+        print(set_statement.strip(","))
         
         cursor.execute(
             f"UPDATE annotation_inventory {set_statement} WHERE organism=='{organism}'"
@@ -135,10 +138,11 @@ def update_organim(organism, db="annotation_inventory.sqlite", **kwargs):
         connection.close()
 
     else:
-        raise Exception(f"{organism} isn't in the inventory. Maybe it is spelled differently?")
+        results = cursor.execute("SELECT organism FROM annotation_inventory;").fetchall()
+        raise Exception(f"{organism} isn't in the inventory. Maybe it is spelled differently?\n Choose from {results}")
 
 
-def set_primary_organism(organism, scientific, db='annotation_inventory.sqlite'):
+def set_primary_organism(organism, scientific, db='annotation_inventory/annotation_inventory.sqlite'):
     '''
     Set the primary organism for the given scientific name. (ie. 'Homo sapiens' primary organism 'human_hg19_gencode25')
     '''
@@ -159,7 +163,8 @@ def set_primary_organism(organism, scientific, db='annotation_inventory.sqlite')
     connection.commit()
     connection.close()
 
-def run(args):
+
+def run(args, db="annotation_inventory/annotation_inventory.sqlite"):
     '''
     Run the operation given the provided commands
     '''
@@ -179,7 +184,8 @@ def run(args):
             genome_index=args.g,
             genome_fasta=args.f,
             annotation_sqlite=args.s,
-            chrom_sizes_file=args.c
+            chrom_sizes_file=args.c, 
+            db=db
         )
     
     elif args.operation == "remove":
@@ -188,7 +194,7 @@ def run(args):
             if not vars(args)[i]:
                 raise Exception(f"Missing required argument: -{i}")
 
-        remove_organism(organism=args.o, db=args.s)
+        remove_organism(organism=args.o, db=db)
 
 
     elif args.operation == "update":
@@ -202,7 +208,7 @@ def run(args):
         for item in ['operation', 'o', 's']:
             items_to_update.pop(item)
             
-        update_organim(organism=args.o, db=args.s, **items_to_update)
+        update_organim(organism=args.o, db=db, **items_to_update)
     
     elif args.operation == 'set_primary_organism':
         required = ['o', 'scientific']
@@ -217,7 +223,7 @@ def run(args):
         raise Exception(f"Invalid operation: {args.operation}")
 
 
-def run_prompted(args, db='annotation_inventory.sqlite'):
+def run_prompted(args, db='annotation_inventory/annotation_inventory.sqlite'):
     '''
     Walk the user through parameter input and then run the program
     '''
@@ -284,9 +290,12 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if not args.operation:
-        run_prompted(args, db=args.s)
+        run_prompted(args)
     else:
         run(args)
 
 
 
+'''
+ python annotation_inventory/annotation_inventory_manager.py --operation update -o 'homo_sapiens' -r /mnt/data/indices/bowtie/ncRNA/homo_sapiens_hg38/homo_sapiens_hg38_rRNA -t /mnt/data/indices/bowtie/transcriptome/homo_sapiens_gencode39/homo_sapiens_gencode39_transcriptome -g /mnt/data/indices/bowtie/genome/homo_sapiens_hg38/homo_sapiens_hg38_genome -f /mnt/data/indices/bowtie/genome/homo_sapiens_hg38/hg38.fa -s /mnt/data/organism_sqlites/homo_sapiens_gencode39/homo_sapiens.gencode39.sqlite
+'''
