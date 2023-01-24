@@ -45,11 +45,11 @@ def get_db_curosor(connection):
     return cursor
 
 
-def is_organism_in_use(organism, curosr):
+def is_organism_in_use(organism, cursor):
     '''
     Return a boolean response describing whether the organism name is unique or not 
     '''
-    organisms = curosr.execute(f"SELECT organism FROM annotation_inventory;").fetchall()
+    organisms = cursor.execute("SELECT organism FROM annotation_inventory;").fetchall()
     return organism in [i[0] for i in organisms]
 
 
