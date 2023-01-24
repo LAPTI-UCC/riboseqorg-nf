@@ -40,13 +40,11 @@ process RUN_FFQ {
         tuple val(GSE),val(srp)
 
     output:
-        path "*.txt"
+        path "*.fastq.gz"
 
     script:
     """
-     ffq --ftp $GSE 2>/dev/null | cat > ${GSE}.json
-     cat ${GSE}.json | jq -r .[].url > outfile.txt
-
+     ffq --ftp $GSE 2>/dev/null | grep -Eo '"url": "[^"]*"' | grep -o '"[^"]*"$' | xargs curl -O
     """
 }
 
