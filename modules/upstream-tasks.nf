@@ -54,23 +54,6 @@ process RUN_FFQ {
 }
 
 
-process WGET_FASTQ {
-
-    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
-
-    input:
-        path fastq_url
-
-    output:
-        path "*.fastq.gz"
-
-    shell:
-        """
-        wget -i $fastq_url
-        """
-}
-
-
 process FIND_ADAPTERS {
     publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
 
