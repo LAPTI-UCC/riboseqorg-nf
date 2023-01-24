@@ -219,7 +219,7 @@ def run(args, db="annotation_inventory/annotation_inventory.sqlite"):
             if not vars(args)[i]:
                 raise Exception(f"Missing required argument: -{i}")
 
-        set_primary_organism(organism=args.o, db=args.s, scientific=args.scientific)
+        set_primary_organism(organism=args.o, db=db, scientific=args.scientific)
     
     else:
         raise Exception(f"Invalid operation: {args.operation}")
@@ -229,6 +229,8 @@ def run_prompted(args, db='annotation_inventory/annotation_inventory.sqlite'):
     '''
     Walk the user through parameter input and then run the program
     '''
+    print("-"*90)
+    args.db = input("What is the path to the annotation inventory database? (default: annotation_inventory/annotation_inventory.sqlite): ").strip(' ')
     print("-"*90)
     args.operation = input("Which operation would you like to perform on the database? ('add', 'remove' or 'update'): ").strip(' ')
     if args.operation not in ['add', 'remove', 'update', 'set_primary_organim']:
