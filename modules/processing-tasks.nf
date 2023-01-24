@@ -100,7 +100,7 @@ process BAM_TO_SQLITE {
 	file "*.sqlite" /// into sqlite_ch ///
 
 	"""
-	python3 $projectDir/scripts/bam_to_sqlite.py --bam ${sorted_bam} --annotation $params.annotation_sqlite --output ${sorted_bam.baseName}
+	python3 $projectDir/scripts/bam_to_sqlite.py --bam ${sorted_bam} --annotation $params.annotation_sqlite --output ${sorted_bam.baseName}.sqlite
 	"""
 }
 
