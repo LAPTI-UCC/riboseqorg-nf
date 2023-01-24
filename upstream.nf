@@ -42,7 +42,7 @@ workflow upstream_flow {
 workflow {
 
     GSE_inputs = Channel
-        .fromPath("/home/jack/projects/riboseq_data_processing/data/GSE69921_test.csv")
+        .fromPath("data/GSE69921_test.csv")
         .splitCsv(header: true)
         .map { row -> tuple("${row.Accession}", "${row.SRA}" )} // use for superset  
 

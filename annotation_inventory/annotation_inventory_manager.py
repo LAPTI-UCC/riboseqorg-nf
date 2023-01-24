@@ -128,6 +128,8 @@ def update_organim(organism, db="annotation_inventory/annotation_inventory.sqlit
             elif key == 'c':
                 set_statement += f"chrom_sizes_file='{value}',"
 
+
+
         set_statement = ''.join(set_statement)
         print(set_statement.strip(","))
         

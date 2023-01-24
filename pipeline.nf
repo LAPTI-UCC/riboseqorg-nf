@@ -24,7 +24,7 @@ workflow {
 	/// PRE-PROCESSING ///
 	rRNA_MAPPING        ( fastq_data )
 	FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
-	MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out.fastqc_full_reports )		
+	// MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out.fastqc_full_reports.collect() )		
 
     /// TRANSCRIPTOME MAPPING ///
 	if ( params.skip_trips == false ) {

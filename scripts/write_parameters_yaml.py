@@ -143,3 +143,5 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     run_project_setup(args.a, args.r, args.o, db=args.s)
+
+    
