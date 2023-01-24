@@ -44,7 +44,7 @@ process RUN_FFQ {
 
     script:
     """
-     ffq --ftp $GSE 2>/dev/null | jq -r '.[] | .url' | xargs curl -O
+     ffq --ftp $GSE  | jq -r '.[] | .url' | xargs curl -O
     """
 }
 
