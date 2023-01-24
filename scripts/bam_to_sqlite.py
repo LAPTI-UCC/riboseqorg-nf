@@ -6,6 +6,8 @@ import time
 import sqlite3
 from sqlitedict import SqliteDict
 
+import argparse
+
 def tran_to_genome(tran, pos, transcriptome_info_dict):
 	#print ("tran",list(transcriptome_info_dict))
 	traninfo = transcriptome_info_dict[tran]
@@ -570,14 +572,11 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 
 
 if __name__ == "__main__":
-	if len(sys.argv) <= 2:
-		print ("Usage: python bam_to_sqlite.py <path_to_bam_file> <path_to_organism.sqlite> <file_description (optional)>")
-		sys.exit()
-	bam_filepath = sys.argv[1]
-	annotation_sqlite_filepath = sys.argv[2]
-	#try:
-	#	desc = sys.argv[3]
-	#except:
-	#	desc = bam_filepath.split("/")[-1]
-	outputfile = bam_filepath+"v2.sqlite"
-	process_bam(bam_filepath,annotation_sqlite_filepath,outputfile)
+	parser = argparse.ArgumentParser(description='Convert a BAM file to Trips-Viz SQLITE format.')
+	parser.usage = "python bam_to_sqlite.py --bam <path_to_bam_file> --annotation <path_to_organism.sqlite> --output <path_to_output_file>"
+	parser.add_argument('--bam', help='Path to name sorted BAM file')
+	parser.add_argument('--annotation', help='Path to annotation SQLITE file')
+	parser.add_argument('--output', help='Path to output SQLITE file')
+	args = parser.parse_args()
+
+	process_bam(args.bam, args.annotation, args.output)
