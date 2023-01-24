@@ -182,6 +182,8 @@ rRNA_alignment_stats/*
 bedGraphToBigWig/*
 trips_alignment_stats/*
 
+annotation_inventory.sqlite 
+
 readme.txt
 scripts/csv_superset_filter.py
 data/CSV_reports/*
