@@ -9,12 +9,10 @@ from sqlitedict import SqliteDict
 import argparse
 
 def tran_to_genome(tran, pos, transcriptome_info_dict):
-	#print ("tran",list(transcriptome_info_dict))
 	traninfo = transcriptome_info_dict[tran]
 	chrom = traninfo["chrom"]
 	strand = traninfo["strand"]
 	exons = sorted(traninfo["exons"])
-	#print exons
 	if strand == "+":
 		exon_start = 0
 		for tup in exons:
@@ -58,7 +56,6 @@ def processor(process_chunk, master_read_dict, transcriptome_info_dict,master_di
 
 		pos = int(listname[1])
 		genomic_pos = tran_to_genome(tran, pos, transcriptome_info_dict)
-		#print ("genomic pos",genomic_pos)
 		if genomic_pos not in genomic_positions:
 			genomic_positions.append(genomic_pos)
 
@@ -228,7 +225,6 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	result = cursor.fetchall()
 	for row in result:
 		transcriptome_info_dict[str(row[0])] = {"cds_start":row[1],"cds_stop":row[2],"length":row[3],"strand":row[4],"chrom":row[5],"exons":[],"tran_type":row[6]}
-	#print list(transcriptome_info_dict)[:10]
 	
 	cursor.execute("SELECT * from exons;")
 	result = cursor.fetchall()
@@ -275,8 +271,6 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 			ref = read.reference_id
 			tran =  (all_ref_ids[ref]).split(".")[0]
 			mapped_reads += 1
-			if mapped_reads%1000000 == 0:
-				print ("{} reads parsed at {}".format(mapped_reads,(time.time()-start_time)))
 			pos = read.reference_start
 			readname = read.query_name
 			read_tags = read.tags
@@ -361,14 +355,11 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	
 	if "read_name" in master_read_dict:
 		del master_read_dict["read_name"]
-	print ("BAM file processed")
-	print ("Creating metagenes, triplet periodicity plots, etc.")
 
 	for tran in master_read_dict:
 		try:
 			cds_start = int(0 if transcriptome_info_dict[tran]["cds_start"] is None else transcriptome_info_dict[tran]["cds_start"])
 			cds_stop = int(0 if transcriptome_info_dict[tran]["cds_stop"] is None else transcriptome_info_dict[tran]["cds_stop"])
-			# print(tran, type(cds_start))
 		except:
 			print("Exception: ", tran)
 			continue
@@ -379,10 +370,8 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 			for primetype in ["fiveprime", "threeprime"]:
 				# Create the triplet periodicity and metainfo plots based on both the 5' and 3' ends of reads
 				for readlength in master_read_dict[tran]["unambig"]:
-					#print "readlength", readlength
 					# for each fiveprime postion for this readlength within this transcript
 					for raw_pos in master_read_dict[tran]["unambig"][readlength]:
-						#print "raw pos", raw_pos
 						trip_periodicity_reads += 1
 						if primetype == "fiveprime":
 							# get the five prime postion minus the cds start postion
@@ -393,7 +382,6 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 							rel_stop_pos = (raw_pos+readlength)-cds_stop
 						#get the readcount at the raw postion
 						readcount = master_read_dict[tran]["unambig"][readlength][raw_pos]
-						#print "readcount", readcount
 						frame = (real_pos%3)
 						if real_pos >= cds_start and real_pos <= cds_stop:
 							if readlength in master_trip_dict[primetype]:
@@ -405,14 +393,11 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 						if real_pos > (-600) and real_pos < (601):
 							if readlength in master_offset_dict[primetype]:
 								if real_pos in master_offset_dict[primetype][readlength]:
-									#print "real pos in offset dict"
 									master_offset_dict[primetype][readlength][real_pos] += readcount
 								else:
-									#print "real pos not in offset dict"
 									master_offset_dict[primetype][readlength][real_pos] = readcount
 							else:
 								#initiliase with zero to avoid missing neighbours below
-								#print "initialising with zeros"
 								master_offset_dict[primetype][readlength]= {}
 								for i in range(-600,601):
 									master_offset_dict[primetype][readlength][i] = 0
@@ -447,7 +432,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 			# a perfect score would be 0 meaning there is only a single peak, the worst score would be 1 meaning two highest peaks are the same height
 			master_trip_dict[primetype][subreadlength]["score"] = float(secondmaxcount)/float(maxcount)
 	#This part is to determine what offsets to give each read length
-	print ("Calculating offsets")
+
 	for primetype in ["fiveprime", "threeprime"]:
 		for readlen in master_offset_dict[primetype]:
 			accepted_len = False
@@ -460,7 +445,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 				if master_offset_dict[primetype][readlen][relative_pos] > max_relative_count:
 					max_relative_pos = relative_pos
 					max_relative_count = master_offset_dict[primetype][readlen][relative_pos]
-			#print "for readlen {} the max_relative pos is {}".format(readlen, max_relative_pos)
+
 			if primetype == "fiveprime":
 				# -3 to get from p-site to a-site, +1 to account for 1 based co-ordinates, resulting in -2 overall
 				final_offsets[primetype]["offsets"][readlen] = abs(max_relative_pos-2)
@@ -505,7 +490,6 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_read_dict["ambiguous_fiveprime_totals"] = {}
 	master_read_dict["ambiguous_cds_totals"] = {}
 	master_read_dict["ambiguous_threeprime_totals"] = {}
-	print ("calculating transcript counts")
 	for tran in master_read_dict:
 		if tran in transcriptome_info_dict:
 			five_total = 0
@@ -562,7 +546,6 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 			master_read_dict["ambiguous_cds_totals"][tran] = cds_total+ambig_cds_total
 			master_read_dict["ambiguous_threeprime_totals"][tran] = three_total+ambig_three_total
 
-	print ("Writing out to sqlite file")
 	sqlite_db = SqliteDict(outputfile,autocommit=False)
 	for key in master_read_dict:
 		sqlite_db[key] = master_read_dict[key]
