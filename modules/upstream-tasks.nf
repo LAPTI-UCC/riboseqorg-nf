@@ -43,9 +43,14 @@ process RUN_FFQ {
         path "*.fastq.gz"
 
     script:
-    """
-     ffq --ftp $GSE  | jq -r '.[] | .url' | xargs curl -O
-    """
+        def z = ["4", "5", "6", "7", "8", "9"]
+        Random rnd = new Random()
+
+        Sleep_time = (z[rnd.nextInt(z.size)])
+        """
+        sleep ${Sleep_time}
+        ffq --ftp $GSE  | jq -r '.[] | .url' | xargs curl -O
+        """
 }
 
 
@@ -60,9 +65,9 @@ process WGET_FASTQ {
         path "*.fastq.gz"
 
     shell:
-    """
-    wget -i $fastq_url
-    """
+        """
+        wget -i $fastq_url
+        """
 }
 
 
