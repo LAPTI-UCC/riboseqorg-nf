@@ -1,3 +1,8 @@
+'''
+Python script to convert a bam file to a sqlite read file 
+'''
+
+
 import sys
 import pysam
 import operator
@@ -9,6 +14,19 @@ from sqlitedict import SqliteDict
 import argparse
 
 def tran_to_genome(tran, pos, transcriptome_info_dict):
+	'''
+	Coverts a transcript position to a genomic position
+
+	Inputs:
+		tran: transcript name
+		pos: position in transcript
+		transcriptome_info_dict: dictionary with transcript information
+
+	Returns:
+		chrom: chromosome
+		genomic_pos: genomic position
+
+	'''
 	traninfo = transcriptome_info_dict[tran]
 	chrom = traninfo["chrom"]
 	strand = traninfo["strand"]
@@ -36,9 +54,16 @@ def tran_to_genome(tran, pos, transcriptome_info_dict):
 	return (chrom, genomic_pos)
 
 
-#  Takes a dictionary with a readname as key and a list of lists as value, each sub list has consists of two elements a transcript and the position the read aligns to in the transcript
-#  This function will count the number of genes that the transcripts correspond to and if less than or equal to 3 will add the relevant value to transcript_counts_dict
+
 def processor(process_chunk, master_read_dict, transcriptome_info_dict,master_dict,readseq, unambig_read_length_dict):
+	'''
+	Takes a dictionary with a readname as key and a list of lists as value, 
+	each sub list has consists of two elements a transcript and the position 
+	the read aligns to in the transcript. This function will count the number
+	of genes that the transcripts correspond to and if less than or equal
+	to 3 will add the relevant value to transcript_counts_dict
+	
+	'''
 	readlen = len(readseq)
 	ambiguously_mapped_reads = 0
 	#get the read name
@@ -160,6 +185,23 @@ def processor(process_chunk, master_read_dict, transcriptome_info_dict,master_di
 
 
 def get_mismatch_pos(md_tag,pos,readlen,master_read_dict,tran,readseq):
+	'''
+	Get the position of the mismatches in the read
+
+	Inputs:
+		md_tag: the MD tag from the SAM file
+		pos: the position of the read in the transcriptome
+		readlen: the length of the read
+		master_read_dict: the dictionary containing the read counts
+		tran: the transcriptome name
+		readseq: the sequence of the read
+
+	Outputs:
+		pos_modifier: the number of positions to add to the position of the read
+		readlen_modifier: the number of positions to subtract from the read length
+		mismatches: a dictionary containing the mismatches in the read
+
+	'''
 	nucs = ["A","T","G","C"]
 	mismatches = {}
 	total_so_far = 0
@@ -207,6 +249,20 @@ def get_mismatch_pos(md_tag,pos,readlen,master_read_dict,tran,readseq):
 
 
 def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
+	'''
+	Main wrapper script for BAM processing
+
+	Inputs:
+		bam_filepath: the path to the BAM file
+		transcriptome_info_dict_path: the path to the transcriptome info dictionary
+		outputfile: the path to the output file
+
+	Outputs:
+		None
+
+	TODO:
+		- Refactor this function to be more modular
+	'''
 	desc = "NULL"
 	start_time = time.time()
 	study_dict ={}
