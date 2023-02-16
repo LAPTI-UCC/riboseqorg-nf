@@ -13,3 +13,8 @@ CREATE TABLE primary_organism(
     scientific_name varchar(100)PRIMARY KEY,
     organism varchar(100)
 );
+
+CREATE TABLE gwips_organism(
+    scientific_name varchar(100)PRIMARY KEY,
+    gwipsDb varchar(100)
+);
