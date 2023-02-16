@@ -32,12 +32,13 @@ def get_parser():
     parser.add_argument("-s", help="Path to annotation inventory sqlite (default .annotation_inventory/annotation_inventory.sqlite)", type=str, default="annotation_inventory/annotation_inventory.sqlite") 
     parser.add_argument("-c", help="Path to chromosome sizes corresponding to genome fasta (-g)", type=str) 
 
-    parser.add_argument("--scientific", help="Scientific name of the organism you want to set. Goes with '--operation ", type=str)
-  
+    parser.add_argument("--scientific", help="Scientific name of the organism you want to set. Goes with '--operation' ", type=str)
+    parser.add_argument("--gwips_db", help="Name of the gwips database for a given organism. Goes with '--operation' ", type=str)
+
     return parser
 
 
-def get_db_curosor(connection):
+def get_db_cursor(connection):
     '''
     return a sqlite cursor for working with the db at the provided path
     '''
@@ -74,7 +75,7 @@ def add_organism(organism, rRNA_index, transcriptome_index, genome_index, genome
     Insert row with provided details into annotation inventory.
     '''
     connection = sqlite3.connect(db)
-    cursor = get_db_curosor(connection)
+    cursor = get_db_cursor(connection)
     if not is_organism_in_use(organism, cursor):
         cursor.execute(
             f"INSERT INTO annotation_inventory VALUES('{organism}', '{rRNA_index}', '{transcriptome_index}', '{genome_index}', '{genome_fasta}', '{annotation_sqlite}', '{chrom_sizes_file}');"
@@ -91,7 +92,7 @@ def remove_organism(organism, db="annotation_inventory/annotation_inventory.sqli
     Remove entry where organism = organism
     '''
     connection = sqlite3.connect(db)
-    cursor = get_db_curosor(connection)
+    cursor = get_db_cursor(connection)
     if is_organism_in_use(organism, cursor):
         cursor.execute(
             f"DELETE FROM annotation_inventory WHERE organism = {organism}"
@@ -104,12 +105,12 @@ def remove_organism(organism, db="annotation_inventory/annotation_inventory.sqli
         raise Exception(f"{organism} isn't in the inventory. Maybe it is spelled differently?\n Choose from {results}")
 
 
-def update_organim(organism, db="annotation_inventory/annotation_inventory.sqlite", **kwargs):
+def update_organism(organism, db="annotation_inventory/annotation_inventory.sqlite", **kwargs):
     '''
-    Update the entry for the given organims using the parameters provided
+    Update the entry for the given organism using the parameters provided
     '''
     connection = sqlite3.connect(db)
-    cursor = get_db_curosor(connection)
+    cursor = get_db_cursor(connection)
     if is_organism_in_use(organism, cursor):
 
         set_statement = "SET "
@@ -150,7 +151,7 @@ def set_primary_organism(organism, scientific, db='annotation_inventory/annotati
     '''
     
     connection = sqlite3.connect(db)
-    cursor = get_db_curosor(connection)
+    cursor = get_db_cursor(connection)
 
     organism_results = cursor.execute(f"SELECT COUNT(*) FROM annotation_inventory where organism='{organism}'").fetchall()[0][0]
     if organism_results < 1:
@@ -166,15 +167,45 @@ def set_primary_organism(organism, scientific, db='annotation_inventory/annotati
     connection.close()
 
 
+def add_gwips_organism(gwips_db, scientific, db='annotation_inventory/annotation_inventory.sqlite'):
+    '''
+    Adds the organism to the gwips_organism table
+
+    Parameters:
+        gwips_db: the name of the gwips database
+        scientific: the scientific name of the organism
+    '''
+    connection = sqlite3.connect(db)
+    cursor = get_db_cursor(connection)
+
+    scientific_results = cursor.execute(f"SELECT COUNT(*) FROM gwips_organism where scientific_name='{scientific}'").fetchall()[0][0]
+
+    if scientific_results < 1:
+        cursor.execute(f"INSERT INTO gwips_organism VALUES('{scientific}', '{gwips_db}')")
+    else:
+        cursor.execute(f"UPDATE gwips_organism SET organism='{gwips_db}'")
+
+
+def check_required_args(args, required: list) -> bool:
+    '''
+    Check that all required arguments are present
+    
+    Parameters:
+        args: the arguments provided
+        required: the required arguments
+    '''
+    for i in required:
+        if not vars(args)[i]:
+            raise Exception(f"Missing required argument: -{i}")
+    return True
+
 def run(args, db="annotation_inventory/annotation_inventory.sqlite"):
     '''
     Run the operation given the provided commands
     '''
     if args.operation == 'add':
         required = ['o', 'r','t','g','f']
-        for i in required:
-            if not vars(args)[i]:
-                raise Exception(f"Missing required argument: -{i}")
+        check_required_args(args, required)
 
         if not args.c:
             args.c = handle_chrom_sizes(args.f)
@@ -192,34 +223,33 @@ def run(args, db="annotation_inventory/annotation_inventory.sqlite"):
     
     elif args.operation == "remove":
         required = ['o']
-        for i in required:
-            if not vars(args)[i]:
-                raise Exception(f"Missing required argument: -{i}")
+        check_required_args(args, required)
 
         remove_organism(organism=args.o, db=db)
 
 
     elif args.operation == "update":
         required = ['o']
-        for i in required:
-            if not vars(args)[i]:
-                raise Exception(f"Missing required argument: -{i}")
+        check_required_args(args, required)
         
         items_to_update = {key:value for key, value in vars(args).items() if value}
 
         for item in ['operation', 'o', 's']:
             items_to_update.pop(item)
             
-        update_organim(organism=args.o, db=db, **items_to_update)
+        update_organism(organism=args.o, db=db, **items_to_update)
     
     elif args.operation == 'set_primary_organism':
         required = ['o', 'scientific']
 
-        for i in required:
-            if not vars(args)[i]:
-                raise Exception(f"Missing required argument: -{i}")
-
+        check_required_args(args, required)
         set_primary_organism(organism=args.o, db=db, scientific=args.scientific)
+
+    elif args.operation == 'add_gwips':
+        required = ['scientific', 'gwips_db']
+
+        check_required_args(args, required)
+        add_gwips_organism(gwips_db=args.gwips_db, scientific=args.scientific, db=db)
     
     else:
         raise Exception(f"Invalid operation: {args.operation}")
@@ -233,8 +263,8 @@ def run_prompted(args, db='annotation_inventory/annotation_inventory.sqlite'):
     args.db = input("What is the path to the annotation inventory database? (default: annotation_inventory/annotation_inventory.sqlite): ").strip(' ')
     print("-"*90)
     args.operation = input("Which operation would you like to perform on the database? ('add', 'remove' or 'update'): ").strip(' ')
-    if args.operation not in ['add', 'remove', 'update', 'set_primary_organim']:
-        raise Exception("invalid opetion. Must be ('add', 'remove', 'update' or 'set_primary_organim')")
+    if args.operation not in ['add', 'remove', 'update', 'set_primary_organism']:
+        raise Exception("invalid operation. Must be ('add', 'remove', 'update' or 'set_primary_organism')")
     
     print("-"*90)
     if args.operation == 'add':
@@ -280,7 +310,7 @@ def run_prompted(args, db='annotation_inventory/annotation_inventory.sqlite'):
 
         
 
-    elif args.operation == "set_primary_organim":
+    elif args.operation == "set_primary_organism":
         args.o = input("What is the name of the organism you want to set? Be specific: ").strip(' ')
         print("-"*90)
         args.scientific = input("What is the scientific name of the organism you want to set? eg. 'Homo sapiens': ").strip(' ')
