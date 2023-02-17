@@ -32,7 +32,7 @@ def read_study_metadata(study_metadata_path):
     return study_metadata   
 
 
-def get_gwipsDB_for_oragnism(organism, annotationDB_path):
+def get_gwipsDB_for_organism(organism, annotationDB_path):
     '''
     Returns the path to the GWIPS-viz database for the given organism.
     '''
@@ -289,7 +289,7 @@ def main(args):
 
         organism = organism.strip(' ')
 
-        with open(f"{get_gwipsDB_for_oragnism(organism, args.db)}.sql", "w") as f:
+        with open(f"{get_gwipsDB_for_organism(organism, args.db)}.sql", "w") as f:
             sample_names = generate_sample_names(organism_metadata, study_metadata)
 
             # Handle sample tables with paths to bigWig files
