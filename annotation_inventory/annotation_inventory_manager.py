@@ -22,7 +22,7 @@ def get_parser():
     '''
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--operation", choices=['add', 'remove', 'update', 'set_primary_organism'])
+    parser.add_argument("--operation", choices=['add', 'remove', 'update', 'set_primary_organism', 'add_gwips'])
 
     parser.add_argument("-o", help="Organism name. This is used as dictionary key for future reference", type=str) 
     parser.add_argument("-r", help="Path to rRNA bowtie indexes", type=str) 
@@ -115,7 +115,6 @@ def update_organism(organism, db="annotation_inventory/annotation_inventory.sqli
 
         set_statement = "SET "
         for key, value in kwargs.items():
-            print(key, value)
             if key == 'r':
                 set_statement += f"rRNA_index='{value}',"
             elif key == 't':
@@ -129,10 +128,7 @@ def update_organism(organism, db="annotation_inventory/annotation_inventory.sqli
             elif key == 'c':
                 set_statement += f"chrom_sizes_file='{value}',"
 
-
-
         set_statement = ''.join(set_statement)
-        print(set_statement.strip(","))
         
         cursor.execute(
             f"UPDATE annotation_inventory {set_statement} WHERE organism=='{organism}'"
@@ -263,7 +259,7 @@ def run_prompted(args, db='annotation_inventory/annotation_inventory.sqlite'):
     args.db = input("What is the path to the annotation inventory database? (default: annotation_inventory/annotation_inventory.sqlite): ").strip(' ')
     print("-"*90)
     args.operation = input("Which operation would you like to perform on the database? ('add', 'remove' or 'update'): ").strip(' ')
-    if args.operation not in ['add', 'remove', 'update', 'set_primary_organism']:
+    if args.operation not in ['add', 'remove', 'update', 'set_primary_organism', 'add_gwips']:
         raise Exception("invalid operation. Must be ('add', 'remove', 'update' or 'set_primary_organism')")
     
     print("-"*90)
