@@ -15,6 +15,7 @@ This script also assumes that the inserts are for an existing Organism.
 import argparse
 import pandas as pd
 import sqlite3
+import sys
 
 def read_metadata(metadata_path):
     '''
@@ -276,12 +277,33 @@ def write_study_inserts(metadata: pd.DataFrame, sample_names: dict, gbdb_path: s
     return study_inserts
 
 
+def subset_metadata(metadata: pd.DataFrame, study_metadata: pd.DataFrame) -> pd.DataFrame:
+    '''
+    Subset metadata to only include samples that have non NA values for the following columns:
+    - Organism
+    - Library type
+    - Ribosome Position
+
+    Returns a subsetted metadata dataframe.
+    '''
+    subset = metadata[metadata['Organism'].notna()]
+    subset = subset[subset['Library_Strategy'].notna()]
+    subset = subset[subset['Ribosome_position'].notna()]
+    return subset
+
+
 def main(args):
     '''
     Main function.
     '''
     metadata = read_metadata(args.m)
     study_metadata = read_study_metadata(args.s)
+    metadata = subset_metadata(metadata, study_metadata)
+
+    if metadata.empty:
+        print("No valid samples found in metadata. Valid entries must be present for 'Organism', 'Library_Strategy' and 'Ribosome_position'.Exiting.")
+        sys.exit(1)
+    print(metadata.head())
     
     #loop through unique organisms in study_metadata and create output insert files for each
     for organism in metadata['Organism'].unique():
@@ -310,8 +332,6 @@ def main(args):
             trackDb = write_trackDb_inserts(organism_metadata, sample_names, study_metadata)
             for track in trackDb:
                 f.write(track)
-        
-
 
     return study_inserts
 
