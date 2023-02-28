@@ -303,7 +303,7 @@ def main(args):
     if metadata.empty:
         print("No valid samples found in metadata. Valid entries must be present for 'Organism', 'Library_Strategy' and 'Ribosome_position'.Exiting.")
         sys.exit(1)
-    print(metadata.head())
+
     
     #loop through unique organisms in study_metadata and create output insert files for each
     for organism in metadata['Organism'].unique():
