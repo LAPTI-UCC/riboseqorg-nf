@@ -208,3 +208,21 @@ process BED_TO_BIGWIG {
 	$projectDir/scripts/bedGraphToBigWig ${bedfile} $params.chrom_sizes_file ${bedfile.baseName}.coverage.bw
 	"""
 }
+
+
+process GWIPS_INSERTS {
+
+	publishDir "$params.study_dir/gwips_inserts", mode: 'copy', pattern: '*.txt'
+
+	input:
+	file run_metadata
+	file study_metadata 
+	file annotation_inventory_sqlite
+
+	output:
+	file "*.txt" /// into gwips_inserts ///
+
+	"""
+	python3 $projectDir/scripts/write_GWIPS_inserts.py -s ${study_metadata} -m ${run_metadata} --db ${annotation_inventory_sqlite} -o ${run_metadata.baseName}_gwips_inserts.txt
+	"""
+}
