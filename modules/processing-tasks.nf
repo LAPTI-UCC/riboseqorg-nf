@@ -212,7 +212,7 @@ process BED_TO_BIGWIG {
 
 process GWIPS_INSERTS {
 
-	publishDir "$params.study_dir/gwips_inserts", mode: 'copy', pattern: '*.txt'
+	publishDir "$params.study_dir/gwips_inserts", mode: 'copy', pattern: '*.sql'
 
 	input:
 	file run_metadata
@@ -223,6 +223,24 @@ process GWIPS_INSERTS {
 	file "*.txt" /// into gwips_inserts ///
 
 	"""
-	python3 $projectDir/scripts/write_GWIPS_inserts.py -s ${study_metadata} -m ${run_metadata} --db ${annotation_inventory_sqlite} -o ${run_metadata.baseName}_gwips_inserts.txt
+	python3 $projectDir/scripts/write_GWIPS_inserts.py -s ${study_metadata} -m ${run_metadata} --db ${annotation_inventory_sqlite} 
 	"""
+}
+
+process TRIPS_INSERTS {
+
+	publishDir "$params.study_dir/trips_inserts", mode: 'copy', pattern: '*.sql'
+
+	input:
+	file run_metadata
+	file study_metadata 
+	file trips_sqlite
+
+	output:
+	file "*.txt" /// into trips_inserts ///
+
+	"""
+	python3 $projectDir/scripts/write_TRIPS_inserts.py -s ${study_metadata} -r ${run_metadata} -m db -d ${annotation_inventory_sqlite} 
+	"""
+
 }

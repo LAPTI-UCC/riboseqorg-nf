@@ -297,10 +297,6 @@ if __name__ == "__main__":
 
 
 """
- python scripts/write_GWIPS_inserts.py -s /home/jack/projects/Riboseq-Database/data/GSE115161_metadata.csv 
-                                        -m /home/jack/projects/Riboseq-Database/null/null/GSE115161_family.csv 
-                                        --db /home/jack/projects/riboseq_data_processing/annotation_inventory/annotation_inventory.sqlite
-
 
 python scripts/trips.py -s /home/jack/projects/Riboseq-Database/data/GSE115161_metadata.csv -r /home/jack/projects/Riboseq-Database/null/null/GSE115161_family.csv -m db -d /home/jack/projects/Riboseq-Database/trips.sqlite
 
