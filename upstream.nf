@@ -7,6 +7,7 @@ params.ribosome_prof_superset = "/data/ribosome_profiling_superset.csv"
 params.data_dir = "data"
 project_dir = projectDir 
 
+
 log.info """\
     R I B O - S E Q    N F    P I P E L I N E
     =========================================
@@ -16,7 +17,7 @@ log.info """\
 
 
 /// Processes necessary for upstream_flow
-include { GET_RUN_INFO; RUN_FFQ; CLIP_FASTQ; COLLAPSE_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML            } from './modules/upstream-tasks.nf'
+include { GET_RUN_INFO; RUN_FFQ; CLIP_FASTQ; COLLAPSE_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML; FASTQ_DL            } from './modules/upstream-tasks.nf'
 
 
 
@@ -27,7 +28,9 @@ workflow upstream_flow {
     main:
         run_info_ch         = GET_RUN_INFO            ( GSE_inputs )
         runs_ch             = run_info_ch.splitCsv(header: true).map { row -> tuple("${row.Run}", params.GSE )}
-        fastq_path_ch       = RUN_FFQ                 ( runs_ch ) 
+        // fastq_path_ch       = RUN_FFQ                 ( runs_ch ) 
+
+        fastq_path_ch       = FASTQ_DL                ( runs_ch )
         adapter_report_ch   = FIND_ADAPTERS           ( fastq_path_ch )
         clipped_ch          = CLIP_FASTQ              ( fastq_path_ch, adapter_report_ch )
         collapsed_ch        = COLLAPSE_FASTQ          ( clipped_ch )

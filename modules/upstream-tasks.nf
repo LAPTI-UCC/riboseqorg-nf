@@ -124,3 +124,20 @@ process WRITE_PARAMTERS_YAML {
         python3 $projectDir/scripts/write_parameters_yaml.py -a "$projectDir/$params.data_dir/$GSE/fastq" -s $projectDir/annotation_inventory/annotation_inventory.sqlite -r $sraRunInfo -o parameters.yaml
         """
 }
+
+
+process FASTQ_DL {
+
+    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+
+    input:
+        tuple val(accession), val(GSE)
+
+    output:
+        file "*.fastq.gz"
+
+    script:
+        """
+        fastq-dl -a $accession --cpus 5
+        """
+}
