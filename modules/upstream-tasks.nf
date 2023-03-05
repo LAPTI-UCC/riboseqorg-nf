@@ -23,37 +23,6 @@ process GET_RUN_INFO {
 }
 
 
-"""
-TODO: I need to find a way to raise an error if the output file is empty
-
-Sometimes a brokenPipe error leads to the file being empty. 
-This appears to be a bug in the ffq package. I had a similar issue with piping to cat in the command line. 
-I cannot tell what determines what causes ffq to fail 
-
-"""
-
-process RUN_FFQ {
-
-    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
-
-    input:
-        tuple val(GSE),val(srp)
-
-    output:
-        path "*.fastq.gz"
-
-    script:
-        def z = ["4", "5", "6", "7", "8", "9"]
-        Random rnd = new Random()
-
-        Sleep_time = (z[rnd.nextInt(z.size)])
-        """
-        sleep ${Sleep_time}
-        ffq --ftp $GSE  | jq -r '.[] | .url' | xargs curl -O
-        """
-}
-
-
 process FIND_ADAPTERS {
     publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
 
@@ -81,7 +50,7 @@ process CLIP_FASTQ {
 	
 	script: 
 	"""
-    cutadapt -j 5 --minimum-length=25 -a "file:$adapter_report" -o $raw_fastq"_clipped.fastq" $raw_fastq
+    cutadapt -j 5 --minimum-length=15 -a "file:$adapter_report" -o $raw_fastq"_clipped.fastq" $raw_fastq
     """
 }
 
