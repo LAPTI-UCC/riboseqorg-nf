@@ -46,7 +46,7 @@ process CLIP_FASTQ {
     file adapter_report
 
     output:
-    file '*_clipped.fastq' /// into clipped_fastq_channel  ///
+    file '*_clipped.fastq' 
 	
 	script: 
 	"""
