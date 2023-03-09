@@ -22,6 +22,21 @@ process GET_RUN_INFO {
         """
 }
 
+process FASTQ_DL {
+
+    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+
+    input:
+        tuple val(accession), val(GSE)
+
+    output:
+        file "*.fastq.gz"
+
+    script:
+        """
+        fastq-dl -a $accession --cpus 5
+        """
+}
 
 process FIND_ADAPTERS {
     publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
@@ -40,7 +55,8 @@ process FIND_ADAPTERS {
 
 
 process CLIP_FASTQ {
-        
+    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+
     input:
     file raw_fastq 
     file adapter_report
@@ -68,7 +84,7 @@ process COLLAPSE_FASTQ {
 
     script:
     """
-    python3 $projectDir/scripts/collapse_fastq.py -i $fastq -o ${fastq.baseName}.fastq.gz
+    python3 $projectDir/scripts/collapse_fastq.py -i $fastq -o ${fastq.baseName}_collapsed.fastq.gz
 
     """
 }
@@ -95,18 +111,3 @@ process WRITE_PARAMTERS_YAML {
 }
 
 
-process FASTQ_DL {
-
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
-
-    input:
-        tuple val(accession), val(GSE)
-
-    output:
-        file "*.fastq.gz"
-
-    script:
-        """
-        fastq-dl -a $accession --cpus 5
-        """
-}
