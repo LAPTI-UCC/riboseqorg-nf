@@ -189,3 +189,5 @@ scripts/csv_superset_filter.py
 data/CSV_reports/*
 trace*
 report*
+null/*
+trips.sqlite
