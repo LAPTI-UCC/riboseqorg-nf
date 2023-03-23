@@ -19,7 +19,7 @@ log.info """\
 /// Processes necessary for upstream_flow
 include { GET_RUN_INFO; CLIP_FASTQ; COLLAPSE_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML; FASTQ_DL            } from './modules/upstream-tasks.nf'
 
-include { FASTQC_ON_PROCESSED } from './modules/processing-tasks.nf'
+include { FASTQC } from './modules/processing-tasks.nf'
 
 
 workflow upstream_flow {
@@ -32,7 +32,7 @@ workflow upstream_flow {
         fastq_path_ch       = FASTQ_DL                ( runs_ch )
         adapter_report_ch   = FIND_ADAPTERS           ( fastq_path_ch )
         clipped_ch          = CLIP_FASTQ              ( fastq_path_ch, adapter_report_ch )
-        FASTQC_ON_PROCESSED ( clipped_ch )
+        FASTQC ( clipped_ch )
         collapsed_ch        = COLLAPSE_FASTQ          ( clipped_ch )
         params_ch           = WRITE_PARAMTERS_YAML    (adapter_report_ch.collect(), run_info_ch, GSE_inputs ) 
 

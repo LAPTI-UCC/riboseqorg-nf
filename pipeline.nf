@@ -11,7 +11,7 @@ nextflow.enable.dsl=2
 
 project_dir = projectDir  /// specify a new variable, the project directory ///
 
-include { rRNA_MAPPING; FASTQC_ON_PROCESSED; MULTIQC_ON_FASTQ } from "./modules/processing-tasks.nf"
+include { rRNA_MAPPING; FASTQC; MULTIQC_ON_FASTQ } from "./modules/processing-tasks.nf"
 include { TRANSCRIPTOME_MAPPING; TRANSCRIPTOME_SAM_TO_BAM; BAM_TO_SQLITE; RIBO_QC } from "./modules/processing-tasks.nf"
 include { GENOME_MAPPING; INDEX_BAM; BAM_TO_COVBED; GENOME_BAM_TO_BED; BED_TO_BIGWIG} from "./modules/processing-tasks.nf"
 include { BED_TO_BIGWIG as BED_TO_COV_BIGWIG } from "./modules/processing-tasks.nf"
@@ -23,8 +23,8 @@ workflow {
 	fastq_data = Channel.fromPath ( params.fastq_files )
 	/// PRE-PROCESSING ///
 	rRNA_MAPPING        ( fastq_data )
-	FASTQC_ON_PROCESSED ( rRNA_MAPPING.out.fastq_less_rRNA )
-	// MULTIQC_ON_FASTQ    ( FASTQC_ON_PROCESSED.out.fastqc_full_reports.collect() )		
+	FASTQC ( rRNA_MAPPING.out.fastq_less_rRNA )
+	MULTIQC_ON_FASTQ    ( FASTQC.out.fastqc_full_reports.collect() )		
 
     /// TRANSCRIPTOME MAPPING ///
 	if ( params.skip_trips == false ) {

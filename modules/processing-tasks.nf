@@ -18,23 +18,21 @@ process rRNA_MAPPING {
 	"""
 }
 
-/* ORIGINALLY THE BELOW PROCESS WAS NAMED "fastqc_on_raw". It has been updated for consistency, considering we are
-using fastqc on processed reads in this new version (sequences with no adapters and no rRNAs)-> new name is fastqc_on_processed */
 
-process FASTQC_ON_PROCESSED {
+process FASTQC {
 
 	publishDir "$params.study_dir/fastqc", mode: 'copy'
 	
 	input:
-	file processed_fastq 
+	file fastq 
 
 	output:
 	path "*_fastqc.{zip,html}", emit: fastqc_full_reports/// into raw_fastqc_dir ///
-    path "${processed_fastq.baseName}_fastqc/fastqc_data.txt", emit: fastqc_data
+    path "${fastq.baseName}_fastqc/fastqc_data.txt", emit: fastqc_data
 
 	"""
-	fastqc -q $processed_fastq 
-    unzip ${processed_fastq.baseName}_fastqc.zip
+	fastqc -q $fastq 
+    unzip ${fastq.baseName}_fastqc.zip
 	"""
 }
 
