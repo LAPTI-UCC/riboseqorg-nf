@@ -32,7 +32,7 @@ workflow {
 		TRANSCRIPTOME_MAPPING    ( rRNA_MAPPING.out.fastq_less_rRNA )
 		TRANSCRIPTOME_SAM_TO_BAM ( TRANSCRIPTOME_MAPPING.out.transcriptome_sam )
 		BAM_TO_SQLITE            ( TRANSCRIPTOME_SAM_TO_BAM.out )
-		RIBO_QC					 ( BAM_TO_SQLITE.out, FASTQC_ON_PROCESSED.out.fastqc_data )
+		RIBO_QC					 ( BAM_TO_SQLITE.out, FASTQC.out.fastqc_data )
 
 	}
 
