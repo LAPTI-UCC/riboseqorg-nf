@@ -73,8 +73,10 @@ def calculate_triplet_periodicity_score(sqlite_dict, min_read_length=25, max_rea
                                         sqlite_dict["fiveprime"][readlength]['2']])
         highest += sorted_frame_counts[2]
         second_highest += sorted_frame_counts[1]
-
-    trip_periodicity_score = 1 - (second_highest/highest)
+    if highest == 0 or second_highest == 0:
+        trip_periodicity_score = 0
+    else:
+        trip_periodicity_score = 1 - (second_highest/highest)
     return round(trip_periodicity_score , 4)
 
 

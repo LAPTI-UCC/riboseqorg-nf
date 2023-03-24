@@ -114,7 +114,7 @@ process RIBO_QC {
 	file "*.txt" /// into sqlite_ch ///
 
 	"""
-	python3 $projectDir/scripts/riboqc.py -s ${sqlite_readfile} -r ${fastqc_report} -p $params.annotation_sqlite -o ${sqlite_readfile.simpleName}_riboqc.txt
+	python3 $projectDir/scripts/RiboQC.py -s ${sqlite_readfile} -r ${fastqc_report} -p $params.annotation_sqlite -o ${sqlite_readfile.simpleName}_riboqc.txt
 	"""
 }
 
