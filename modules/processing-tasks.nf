@@ -32,7 +32,7 @@ process FASTQC {
 
 	"""
 	fastqc -q $fastq 
-    unzip *.zip
+    unzip ${fastq.baseName}_fastqc.zip
 	"""
 }
 
