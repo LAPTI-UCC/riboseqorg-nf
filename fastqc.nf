@@ -29,7 +29,6 @@ process FASTQC {
 
 	output:
 	path "*_fastqc.{zip,html}", emit: fastqc_full_reports/// into raw_fastqc_dir ///
-    path "${fastq.baseName}_fastqc/fastqc_data.txt", emit: fastqc_data
 
 	"""
 	fastqc -q $fastq 
