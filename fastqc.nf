@@ -19,7 +19,22 @@ log.info """\
 /// Processes necessary for upstream_flow
 include { GET_RUN_INFO; CLIP_FASTQ; COLLAPSE_FASTQ; FIND_ADAPTERS; WRITE_PARAMTERS_YAML; FASTQ_DL            } from './modules/upstream-tasks.nf'
 
-include { FASTQC } from './modules/processing-tasks.nf'
+
+process FASTQC {
+
+	publishDir "$params.study_dir/fastqc", mode: 'copy'
+	
+	input:
+	file fastq 
+
+	output:
+	path "*_fastqc.{zip,html}", emit: fastqc_full_reports/// into raw_fastqc_dir ///
+    path "${fastq.baseName}_fastqc/fastqc_data.txt", emit: fastqc_data
+
+	"""
+	fastqc -q $fastq 
+	"""
+}
 
 
 workflow upstream_flow {
