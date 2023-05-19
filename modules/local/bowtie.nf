@@ -1,3 +1,5 @@
+
+
 process BOWTIE_RRNA {
 
 	publishDir "$params.study_dir/less_rRNA_fastq_files", mode: 'copy', pattern: '*_less_rRNA.fastq'
