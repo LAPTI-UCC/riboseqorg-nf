@@ -5,7 +5,7 @@ process FASTQ_DL {
     publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
     input:
-        tuple val(accession), val(GSE)
+        val(accession)
 
     output:
         file "*.fastq.gz"
