@@ -16,8 +16,6 @@ process BOWTIE_RRNA {
 }
 
 
-// This should pass straight to samtools sort 
-
 process BOWTIE_TRANSCRIPTOME {
 
 	publishDir "$params.study_dir/trips_alignment_stats", mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
@@ -30,7 +28,11 @@ process BOWTIE_TRANSCRIPTOME {
 	path "${less_rrna_fastq.baseName}_trips_alignment_stats.txt", emit: mRNA_alignment_stats
 
 	"""
-	bowtie -p 8 --norc -a -m 100 -l 25 -n 2 $params.transcriptome_index -q ${less_rrna_fastq} -S ${less_rrna_fastq.baseName}_transcriptome.sam  > ${less_rrna_fastq.baseName}_trips_alignment_stats.txt 2>&1
+	bowtie -p 8 --norc -a -m 100 -l 25 -n 2 $params.transcriptome_index -q ${less_rrna_fastq} -S > ${less_rrna_fastq.baseName}_trips_alignment_stats.txt |
+
+	samtools view -@ 8 -b -S |
+
+	samtools sort -m 1G -n -@ 8-o ${less_rrna_fastq.baseName}_transcriptome.bam_sorted
 	"""
 } 
 
