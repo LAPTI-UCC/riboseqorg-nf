@@ -1,5 +1,5 @@
 
-process TRANSCRIPTOME_SAM_TO_BAM {
+process SAMTOOLS_NAME_SORT {
 
 	input:
 	file transcriptome_sam /// from transcriptome_sams ///
