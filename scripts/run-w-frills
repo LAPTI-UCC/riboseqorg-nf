@@ -1,0 +1,26 @@
+#!/bin/bash 
+
+# Usage : bash run-w-frills <params-file.config> <profile name from nextflow.config>
+# Example: bash run-w-frills params.config docker
+
+# tower.nf allows GUI tracking of workflow progress
+# Set it up using the instructions here: https://help.tower.nf/22.4/getting-started/usage/#nextflow-with-tower
+
+params=$1
+profile=$2
+
+if [[ -z "${TOWER_ACCESS_TOKEN}" ]]; then
+    nextflow run main.nf \
+        -resume \
+        -with-report report.html \
+        -profile $profile \
+        -params-file $params
+else
+    nextflow run main.nf \
+        -resume \
+        -with-report report.html \
+        -profile $profile \
+        -params-file $params \
+        -with-tower
+fi
+

@@ -1,3 +1,57 @@
+# Ribo-Seq Data Processing
+## Introduction 
+
+[Describe here what this pipeline does]
+
+## Requirements 
+This pipeline can be run using each of the following container methods
+| Method      | Instructions                                                                                   |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| Singularity | [docs.syslabs.io](https://docs.sylabs.io/guides/3.0/user-guide/installation.html)              |
+| Docker      | [docs.docker.com](https://docs.docker.com/engine/install/)                                     |
+| Conda       | [docs.conda.io](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)  |
+
+
+## Setup
+##### Singularity
+```
+sudo singularity build singularity/pipeline Singularity
+```
+Then as the profile `singularity` specifies `container = 'singularity/pipeline'` use the following to execute:
+```
+nextflow run main.nf -profile singularity
+```
+
+##### Docker
+```
+docker build . -t pipeline-image
+```
+Then as the profile `docker` specifies `container = 'pipeline-image:latest'` use the following to execute:
+```
+nextflow run main.nf -profile docker
+```
+
+##### Conda 
+Create a conda definition yaml file [eg. here](conda/example.yml)
+```
+nextflow run main.nf -profile conda
+```
+
+## Usage
+Call the pipeline directly
+```
+nextflow run main.nf
+```
+
+Run with all the frills
+```
+bash scripts/run-w-frills <params-file> <profile name from nextflow.config>
+```
+Example
+```
+bash scripts/run-w-frills example_parameters.yml standard
+```
+
 # Data Processing For <a href="riboseq.org">RiboSeq.org<a>
 
 ### Automated processing of Ribo-Seq (and associated RNA-Seq) data for <a href="https://gwips.ucc.ie/">GWIPS-Viz<a> and <a href="https://trips.ucc.ie/">TRIPS-Viz<a>

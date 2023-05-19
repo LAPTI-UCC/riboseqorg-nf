@@ -191,3 +191,9 @@ trace*
 report*
 null/*
 trips.sqlite
+
+old
+
+singularity/*
+data/
+work/
