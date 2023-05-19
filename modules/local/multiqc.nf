@@ -1,6 +1,6 @@
 // Just works for fastqc output for now
 
-process MULTIQC_ON_FASTQ {
+process MULTIQC {
 
 	publishDir "$params.study_dir/multiqc", mode: 'copy'
 
