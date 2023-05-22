@@ -16,7 +16,7 @@ def get_annotation_organism(path, db='annotation_inventory.sqlite'):
     name of the organism  to which these runs apply.
     Check the annotation inventory for the 'organism' name that applies
     '''
-    runInfo = pd.read_csv(path)
+    runInfo = pd.read_csv(path, sep='\t')
     scientific_name = runInfo['ScientificName'].unique()[0]
 
     connection = sqlite3.connect(db)
@@ -83,9 +83,9 @@ def main(args):
                                           skip_gwips=args.skip_gwips,
                                           skip_trips=args.skip_trips,
                                           annotations_inventory_sqlite=args.annotation_inventory)
-    parameter_dict['study_dir'] = '/'.join(args.sample_sheet.split('/')[:-2])
+    parameter_dict['study_dir'] = '/'.join(args.sample_sheet.split('/')[:-1])
 
-    with open(args.output_file, 'w') as f:
+    with open(f"{args.output_file}/params.yml", 'w') as f:
         for k,v in parameter_dict.items():
             f.write(f'{k}: {v}\n')
 
