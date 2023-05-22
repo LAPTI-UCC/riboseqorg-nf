@@ -5,18 +5,19 @@ nextflow.enable.dsl=2
 
 /// Import modules and subworkflows
 include { quality_control } from './subworkflows/local/quality_control.nf'
+inlcude { fetch_data } from './subworkflows/local/fetch_data.nf'
 
 // Log the parameters
 log.info """\
 
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
-||                        INSERT PIPELINE NAME                             
+||                 RiboSeqOrg Data Processing Pipeline                            
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 ||  Parameters                                                             
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
-||  input_dir   : ${params.input_dir}                                     
-||  outDir      : ${params.output_dir}                                        
-||  workDir     : ${workflow.workDir}                                     
+||  Sample Sheet    : ${params.sample_sheet}}                                     
+||  outDir          : ${params.output_dir}                                        
+||  workDir         : ${workflow.workDir}                                     
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 
 """
@@ -43,7 +44,7 @@ workflow {
                         .ifEmpty { exit 1, "No fastq files found in ${params.input_dir}" }
 
     /// Run the subworkflow
-    quality_control(fastq_ch)
+    fetch_data(params.sample_sheet)
 }
 
 workflow.onComplete {
