@@ -1,17 +1,24 @@
+import java.util.Random
 
 process FASTQ_DL {
     tag 'medium'
 
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+    conda '${projectDir}/conda/fastq-dl.yaml'
+
+    publishDir "$projectDir/$params.study_dir/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
     input:
-        val(accession)
+        tuple val(study_accession), val(run), val(scientific_name), val(library_type)
 
     output:
         file "*.fastq.gz"
 
     script:
+        def sleepDuration = random.nextInt(10) + 1
+
+        sleep(sleepDuration)
+
         """
-        fastq-dl -a $accession --cpus 5
+        fastq-dl -a $run --cpus 5
         """
 }

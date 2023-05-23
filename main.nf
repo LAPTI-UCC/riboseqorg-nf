@@ -5,7 +5,7 @@ nextflow.enable.dsl=2
 
 /// Import modules and subworkflows
 include { quality_control } from './subworkflows/local/quality_control.nf'
-inlcude { fetch_data } from './subworkflows/local/fetch_data.nf'
+include { fetch_data } from './subworkflows/local/fetch_data.nf'
 
 // Log the parameters
 log.info """\
@@ -15,7 +15,7 @@ log.info """\
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 ||  Parameters                                                             
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
-||  Sample Sheet    : ${params.sample_sheet}}                                     
+||  Sample Sheet    : ${params.sample_sheet}                                     
 ||  outDir          : ${params.output_dir}                                        
 ||  workDir         : ${workflow.workDir}                                     
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
@@ -37,14 +37,14 @@ def help() {
 """.stripIndent()
 }
 
-/// Define the main workflow
 workflow {
-    /// Define the input channels
-    fastq_ch = Channel.fromPath("${params.input_dir}/*.fastq.gz")
-                        .ifEmpty { exit 1, "No fastq files found in ${params.input_dir}" }
-
-    /// Run the subworkflow
-    fetch_data(params.sample_sheet)
+    samples_ch  =   Channel
+                        .fromPath(params.sample_sheet)
+                        .splitCsv(header: true, sep: '\t')
+                        .map { row -> tuple("${row.study_accession}", "${row.Run}", "${row.ScientificName}", "${row.LIBRARYTYPE}")}
+                        
+    fastq_ch    =   fetch_data(samples_ch)
+    
 }
 
 workflow.onComplete {
