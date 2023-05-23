@@ -70,10 +70,7 @@ def fetch_studywide_info(organism,
         f"SELECT * FROM annotation_inventory WHERE organism == '{organism}'"
     ).fetchall()[0]
     connection.close()
-
-    for i in zip(parameter_order[1:-2], reference_details[1:]):
-        parameter_dict[i[0]] = i[1]
-
+    parameter_dict.update(dict(zip(parameter_order[:-2], reference_details[1:])))
     return parameter_dict
 
 
@@ -84,10 +81,21 @@ def main(args):
                                           skip_trips=args.skip_trips,
                                           annotations_inventory_sqlite=args.annotation_inventory)
     parameter_dict['study_dir'] = '/'.join(args.sample_sheet.split('/')[:-1])
+    parameter_dict['sample_sheet'] = args.sample_sheet
 
-    with open(f"{args.output_file}/params.yml", 'w') as f:
-        for k,v in parameter_dict.items():
-            f.write(f'{k}: {v}\n')
+    with open(f"{args.output_file}/params.config", 'w') as f:
+        f.write("params {\n")
+        f.write(f'\tstudy_dir = "{parameter_dict["study_dir"]}"\n')
+        f.write(f'\tskip_trips = {str(parameter_dict["skip_trips"]).lower()}\n')
+        f.write(f'\tskip_gwips = {str(parameter_dict["skip_gwips"]).lower()}\n')
+        f.write(f'\ttranscriptome_index = "{parameter_dict["transcriptome_index"]}"\n')
+        f.write(f'\tgenome_index = "{parameter_dict["genome_index"]}"\n')
+        f.write(f'\tgenome_fasta = "{parameter_dict["genome_fasta"]}"\n')
+        f.write(f'\tannotation_sqlite = "{parameter_dict["annotation_sqlite"]}"\n')
+        f.write(f'\tchrom_sizes_file = "{parameter_dict["chrom_sizes_file"]}"\n')
+        f.write(f'\trRNA_index = "{parameter_dict["rRNA_index"]}"\n')
+        f.write(f'\tsample_sheet = "{parameter_dict["sample_sheet"]}"\n')
+        f.write("}\n")
 
 
 if __name__ == "__main__":
