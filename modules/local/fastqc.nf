@@ -6,7 +6,7 @@ process FASTQC {
 
     tag 'medium'
 
-	publishDir "${params.output_dir}/fastqc", mode: 'copy'
+	publishDir "${params.study_dir}/fastqc", mode: 'copy'
 	
 	input:
 	    file fastq 

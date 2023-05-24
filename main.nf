@@ -42,7 +42,7 @@ workflow {
                         .fromPath(params.sample_sheet)
                         .splitCsv(header: true, sep: '\t')
                         .map { row -> tuple("${row.study_accession}", "${row.Run}", "${row.ScientificName}", "${row.LIBRARYTYPE}")}
-                        
+    samples_ch.view()
     fastq_ch    =   fetch_data(samples_ch)
     
 }
