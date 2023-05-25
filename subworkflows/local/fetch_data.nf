@@ -8,9 +8,10 @@ workflow fetch_data {
     take: samples_ch
 
     main:
-        fastq_path_ch   =   FASTQ_DL( samples_ch )
-        fastqc_path_ch  =   FASTQC( fastq_path_ch )
+        fastq_ch   =   FASTQ_DL( samples_ch )
+        fastqc_path_ch  =   FASTQC( fastq_ch )
 
     emit:
-        fastq_path_ch
+        fastq_ch
+        samples_ch
 }

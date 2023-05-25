@@ -6,6 +6,7 @@ nextflow.enable.dsl=2
 /// Import modules and subworkflows
 include { quality_control } from './subworkflows/local/quality_control.nf'
 include { fetch_data } from './subworkflows/local/fetch_data.nf'
+include { preprocessing } from './subworkflows/local/preprocessing.nf'
 
 // Log the parameters
 log.info """\
@@ -42,9 +43,11 @@ workflow {
                         .fromPath(params.sample_sheet)
                         .splitCsv(header: true, sep: '\t')
                         .map { row -> tuple("${row.study_accession}", "${row.Run}", "${row.ScientificName}", "${row.LIBRARYTYPE}")}
-    samples_ch.view()
-    fastq_ch    =   fetch_data(samples_ch)
-    
+
+    fetch_data_ch   =   fetch_data(samples_ch)
+    fastq_ch        =   fetch_data_ch.fastq_ch
+    samples_ch     =   fetch_data_ch.samples_ch
+    trimmed_fastq_ch = preprocessing(fastq_ch, samples_ch)
 }
 
 workflow.onComplete {

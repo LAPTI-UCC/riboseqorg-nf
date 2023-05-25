@@ -1,14 +1,19 @@
 // workflow for preprocessing data 
 
-include { FASTQ_DL } from '../../modules/local/fastq_dl.nf'
+include { FIND_ADAPTERS } from '../../modules/local/find_adapters.nf'
+include { CUTADAPT } from '../../modules/local/cutadapt.nf'
 
-workflow fetch_data {
+workflow preprocessing {
 
-    take: fastq_ch
+    take: 
+        fastq_ch
+        samples_ch
+    
 
     main:
-        fastq_path_ch   =   FASTQ_DL( samples_ch )
+        adapter_ch          =   FIND_ADAPTERS   ( fastq_ch )
+        trimmed_fastq_ch    =   CUTADAPT        ( fastq_ch, adapter_ch)
 
     emit:
-        fastq_path_ch
+        trimmed_fastq_ch
 }
