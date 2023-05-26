@@ -1,0 +1,7 @@
+name: example
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - fastqc=0.11.5
