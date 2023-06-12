@@ -1,7 +1,7 @@
 
 
 process CUTADAPT {
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+	publishDir "${params.study_dir}/trimmed", mode: 'copy'
 
     input:
     file raw_fastq 

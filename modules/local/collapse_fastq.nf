@@ -1,7 +1,7 @@
 
 
 process COLLAPSE_FASTQ {
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+	publishDir "${params.study_dir}/collapsed_fastq", mode: 'copy'
 
     errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 

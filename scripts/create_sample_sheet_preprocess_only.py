@@ -14,9 +14,8 @@ def main(args):
     print(args.study_accession)
     # metadata = metadata[metadata['study_accession'] == args.study_accession]
     metadata = metadata[metadata['SRAStudy'] == args.study_accession]
-    print(metadata.columns)
 
-    metadata = metadata[['study_accession', 'Run', 'ScientificName', 'LIBRARYTYPE']]
+    metadata = metadata[['SRAStudy', 'Run', 'ScientificName']]
     metadata.to_csv(f"{args.output}/sample_sheet.csv", sep='\t', index=False, header=True)
 
 if __name__ == '__main__':

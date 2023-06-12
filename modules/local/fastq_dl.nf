@@ -5,7 +5,7 @@ process FASTQ_DL {
 
     publishDir "$projectDir/$params.study_dir/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
-    errorStrategy {}
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
         tuple val(study_accession), val(run), val(scientific_name), val(library_type)
@@ -14,7 +14,7 @@ process FASTQ_DL {
         file "*.fastq.gz"
 
     script:
-        def sleepDuration = random.nextInt(10) + 4
+        def sleepDuration = random.nextInt(100) + 4
 
         sleep(sleepDuration)
 

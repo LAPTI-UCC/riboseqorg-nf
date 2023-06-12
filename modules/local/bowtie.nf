@@ -21,20 +21,21 @@ process BOWTIE_RRNA {
 process BOWTIE_TRANSCRIPTOME {
 
 	publishDir "$params.study_dir/trips_alignment_stats", mode: 'copy', pattern: '*_trips_alignment_stats.txt' 
+	publishDir "$params.study_dir/trips_alignments", mode: 'copy', pattern: '*.bam_sorted' 
 
 	input:    
 	file less_rrna_fastq /// from fastq_less_rRNA ///
 
 	output:
-	path "${less_rrna_fastq.baseName}_transcriptome.sam", emit: transcriptome_sam
+	path "${less_rrna_fastq.baseName}_transcriptome.bam_sorted", emit: transcriptome_bam
 	path "${less_rrna_fastq.baseName}_trips_alignment_stats.txt", emit: mRNA_alignment_stats
 
 	"""
-	bowtie -p 8 --norc -a -m 100 -l 25 -n 2 $params.transcriptome_index -q ${less_rrna_fastq} -S > ${less_rrna_fastq.baseName}_trips_alignment_stats.txt |
+	bowtie -p 8 --norc -a -m 100 -l 25 -n 2 $params.transcriptome_index -q ${less_rrna_fastq} -S 2>> ${less_rrna_fastq.baseName}_trips_alignment_stats.txt |
 
-	samtools view -@ 8 -b -S |
+	samtools view -@ 8 -b -S  | 
 
-	samtools sort -m 1G -n -@ 8-o ${less_rrna_fastq.baseName}_transcriptome.bam_sorted
+	samtools sort -m 1G -@ 8 -o ${less_rrna_fastq.baseName}_transcriptome.bam_sorted 2> blank 1> blank_2
 	"""
 } 
 
@@ -53,8 +54,8 @@ process BOWTIE_GENOME {
     """
 	bowtie -p 8 -m 1 -n 2 --seedlen 25 ${params.genome_index} -q ${less_rrna_fastq} -S 2>> ${less_rrna_fastq.baseName}_gwips_alignment_stats.txt | 
 
-	samtools view -@ 8 -b -S |
+	samtools view -@ 8 -b -S  |
 
-	samtools sort -m 1G -@ 8 -o ${less_rrna_fastq.baseName}_genome.bam_sorted
+	samtools sort -m 1G -@ 8 -o ${less_rrna_fastq.baseName}_genome.bam_sorted 2>&1
 	"""
 }
