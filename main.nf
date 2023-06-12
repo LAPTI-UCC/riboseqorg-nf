@@ -8,6 +8,7 @@ include { quality_control } from './subworkflows/local/quality_control.nf'
 include { fetch_data } from './subworkflows/local/fetch_data.nf'
 include { preprocessing } from './subworkflows/local/preprocessing.nf'
 include { trips_RiboSeq } from './subworkflows/local/trips.nf'
+include { gwips_RiboSeq } from './subworkflows/local/gwips.nf'
 
 // Log the parameters
 log.info """\
@@ -50,7 +51,9 @@ workflow {
     fastq_ch                =   fetch_data_ch.fastq_ch
     samples_ch              =   fetch_data_ch.samples_ch
     less_rRNA_ch            =   preprocessing(fastq_ch, samples_ch)
-    transcriptome_bam_ch    =   trips_RiboSeq(less_rRNA_ch)
+    trips_RiboSeq(less_rRNA_ch)
+    gwips_RiboSeq(less_rRNA_ch)
+
 }
 
 workflow.onComplete {

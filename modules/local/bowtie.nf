@@ -43,6 +43,7 @@ process BOWTIE_TRANSCRIPTOME {
 process BOWTIE_GENOME {
 
 	publishDir "$params.study_dir/gwips_alignment_stats", mode: 'copy', pattern: '*_gwips_alignment_stats.txt'
+	publishDir "$params.study_dir/gwips_alignments", mode: 'copy', pattern: '*.bam_sorted'
 	
     input:
    	file less_rrna_fastq /// from fastq_less_rRNA ///

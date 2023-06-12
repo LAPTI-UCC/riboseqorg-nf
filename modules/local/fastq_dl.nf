@@ -19,6 +19,6 @@ process FASTQ_DL {
         sleep(sleepDuration)
 
         """
-        fastq-dl -a $run --cpus $task.cpus
+        fastq-dl -a $run --cpus $task.cpus --silent
         """
 }
