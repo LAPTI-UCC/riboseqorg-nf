@@ -3,4 +3,4 @@
 # Usage: bash clean
 #
 
-rm -rf work .nextflow* report.html* trace.txt*
+rm -rf .nextflow* report.html* trace.txt*

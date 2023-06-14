@@ -20,15 +20,15 @@ process SAMTOOLS_INDEX {
 	errorStrategy { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
 	input:
-	file genome_sorted_bam
+	file sorted_bam
 
 	output:
-	path "${genome_sorted_bam.baseName}.bam_sorted", emit: genome_index_sorted_bam ///not outputting the index///
-	path "${genome_sorted_bam.baseName}.bam_sorted.bai", emit: genome_index_sorted_bam_bai
+	path "${sorted_bam.baseName}.bam_sorted", emit: sorted_bam
+	path "${sorted_bam.baseName}.bam_sorted.bai", emit: sorted_bam_bai
 	
 
 	"""
-	samtools index ${genome_sorted_bam.baseName}.bam_sorted
+	samtools index ${sorted_bam.baseName}.bam_sorted
 	"""
 
 }
