@@ -1,5 +1,7 @@
 process FIND_ADAPTERS {
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
+	publishDir "${params.study_dir}/adapter_reports", mode: 'copy'
+    
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
         file raw_fastq

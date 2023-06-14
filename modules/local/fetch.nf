@@ -1,6 +1,4 @@
-import java.util.Random
-
-process FASTQ_DL {
+process FETCH_RUN {
     tag 'high'
 
     publishDir "$projectDir/$params.study_dir/fastq", mode: 'copy', pattern: '*.fastq.gz'
@@ -11,14 +9,10 @@ process FASTQ_DL {
         tuple val(study_accession), val(run), val(scientific_name), val(library_type)
 
     output:
-        file "*.fastq.gz"
+        file "${run}"
 
     script:
-        def sleepDuration = random.nextInt(100) + 4
-
-        sleep(sleepDuration)
-
         """
-        fastq-dl -a $run --cpus 16 --silent
+        aws --no-sign-request s3 sync s3://sra-pub-run-odp/sra/${run} .
         """
 }

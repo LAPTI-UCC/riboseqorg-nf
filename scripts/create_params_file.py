@@ -66,6 +66,7 @@ def fetch_studywide_info(organism,
 
     connection = sqlite3.connect("{}".format(annotations_inventory_sqlite))
     cursor = connection.cursor()
+    print(organism)
     reference_details = cursor.execute(
         f"SELECT * FROM annotation_inventory WHERE organism == '{organism}'"
     ).fetchall()[0]
@@ -83,7 +84,7 @@ def main(args):
     parameter_dict['study_dir'] = '/'.join(args.sample_sheet.split('/')[:-1])
     parameter_dict['sample_sheet'] = args.sample_sheet
 
-    with open(f"{args.output_file}/params.config", 'w') as f:
+    with open(f"{args.output_dir}/params.config", 'w') as f:
         f.write("params {\n")
         f.write(f'\tstudy_dir = "{parameter_dict["study_dir"]}"\n')
         f.write(f'\tskip_trips = {str(parameter_dict["skip_trips"]).lower()}\n')
@@ -102,7 +103,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Create params file for a study')
     parser.add_argument('-s', '--sample_sheet', help='Sample sheet', required=True)
     parser.add_argument('-a', '--annotation_inventory', help='Path to Annotation Inventory', required=False)
-    parser.add_argument('-o', '--output_file', help='Output file name', required=True)
+    parser.add_argument('-o', '--output_dir', help='Output dir name', required=True)
     parser.add_argument('-g', '--skip_gwips', help='Skip gwips', action='store_true')
     parser.add_argument('-t', '--skip_trips', help='Skip trips', action='store_true')
     args = parser.parse_args()
