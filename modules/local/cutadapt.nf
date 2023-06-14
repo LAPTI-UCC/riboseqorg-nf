@@ -3,6 +3,8 @@
 process CUTADAPT {
 	publishDir "${params.study_dir}/trimmed", mode: 'copy'
 
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+
     input:
     file raw_fastq 
     file adapter_report

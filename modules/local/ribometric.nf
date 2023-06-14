@@ -6,6 +6,7 @@ process RIBOMETRIC {
 	
 	input:
 	    file transcriptome_bam
+        file transcriptome_bam_bai
 
 	output:
 	    path "*_ribometric.html", emit: ribometric_reports
@@ -13,6 +14,7 @@ process RIBOMETRIC {
 
     script:
         """
-        ribometric run --bam ${transcriptome_bam} --annotation ${params.annotation} --threads 5 --html --csv
+        samtools index ${transcriptome_bam}
+        RiboMetric run --bam ${transcriptome_bam} --annotation ${params.annotation} --threads 5 --html --csv 2>&1
         """
 }

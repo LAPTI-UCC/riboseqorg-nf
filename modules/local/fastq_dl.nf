@@ -1,7 +1,7 @@
 import java.util.Random
 
 process FASTQ_DL {
-    tag 'medium'
+    tag 'high'
 
     publishDir "$projectDir/$params.study_dir/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
@@ -19,6 +19,6 @@ process FASTQ_DL {
         sleep(sleepDuration)
 
         """
-        fastq-dl -a $run --cpus $task.cpus --silent
+        fastq-dl -a $run --cpus 16 --silent
         """
 }
