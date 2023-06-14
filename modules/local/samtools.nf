@@ -15,6 +15,22 @@ process SAMTOOLS_NAME_SORT {
 	"""
 }
 
+
+process SAMTOOLS_COORD_SORT {
+
+	errorStrategy { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+
+
+	input:
+	file transcriptome_alignments
+
+	output:
+	file "${transcriptome_alignments.baseName}.bam_sorted" 
+
+	"""
+	samtools sort -m 1G -@ 8 ${transcriptome_alignments} > ${transcriptome_alignments.baseName}.bam_sorted
+	"""
+}
 process SAMTOOLS_INDEX {
 
 	errorStrategy { task.attempt <= maxRetries  ? 'retry' :  'ignore' }

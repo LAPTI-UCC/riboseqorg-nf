@@ -10,6 +10,8 @@ include { preprocessing } from './subworkflows/local/preprocessing.nf'
 include { trips_RiboSeq } from './subworkflows/local/trips.nf'
 include { gwips_RiboSeq } from './subworkflows/local/gwips.nf'
 
+include { BOWTIE_RRNA } from './modules/local/bowtie.nf'
+
 // Log the parameters
 log.info """\
 
@@ -50,9 +52,11 @@ workflow {
     fetch_data_ch           =   fetch_data(samples_ch)
     fastq_ch                =   fetch_data_ch.fastq_ch
     samples_ch              =   fetch_data_ch.samples_ch
-    less_rRNA_ch            =   preprocessing(fastq_ch, samples_ch)
-    trips_RiboSeq(less_rRNA_ch)
-    gwips_RiboSeq(less_rRNA_ch)
+    collapsed_fastq_ch      =   preprocessing(fastq_ch, samples_ch)
+    less_rRNA_ch          =   BOWTIE_RRNA     ( collapsed_fastq_ch )
+
+    trips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
+    gwips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
 
 }
 

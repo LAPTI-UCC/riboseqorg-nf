@@ -9,8 +9,8 @@ process RIBOMETRIC {
         file transcriptome_bam_bai
 
 	output:
-	    path "*_ribometric.html", emit: ribometric_reports
-        path "*_ribometric.json", emit: ribometric_json
+	    path "*RiboMetric.csv", emit: ribometric_reports
+        path "*RiboMetric.json", emit: ribometric_json
 
     script:
         """

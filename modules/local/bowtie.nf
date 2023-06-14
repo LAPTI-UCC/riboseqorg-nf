@@ -27,15 +27,15 @@ process BOWTIE_TRANSCRIPTOME {
 	file less_rrna_fastq /// from fastq_less_rRNA ///
 
 	output:
-	path "${less_rrna_fastq.baseName}_transcriptome.bam_sorted", emit: transcriptome_bam
+	path "${less_rrna_fastq.baseName}_transcriptome.bam", emit: transcriptome_bam
 	path "${less_rrna_fastq.baseName}_trips_alignment_stats.txt", emit: mRNA_alignment_stats
 
 	"""
 	bowtie -p 8 --norc -a -m 100 -l 25 -n 2 $params.transcriptome_index -q ${less_rrna_fastq} -S 2>> ${less_rrna_fastq.baseName}_trips_alignment_stats.txt |
 
-	samtools view -@ 8 -b -S  | 
+	samtools view -@ 8 -b -S > ${less_rrna_fastq.baseName}_transcriptome.bam 2>&1
 
-	samtools sort -m 1G -@ 8 -o ${less_rrna_fastq.baseName}_transcriptome.bam_sorted 2> blank 1> blank_2
+	samtools sort ${less_rrna_fastq.baseName}_transcriptome.bam -o ${less_rrna_fastq.baseName}_transcriptome.bam_sorted  2>&1
 	"""
 } 
 

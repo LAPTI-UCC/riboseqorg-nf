@@ -16,8 +16,7 @@ workflow preprocessing {
         adapter_ch          =   FIND_ADAPTERS   ( fastq_ch )
         trimmed_fastq_ch    =   CUTADAPT        ( fastq_ch, adapter_ch)
         collapsed_fastq_ch  =   COLLAPSE_FASTQ  ( trimmed_fastq_ch )
-        lessRNA_ch          =   BOWTIE_RRNA     ( collapsed_fastq_ch )
 
     emit:
-        lessRNA_ch.fastq_less_rRNA
+        collapsed_fastq_ch
 }
