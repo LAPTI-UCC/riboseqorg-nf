@@ -54,10 +54,12 @@ workflow {
     samples_ch              =   fetch_data_ch.samples_ch
     collapsed_fastq_ch      =   preprocessing(fastq_ch, samples_ch)
     less_rRNA_ch          =   BOWTIE_RRNA     ( collapsed_fastq_ch )
-
-    trips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
-    gwips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
-
+    if ( params.skip_gwips == false ) {
+        gwips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
+    }
+    if ( params.skip_trips == false ) {
+        trips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
+    }
 }
 
 workflow.onComplete {
