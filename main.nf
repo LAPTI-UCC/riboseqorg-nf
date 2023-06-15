@@ -50,10 +50,13 @@ workflow {
                         .map { row -> tuple("${row.study_accession}", "${row.Run}", "${row.ScientificName}", "${row.LIBRARYTYPE}")}
 
     fetch_data_ch           =   fetch_data(samples_ch)
-    fastq_ch                =   fetch_data_ch.fastq_ch
-    samples_ch              =   fetch_data_ch.samples_ch
-    collapsed_fastq_ch      =   preprocessing(fastq_ch, samples_ch)
-    less_rRNA_ch          =   BOWTIE_RRNA     ( collapsed_fastq_ch )
+
+    collapsed_fastq_ch      =   preprocessing(fetch_data_ch.fastq_ch, samples_ch)
+    if ( params.skip_rRNA ) {
+        if ( params.skip_rRNA == false ) {
+            less_rRNA_ch          =   BOWTIE_RRNA     ( collapsed_fastq_ch )
+        }
+    }
     if ( params.skip_gwips == false ) {
         gwips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
     }

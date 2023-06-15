@@ -1,6 +1,6 @@
-name: cutadapt
+name: adapters
 channels:
   - conda-forge
   - bioconda
 dependencies:
-  - cutadapt=4.4
+  - pandas

@@ -10,10 +10,12 @@ process FASTQC {
 	    file fastq 
 
 	output:
-	    path "*_fastqc.{zip,html}", emit: fastqc_full_reports
+	    path "*_fastqc.html", emit: fastqc_html
+        path "*/fastqc_data.txt", emit: fastqc_data
 
     script:
         """
         fastqc -q $fastq 
+        unzip *_fastqc.zip
         """
 }

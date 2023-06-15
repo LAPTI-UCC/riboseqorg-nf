@@ -57,7 +57,7 @@ def collapse(infile, outfile):
         # Write the unique reads to the file with their counts
     read_number = 1
     for seq, vals in unique_reads.items():
-        f.write(f'@read{read_number}_x{vals["count"]}\n')
+        f.write(f'@seq{read_number}_x{vals["count"]}\n')
         f.write(f"{seq}\n")
         f.write('+\n')
         f.write(f'{vals["qual"]}\n')

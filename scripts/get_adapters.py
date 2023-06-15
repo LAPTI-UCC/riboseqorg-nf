@@ -1,129 +1,95 @@
+'''
+This script read the fastqc output fastqc_data.txt and extract the top adapter sequence
+for the sample and write it to a file called adapters.fa
+
+Usage: python get_adapters.py -i <fastqc_data.txt> -a <adapters.tsv> -o <adapters.fa>
+
+'''
+
 import argparse
-import subprocess
+import pandas as pd
+from io import StringIO
 
 
-def rev_comp(adapter):
+def get_adapter_dict(adapter_path: str) -> dict:
     '''
-    Return the reverse complimnet of a provided nucleotide adapter sequence 
+    parse the adapter file and return a dictionary of adapter sequences and names
+
+    Input: 
+        adapter file path
+
+    Output:
+        dictionary of adapter sequences and names
     '''
-    adapter = adapter[::-1]
-    adapter = (
-        adapter.replace("A", "t").replace("T", "a").replace("G", "c").replace("C", "g")
-    )
-    return adapter.upper()
+    df = pd.read_csv(adapter_path, sep='\t', header=None, comment='#')
+    collapsed_column = df.iloc[:, 1:8].apply(lambda x: ''.join(x.dropna().astype(str)), axis=1)
+
+    # Assign the collapsed column back to the DataFrame
+    df['collapsed_column'] = collapsed_column
+    df.drop(df.columns[1:8], axis=1, inplace=True)
+    return df.set_index(0)['collapsed_column'].to_dict()
 
 
-def get_number_of_reads(fastq_path):
+def get_adapter_module(fastqc_data_path: str) -> list:
     '''
-    return the number of reads in the fastq file (num lines / 4)
+    parse the fastqc data file and return the adapter module as a string 
+
+    Input: 
+        fastqc_data.txt path
+
+    Output:
+        adapter module as a list of strings
     '''
-    fastq_lines_output = subprocess.check_output(
-        f"wc -l {fastq_path}", shell=True
-    )
-    fastq_lines = float(fastq_lines_output.split()[0])
-    number_of_reads = int(round(fastq_lines/4, 0))
-    return number_of_reads
+    adapter_module = []
+    with open(fastqc_data_path, 'r') as f:
+        for line in f:
+            if line.startswith('>>Adapter'):
+                adapter_module.append(f"%{line}")
+
+            if adapter_module != []:
+                if line.startswith('>>END_MODULE'):
+                    break
+                elif line.startswith('>>'):
+                    continue
+                else:
+                    adapter_module.append(line)
+    return adapter_module
 
 
-def check_adapter(adapter, fastq_path, number_of_reads=2000000, verbose=False):
+def get_top_adapter(adapter_module: list, adapter_dict: dict) -> str:
     '''
-    For a given adapter sequence check for its presence in the given FASTQ file 
+    parse the adapter module and return the top adapter sequence
+
+    Input:
+        adapter module as a list of strings
+        adapter_dict as a dictionary of adapter sequences and names
+
+    Output:
+        top adapter sequence as a string
     '''
-    try:
-        if fastq_path.split('.')[-1] == 'gz': 
-            adapter_count_raw = subprocess.check_output(
-                f"gzip -cd {fastq_path} | head -{number_of_reads} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq",
-                shell=True, 
-            )
-        elif fastq_path.split('.')[-1] == 'fastq' or fastq_path.split('.')[-1] == 'fq':
-            adapter_count_raw = subprocess.check_output(
-                f"head -{number_of_reads} {fastq_path} | sed -n '2~4p' > ~/test.fq; agrep -c1 \"{adapter}\" ~/test.fq",
-                shell=True,
-            )
+    module_string = ''.join(adapter_module)
+    str = StringIO(module_string)
+    adapter_df = pd.read_csv(str, sep='\t', dtype=float, comment='%').drop(columns=['#Position'])
 
-    except subprocess.CalledProcessError as e: # When agrep finds no cases it returns with code 1 but 0 is a valid resuly 
-        adapter_count_raw = e.output
-        # raise RuntimeError(f"command {e.cmd} return with error (code {e.returncode}): {e.output}")
+    sums = adapter_df.sum(axis=0)
+    top_adapter = sums.idxmax()
+    with open(args.output, 'w') as f:
+        f.write(f'>{top_adapter}\n')
+        f.write(f'{adapter_dict[top_adapter].strip()}\n')
+    return adapter_dict[top_adapter]
 
-    adapter_count = float(adapter_count_raw.decode('utf-8').strip('\n'))
-
-    percentage_contamination = float((adapter_count / number_of_reads) * 100)
-
-    if percentage_contamination >= (0.05):
-        return True
-    else:
-        return False
+def main(args):
+    adapter_module = get_adapter_module(args.input) 
+    adapter_dict = get_adapter_dict(args.adapters)
+    top_adapter = get_top_adapter(adapter_module, adapter_dict)
 
 
-def get_adapters(fastq_path, adapter_sequences, verbose=False):
-    '''
-    Given a list of know adapters check if each (or its reverse compliment) is found in the fastq file for which the path was provided
-    '''
-    found_adapters ={'forward': [], 'reverse': []}
-    number_of_reads = get_number_of_reads(fastq_path)
-
-    for adapter in adapter_sequences:
-        verdict = check_adapter(adapter, fastq_path, number_of_reads, verbose=verbose)
-        if verdict:
-            found_adapters['forward'].append(adapter)
-
-        else:
-            adapter = rev_comp(adapter)
-            verdict = check_adapter(adapter, fastq_path, number_of_reads, verbose=verbose)
-            if verdict:
-                found_adapters['reverse'].append(adapter)
-
-    return found_adapters
-  
-
-def write_adapter_report(found_adapters, outfile_path):
-    '''
-    write a simple output file that lists the found forward and reverse adapters 
-    '''
-    with open(outfile_path, 'w') as outfile:
-
-        for direction in found_adapters:
-            for adapter in found_adapters[direction]:
-                outfile.write(f'>{direction}\n{adapter}\n')
-
+    return False
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("-q", help="path to fastq file")
-    parser.add_argument("-o", help="output path for the report")
-
+    parser = argparse.ArgumentParser(description='Get top adapter sequence from fastqc_data.txt')
+    parser.add_argument('-i', '--input', help='fastqc_data.txt file', required=True)
+    parser.add_argument('-a', '--adapters', help='adapter sequence and names tab delimed file', required=True)
+    parser.add_argument('-o', '--output', help='output file name', required=True)
     args = parser.parse_args()
-
-    path_list = args.q.split('/')
-    fastq_dir = '/'.join(path_list[:-1])
-    fastq_filename = path_list[-1]
-
-    adapter_sequences = [
-    "CTGTAGGCACCATCAAT",
-    "AGATCGGAAGAGC",
-    "CGCCTTGGCCGTACAGCAG",
-    "AAAAAAAAAAAAA",
-    "TGGAATTCTCGGGTGCCAAGG",
-    "CCTTGGCACCCGAGAATT",
-    "GATCGGAAGAGCGTCGT",
-    "CTGATGGCGCGAGGGAG",
-    "GATCGGAAGAGCACACG",
-    "AATGATACGGCGACCAC",
-    "GATCGGAAGAGCTCGTA",
-    "CAAGCAGAAGACGGCAT",
-    "ACACTCTTTCCCTACA",
-    "GATCGGAAGAGCGGTT",
-    "ACAGGTTCAGAGTTCTA",
-    "CAAGCAGAAGACGGCAT",
-    "ACAGGTTCAGAGTTCTA",
-    "CAAGCAGAAGACGGCAT",
-    "TGATCGGAAGAGCACAC",
-    "GATCGGAAGAGCACACGT",
-    ]
-
-
-    found_adapters = get_adapters(fastq_path=args.q, adapter_sequences=adapter_sequences)
-
-    report_path = args.o
-    write_adapter_report(found_adapters, report_path)
+    main(args)

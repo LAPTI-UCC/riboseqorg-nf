@@ -1,8 +1,6 @@
 process FETCH_RUN {
     tag 'high'
 
-    publishDir "$projectDir/$params.study_dir/fastq", mode: 'copy', pattern: '*.fastq.gz'
-
     errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:

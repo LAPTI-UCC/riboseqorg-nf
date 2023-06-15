@@ -13,7 +13,6 @@ workflow fetch_data {
         // fastq_ch   =   FASTQ_DL( samples_ch )
         sra_ch          =   FETCH_RUN       ( samples_ch )
         fastq_ch        =   FASTERQ_DUMP    ( sra_ch )
-        fastqc_path_ch  =   FASTQC          ( fastq_ch )
 
     emit:
         fastq_ch
