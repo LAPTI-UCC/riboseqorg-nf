@@ -14,7 +14,6 @@ process RIBOMETRIC {
 
     script:
         """
-        samtools index ${transcriptome_bam}
-        RiboMetric run --bam ${transcriptome_bam} --annotation ${params.annotation} --threads 8 --html --json --csv 2>&1
+        RiboMetric run --bam ${transcriptome_bam} --annotation ${params.annotation} --threads $task.cpus --html --json --csv 2>&1
         """
 }
