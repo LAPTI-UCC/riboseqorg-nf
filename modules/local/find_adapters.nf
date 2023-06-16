@@ -7,10 +7,10 @@ process FIND_ADAPTERS {
         file raw_fastq
 
     output:
-        file "${raw_fastq}_adpater_report.tsv"
+        file "${raw_fastq}_adpater_report.fa"
 
     script:
         """
-        python3 $projectDir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adpater_report.tsv"
+        python3 $projectDir/scripts/get_adapters.py -i $raw_fastq -a $projectDir/scripts/adapter_list.tsv -o "${raw_fastq}_adpater_report.fa"
         """
 }

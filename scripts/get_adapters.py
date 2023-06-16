@@ -22,12 +22,8 @@ def get_adapter_dict(adapter_path: str) -> dict:
         dictionary of adapter sequences and names
     '''
     df = pd.read_csv(adapter_path, sep='\t', header=None, comment='#')
-    collapsed_column = df.iloc[:, 1:8].apply(lambda x: ''.join(x.dropna().astype(str)), axis=1)
-
-    # Assign the collapsed column back to the DataFrame
-    df['collapsed_column'] = collapsed_column
-    df.drop(df.columns[1:8], axis=1, inplace=True)
-    return df.set_index(0)['collapsed_column'].to_dict()
+    print(df)
+    return df.set_index(0)[1].to_dict()
 
 
 def get_adapter_module(fastqc_data_path: str) -> list:
@@ -53,6 +49,7 @@ def get_adapter_module(fastqc_data_path: str) -> list:
                     continue
                 else:
                     adapter_module.append(line)
+
     return adapter_module
 
 
@@ -67,16 +64,22 @@ def get_top_adapter(adapter_module: list, adapter_dict: dict) -> str:
     Output:
         top adapter sequence as a string
     '''
-    module_string = ''.join(adapter_module)
-    str = StringIO(module_string)
-    adapter_df = pd.read_csv(str, sep='\t', dtype=float, comment='%').drop(columns=['#Position'])
+    if len(adapter_module) > 1:
 
-    sums = adapter_df.sum(axis=0)
-    top_adapter = sums.idxmax()
-    with open(args.output, 'w') as f:
-        f.write(f'>{top_adapter}\n')
-        f.write(f'{adapter_dict[top_adapter].strip()}\n')
-    return adapter_dict[top_adapter]
+        module_string = ''.join(adapter_module)
+        str = StringIO(module_string)
+        adapter_df = pd.read_csv(str, sep='\t', dtype=float, comment='%').drop(columns=['#Position'])
+
+        sums = adapter_df.sum(axis=0)
+        top_adapter = sums.idxmax()
+        with open(args.output, 'w') as f:
+            f.write(f'>{top_adapter}\n')
+            f.write(f'{adapter_dict[top_adapter].strip()}\n')
+        return adapter_dict[top_adapter]
+    else:
+        with open(args.output, 'w') as f:
+            f.write(f'\n')
+
 
 def main(args):
     adapter_module = get_adapter_module(args.input) 
