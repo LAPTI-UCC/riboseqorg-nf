@@ -1,0 +1,147 @@
+# This file contains a list of potential contaminants which are
+
+# frequently found in high throughput sequencing reactions.  These
+
+# are mostly sequences of adapters / primers used in the various
+
+# sequencing chemistries.
+
+# 
+
+# Please DO NOT rely on these sequences to design your own oligos, some
+
+# of them are truncated at ambiguous positions, and none of them are
+
+# definitive sequences from the manufacturers so don't blame us if you
+
+# try to use them and they don't work.
+
+#
+
+# You can add more sequences to the file by putting one line per entry
+
+# and specifying a name[tab]sequence.  If the contaminant you add is 
+
+# likely to be of use to others please consider sending it to the FastQ
+
+# authors, either via a bug report at www.bioinformatics.bbsrc.ac.uk/bugzilla/
+
+# or by directly emailing simon.andrews@bbsrc.ac.uk so other users of
+
+# the program can benefit.
+
+#Adapters AGATCGGAAGAGC and CTGTAGGCACCATCAAT too small for fastqc detection 
+
+user_adapter1	CCTTGGCACCCGAGAATTCCA
+
+user_adapter2	GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT
+
+user_adapter3	CTGATGGCGCGAGGGAGGCGTGTAGATCTCGGTGGTCGCCGTATCATT
+
+user_adapter4	GATCGGAAGAGCACACGTCTGAACTCCAGTCACA
+
+user_adapter5	AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT
+
+
+Hankon2	CACTCGGGCACCAAGGA
+
+Hakon3	GTGTCAGTCACTTCCAGCGG
+
+Hakon4	TGTAGGCACCATC
+
+Hakon5	AAAAAAAAAA
+
+Hakon6	TCGTATGCCGTCTTCTGCTT
+
+Kiniry1	CTGTAGGCACCATCAAT
+Kiniry2	AGATCGGAAGAGC
+Kiniry3	CGCCTTGGCCGTACAGCAG
+Kiniry4	AAAAAAAAAAAAA
+Kiniry5	TGGAATTCTCGGGTGCCAAGG
+Kiniry6	CCTTGGCACCCGAGAATT
+Kiniry7	GATCGGAAGAGCGTCGT
+Kiniry8	CTGATGGCGCGAGGGAG
+Kiniry9	GATCGGAAGAGCACACG
+Kiniry10	AATGATACGGCGACCAC
+Kiniry11	GATCGGAAGAGCTCGTA
+Kiniry12	CAAGCAGAAGACGGCAT
+Kiniry13	ACACTCTTTCCCTACA
+Kiniry14	GATCGGAAGAGCGGTT
+Kiniry15	ACAGGTTCAGAGTTCTA
+Kiniry16	CAAGCAGAAGACGGCAT
+Kiniry17	ACAGGTTCAGAGTTCTA
+Kiniry18	CAAGCAGAAGACGGCAT
+Kiniry19	TGATCGGAAGAGCACAC
+Kiniry20	GATCGGAAGAGCACACGT
+
+Illumina Universal Adapter	AGATCGGAAGAGC
+Illumina Small RNA 3' Adapter	TGGAATTCTCGG
+Illumina Small RNA 5' Adapter	GATCGTCGGACT
+Nextera Transposase Sequence	CTGTCTCTTATA
+SOLID Small RNA Adapter	CGCCTTGGCCGT
+Ingolia 2012 adapter	CTGTAGGCACCATCAAT
+Illumina Uni. Adapter var2	ATCGTAGATCGGAAG
+
+Illumina Single End Adapter 1	GATCGGAAGAGCTCGTATGCCGTCTTCTGCTTG
+
+Illumina Single End Adapter 2	CAAGCAGAAGACGGCATACGAGCTCTTCCGATCT
+
+Illumina Single End PCR Primer 1	AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT
+
+Illumina Single End PCR Primer 2	CAAGCAGAAGACGGCATACGAGCTCTTCCGATCT
+
+Illumina Single End Sequencing Primer	ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+
+
+
+Illumina Paired End Adapter 1	ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+
+Illumina Paired End Adapter 2	GATCGGAAGAGCGGTTCAGCAGGAATGCCGAG
+
+Illumina Paried End PCR Primer 1	AATGATACGGCGACCACCGAGATCTACACTCTTTCCCTACACGACGCTCTTCCGATCT
+
+Illumina Paired End PCR Primer 2	CAAGCAGAAGACGGCATACGAGATCGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT
+
+Illumina Paried End Sequencing Primer 1	ACACTCTTTCCCTACACGACGCTCTTCCGATCT
+
+Illumina Paired End Sequencing Primer 2	CGGTCTCGGCATTCCTGCTGAACCGCTCTTCCGATCT
+
+
+
+Illumina DpnII expression Adapter 1	ACAGGTTCAGAGTTCTACAGTCCGAC
+
+Illumina DpnII expression Adapter 2	CAAGCAGAAGACGGCATACGA
+
+Illumina DpnII expression PCR Primer 1	CAAGCAGAAGACGGCATACGA
+
+Illumina DpnII expression PCR Primer 2	AATGATACGGCGACCACCGACAGGTTCAGAGTTCTACAGTCCGA
+
+Illumina DpnII expression Sequencing Primer	CGACAGGTTCAGAGTTCTACAGTCCGACGATC
+
+
+
+Illumina NlaIII expression Adapter 1	ACAGGTTCAGAGTTCTACAGTCCGACATG
+
+Illumina NlaIII expression Adapter 2	CAAGCAGAAGACGGCATACGA
+
+Illumina NlaIII expression PCR Primer 1	CAAGCAGAAGACGGCATACGA
+
+Illumina NlaIII expression PCR Primer 2	AATGATACGGCGACCACCGACAGGTTCAGAGTTCTACAGTCCGA
+
+Illumina NlaIII expression Sequencing Primer	CCGACAGGTTCAGAGTTCTACAGTCCGACATG
+
+
+
+Illumina Small RNA Adapter 1	GTTCAGAGTTCTACAGTCCGACGATC
+
+Illumina Small RNA Adapter 2	TGGAATTCTCGGGTGCCAAGG
+
+Illumina Small RNA RT Primer	CAAGCAGAAGACGGCATACGA
+
+Illumina Small RNA PCR Primer 1	CAAGCAGAAGACGGCATACGA
+
+Illumina Small RNA PCR Primer 2	AATGATACGGCGACCACCGACAGGTTCAGAGTTCTACAGTCCGA
+
+Illumina Small RNA Sequencing Primer	CGACAGGTTCAGAGTTCTACAGTCCGACGATC
+
+Guo14	TCGTATGCCGTCTTCTG

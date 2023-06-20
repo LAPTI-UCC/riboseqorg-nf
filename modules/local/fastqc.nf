@@ -15,7 +15,6 @@ process FASTQC {
 
     script:
         """
-        fastqc -q $fastq --adapters $projectDir/scripts/adapter_list.tsv
-        unzip *_fastqc.zip
+        fastqc --extract -q $fastq --adapters $projectDir/scripts/adapter_list.tsv
         """
 }

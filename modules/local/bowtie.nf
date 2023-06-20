@@ -10,10 +10,10 @@ process BOWTIE_RRNA {
 
 	output:
 	path "${clipped_fastq.baseName}_rRNA_stats.txt" , emit: rRNA_stats
-	path "${clipped_fastq.baseName}_less_rRNA.fastq", emit: fastq_less_rRNA
+	path "${clipped_fastq.baseName}_less_rRNA.fa", emit: fastq_less_rRNA
 
 	"""
-	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -f ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fa 2> ${clipped_fastq.baseName}_rRNA_stats.txt 
+	bowtie -p 8 -v 3 --norc --phred33-qual $params.rRNA_index -f ${clipped_fastq} --un ${clipped_fastq.baseName}_less_rRNA.fa 2> ${clipped_fastq.baseName}_rRNA_stats.txt 1> /dev/null
 	"""
 }
 

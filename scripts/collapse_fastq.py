@@ -39,7 +39,7 @@ def collapse(infile: str, outfile: str) -> None:
 
     read_number = 1
     for seq, vals in unique_reads.items():
-        f.write(f'@seq{read_number}_x{vals["count"]}\n')
+        f.write(f'>seq{read_number}_x{vals["count"]}\n')
         f.write(f"{seq}\n")
         read_number += 1
 
