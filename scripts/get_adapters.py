@@ -68,7 +68,9 @@ def get_top_adapter(adapter_module: list, adapter_dict: dict) -> str:
 
         module_string = ''.join(adapter_module)
         str = StringIO(module_string)
-        adapter_df = pd.read_csv(str, sep='\t', dtype=float, comment='%').drop(columns=['#Position'])
+        adapter_df = pd.read_csv(str, sep='\t', comment='%').drop(columns=['#Position'])
+        for col in adapter_df.columns:
+            adapter_df[col] = adapter_df[col].astype(float)
 
         sums = adapter_df.sum(axis=0)
         top_adapter = sums.idxmax()
