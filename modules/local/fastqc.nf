@@ -1,6 +1,4 @@
 
-// Example module that runs fastqc on a single fastq file.
-// Results are publushed to the study directory in the fastqc directory
 
 process FASTQC {
 
@@ -12,10 +10,11 @@ process FASTQC {
 	    file fastq 
 
 	output:
-	    path "*_fastqc.{zip,html}", emit: fastqc_full_reports
+	    path "*_fastqc.html", emit: fastqc_html
+        path "*/fastqc_data.txt", emit: fastqc_data
 
     script:
         """
-        fastqc -q $fastq 
+        fastqc --extract -q $fastq --adapters $projectDir/scripts/adapter_list.tsv
         """
 }

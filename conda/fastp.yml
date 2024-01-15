@@ -1,6 +1,6 @@
-name: cutadapt
+name: fastp
 channels:
   - conda-forge
   - bioconda
 dependencies:
-  - cutadapt=4.4
+  - fastp=0.23.4

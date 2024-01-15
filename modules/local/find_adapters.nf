@@ -1,14 +1,17 @@
 process FIND_ADAPTERS {
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*_adpater_report.tsv'
+	publishDir "${params.study_dir}/adapter_reports", mode: 'copy'
+    
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
         file raw_fastq
+        file fastqc_data
 
     output:
-        file "${raw_fastq}_adpater_report.tsv"
+        file "${raw_fastq}_adpater_report.fa"
 
     script:
         """
-        python3 $projectDir/scripts/get_adapters.py -q $raw_fastq -o "${raw_fastq}_adpater_report.tsv"
+        python3 $projectDir/scripts/get_adapters.py -i $fastqc_data -a $projectDir/scripts/adapter_list.tsv -o "${raw_fastq}_adpater_report.fa"
         """
 }

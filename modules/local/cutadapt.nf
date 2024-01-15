@@ -1,7 +1,9 @@
 
 
 process CUTADAPT {
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+	publishDir "${params.study_dir}/trimmed", mode: 'copy'
+
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
     file raw_fastq 

@@ -1,15 +1,23 @@
 process FASTP {
-    publishDir "$projectDir/$params.data_dir/$params.GSE/fastq", mode: 'copy', pattern: '*.fastq.gz'
+    publishDir "$params.study_dir/fastp", mode: 'copy', pattern: '*.json'
 
     input:
     file raw_fastq 
     file adapter_report
 
     output:
-    file '*_clipped.fastq' 
+    path '*_clipped.fastq', emit: trimmed_fastq
+    path '*.json', emit: fastp_json
+
 	
 	script: 
 	"""
-    fastp --in $raw_fastq --out $raw_fastq.baseName + '_clipped.fastq' --length_required 15 --adapter_sequence file:$adapter_report
+    fastp \
+    -i $raw_fastq \
+    -o ${raw_fastq.baseName}_clipped.fastq \
+    --length_required 20 \
+    --adapter_fasta $adapter_report \
+    --json ${raw_fastq.baseName}.json \
+    --html ${raw_fastq.baseName}.html \
     """
 }
