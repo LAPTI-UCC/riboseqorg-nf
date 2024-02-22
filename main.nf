@@ -58,7 +58,6 @@ workflow {
     //     }
     // }
     less_rRNA_ch          =   BOWTIE_RRNA     ( collapsed_fastq_ch )
-
     if ( params.skip_gwips == false ) {
         gwips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
     }
