@@ -10,9 +10,9 @@ workflow fetch_data {
     take: samples_ch
 
     main:
-        // fastq_ch   =   FASTQ_DL( samples_ch )
-        sra_ch          =   FETCH_RUN       ( samples_ch )
-        fastq_ch        =   FASTERQ_DUMP    ( sra_ch )
+        fastq_ch   =   FASTQ_DL( samples_ch )
+        // sra_ch          =   FETCH_RUN       ( samples_ch )
+        // fastq_ch        =   FASTERQ_DUMP    ( sra_ch )
 
     emit:
         fastq_ch

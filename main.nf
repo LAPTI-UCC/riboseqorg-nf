@@ -46,9 +46,10 @@ def help() {
 workflow {
     samples_ch  =   Channel
                         .fromPath(params.sample_sheet)
-                        .splitCsv(header: true, sep: '\t')
+                        .splitCsv(header: true, sep: ',')
                         .map { row -> tuple("${row.study_accession}", "${row.Run}", "${row.ScientificName}", "${row.LIBRARYTYPE}")}
 
+    samples_ch.view()
     fetch_data_ch           =   fetch_data(samples_ch)
 
     collapsed_fastq_ch      =   preprocessing(fetch_data_ch.fastq_ch, samples_ch)

@@ -9,3 +9,4 @@ dependencies:
   - sra-tools >=3.0.1
   - wget
   - awscli
+  - fastq-dl

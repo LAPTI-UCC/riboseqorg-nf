@@ -18,8 +18,8 @@ workflow preprocessing {
 
         trimmed_fastq_ch    =   FASTP           ( fastq_ch, adapter_ch )
 
-        collapsed_fastq_ch  =   COLLAPSE_FASTQ  ( trimmed_fastq_ch.trimmed_fastq)
+        // collapsed_fastq_ch  =   COLLAPSE_FASTQ  ( trimmed_fastq_ch.trimmed_fastq)
 
     emit:
-        collapsed_fastq_ch
+        trimmed_fastq_ch.trimmed_fastq
 }
