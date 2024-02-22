@@ -1,5 +1,7 @@
 '''
-This script takes in the path to the '*RunInfo.csv' file and the path to the metadata csv file and writes the SQL inserts to add a study and all of its tracks to GWIPS-viz.
+This script takes in the path to the '*RunInfo.csv' file and the path to the
+metadata csv file and writes the SQL inserts to add a study and all of its
+tracks to GWIPS-viz.
 The script assumes that the study metadata csv file has the following columns:
     - study_name
     - study_description
@@ -14,12 +16,13 @@ import pandas as pd
 import sqlite3
 import sys
 
+
 def read_metadata(metadata_path):
     '''
     Reads the metadata csv file and returns a df of metadata.
     '''
     metadata = pd.read_csv(metadata_path)
-    return metadata 
+    return metadata
 
 
 def read_study_metadata(study_metadata_path):
@@ -27,7 +30,7 @@ def read_study_metadata(study_metadata_path):
     Reads the study metadata csv file and returns a df of study metadata.
     '''
     study_metadata = pd.read_csv(study_metadata_path)
-    return study_metadata   
+    return study_metadata
 
 
 def get_gwipsDB_for_organism(organism, annotationDB_path):
@@ -36,7 +39,9 @@ def get_gwipsDB_for_organism(organism, annotationDB_path):
     '''
     conn = sqlite3.connect(annotationDB_path)
     c = conn.cursor()
-    results = c.execute(f"SELECT * FROM gwips_organism WHERE scientific_name='{organism}';").fetchall()
+    results = c.execute(
+        f"SELECT * FROM gwips_organism WHERE scientific_name='{organism}';"
+        ).fetchall()
 
     gwipsDB = results[0][1]
     return gwipsDB
@@ -45,14 +50,15 @@ def get_gwipsDB_for_organism(organism, annotationDB_path):
 def get_sample_prefix(study_metadata: pd.DataFrame) -> str:
     '''
     Generates the sample name prefix from the metadata df.
-    
+
     returns a string of the sample name prefix
     '''
     first_author = study_metadata['authors'][0].split(',')[0].strip(' ')
     if len(first_author.split(" ")) > 1:
         first_author = first_author.split(" ")[1]
 
-    sample_prefix = f"{first_author}_{study_metadata['date_published'][0].replace(' ', '_')}"
+    date = study_metadata['date_published'][0].replace(' ', '_')
+    sample_prefix = f"{first_author}_{date}"
 
     return sample_prefix
 
@@ -62,7 +68,7 @@ def get_library_type(metadata_row: pd.Series) -> str:
     Returns the library type based on the metadata row.
     '''
     if metadata_row[1]['Library_Strategy'] == 'RNA-Seq study':
-        library_type = f"mRNACov"
+        library_type = "mRNACov"
 
     elif metadata_row[1]['Library_Strategy'] == 'Ribo-seq study':
         if metadata_row[1]['Ribosome_position'] == 'Initiating':
@@ -91,7 +97,7 @@ def get_sample_long_label(metadata_row: pd.Series) -> str:
 def generate_sample_names(metadata: pd.DataFrame, study_metadata: pd.DataFrame) -> dict:
     '''
     Generates the sample names from the metadata df.
-    
+
     returns a dictionary with GSE aas keys and sample name as the values
     '''
     sample_prefix = get_sample_prefix(study_metadata)
@@ -109,10 +115,15 @@ def generate_sample_names(metadata: pd.DataFrame, study_metadata: pd.DataFrame) 
     return sample_names
 
 
-def handle_sample_table(metadata: pd.DataFrame, sample_names: dict, gbdb_path: str) -> list:
+def handle_sample_table(
+        metadata: pd.DataFrame,
+        sample_names: dict,
+        gbdb_path: str
+        ) -> list:
     '''
     Writes the SQL inserts to add the sample tables to GWIPS-viz.
-    These tables store just the path to the sample bigWig file. The sample name is the table name and must match the trackDb entry.    
+    These tables store just the path to the sample bigWig file. The sample
+    name is the table name and must match the trackDb entry.
     Returns a list of SQL inserts.
     '''
 
@@ -145,9 +156,6 @@ def trackDb_parent_track_inserts(metadata: pd.DataFrame, sample_names: dict, stu
         'RiboProElong': (200,0,0),
         'RiboProScan': (200,0,0),
     }
-
-
-
     parent_track_inserts = []
 
     # loop through metadata and make a parent track for each unique library type
@@ -159,22 +167,22 @@ def trackDb_parent_track_inserts(metadata: pd.DataFrame, sample_names: dict, stu
             study_name = f"{get_sample_prefix(study_metadata)}_{grp_dict[library_type]}"
 
             parent_track_insert = f"INSERT INTO trackDb VALUES ('{study_name}', "
-            parent_track_insert += f"'{get_sample_prefix(study_metadata).replace('_', ' ')}'," #shortLabel
-            parent_track_insert += f"'bigWig'," #type
-            parent_track_insert += f"'{get_sample_long_label(row)}: {study_metadata['Title'][0]}'," #longLabel
-            parent_track_insert += f"0," #visibility
-            parent_track_insert += f"1," #priority
-            parent_track_insert += f"{color_dict[library_type][0]}," #colorR
-            parent_track_insert += f"{color_dict[library_type][1]}," #colorG
-            parent_track_insert += f"{color_dict[library_type][2]}," #colorB
-            parent_track_insert += f"{color_dict[library_type][0]}," #altColorR
-            parent_track_insert += f"{color_dict[library_type][1]}," #altColorG
-            parent_track_insert += f"{color_dict[library_type][2]}," #altColorB
-            parent_track_insert += f"0," #useScore
-            parent_track_insert += f"0," #private
-            parent_track_insert += f"0," #restrictCount
-            parent_track_insert += f"''," #restrictList
-            parent_track_insert += f"''," #url
+            parent_track_insert += f"'{get_sample_prefix(study_metadata).replace('_', ' ')}',"  # shortLabel
+            parent_track_insert += f"'bigWig'," # type
+            parent_track_insert += f"'{get_sample_long_label(row)}: {study_metadata['Title'][0]}',"  # longLabel
+            parent_track_insert += f"0,"  # visibility
+            parent_track_insert += f"1,"  # priority
+            parent_track_insert += f"{color_dict[library_type][0]},"  # colorR
+            parent_track_insert += f"{color_dict[library_type][1]},"  # colorG
+            parent_track_insert += f"{color_dict[library_type][2]},"  # colorB
+            parent_track_insert += f"{color_dict[library_type][0]},"  # altColorR
+            parent_track_insert += f"{color_dict[library_type][1]},"  # altColorG
+            parent_track_insert += f"{color_dict[library_type][2]},"  # altColorB
+            parent_track_insert += "0,"  # useScore
+            parent_track_insert += "0,"  # private
+            parent_track_insert += "0,"  # restrictCount
+            parent_track_insert += "'',"  # restrictList
+            parent_track_insert += "'',"  # url
             html= f"""<h2>Description</h2> <p>{study_metadata['Title'][0]}.</p> <h2>Methods</h2>
                 <p>Raw sequence data were obtained from NCBI GEO database (<a href="{study_metadata['GSE'][0]}">{study_metadata['Accession'][0]}</a>). Data from the following samples were processed:
                 <table>
@@ -193,12 +201,12 @@ def trackDb_parent_track_inserts(metadata: pd.DataFrame, sample_names: dict, stu
                 <h2>References</h2>
                 <p>{study_metadata['authors'][0]} <a href="{study_metadata['doi'][0]}">.{study_metadata['title'][0]} </a>. <i>{study_metadata['journal'][0]}</i>.
                 </p>
-            """ #html
+            """  # html
 
-            parent_track_insert += f"'{html}'," #html
+            parent_track_insert += f"'{html}',"  #html
             parent_track_insert += f"'{grp_dict[library_type]}'," #grp
-            parent_track_insert += f"1," #canPack
-            parent_track_insert += f"'compositeTrack on');\n\n" #settings
+            parent_track_insert += "1," #canPack
+            parent_track_insert += "'compositeTrack on');\n\n" #settings
             parent_track_inserts.append(parent_track_insert)
 
     return parent_track_inserts
