@@ -5,7 +5,7 @@ process FASTQ_DL {
 
     publishDir "$projectDir/$params.outdir/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
-    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+    // errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:
         tuple val(study_accession), val(run), val(scientific_name), val(library_type)

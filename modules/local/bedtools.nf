@@ -4,7 +4,7 @@ process BEDTOOLS_GENOMECOV {
 	file genome_sorted_bam /// genome_aligned_and_sorted_bam ///
 
 	output:
-	path "${genome_sorted_bam.baseName}.sorted.cov", emit: coverage_beds
+	path "${genome_sorted_bam.baseName}.sorted.cov", emit: sorted_beds
 
 	"""
 	bedtools genomecov -ibam ${genome_sorted_bam.baseName}.bam_sorted -g $params.chrom_sizes_file -bg > ${genome_sorted_bam.baseName}.cov

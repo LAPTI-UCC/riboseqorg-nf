@@ -17,6 +17,6 @@ process RIBOMETRIC {
 
     script:
         """
-        RiboMetric run --bam ${transcriptome_bam} --annotation ${params.annotation} --threads $task.cpus --html --json --csv > /dev/null
+        ribometric run --bam ${transcriptome_bam} --annotation ${params.annotation} --threads $task.cpus --html --json --csv > /dev/null
         """
 }
