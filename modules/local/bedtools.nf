@@ -1,4 +1,7 @@
 process BEDTOOLS_GENOMECOV {
+	container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/bedtools:2.31.1--hf5e1c6e_0' :
+        'biocontainers/bedtools:2.31.1--hf5e1c6e_0' }"
 
 	input:
 	file genome_sorted_bam /// genome_aligned_and_sorted_bam ///

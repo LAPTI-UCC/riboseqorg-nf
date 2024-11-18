@@ -3,8 +3,9 @@ import java.util.Random
 process FASTQ_DL {
     tag 'high'
 
-    publishDir "$projectDir/$params.outdir/fastq", mode: 'copy', pattern: '*.fastq.gz'
+    publishDir "$params.study_dir/fastq", mode: 'copy', pattern: '*.fastq.gz'
 
+    container 'biocontainers/fastq-dl:0.0.1--py_0'
     // errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
     input:

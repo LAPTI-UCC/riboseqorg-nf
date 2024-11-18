@@ -3,6 +3,9 @@ process SAMTOOLS_NAME_SORT {
 
 	errorStrategy { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/samtools:1.20--h50ea8bc_0' :
+        'biocontainers/samtools:1.20--h50ea8bc_0' }"
 
 	input:
 	file transcriptome_alignments /// from transcriptome_sams ///

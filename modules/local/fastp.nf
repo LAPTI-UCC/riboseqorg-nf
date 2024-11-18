@@ -1,6 +1,10 @@
 process FASTP {
     publishDir "$params.study_dir/fastp", mode: 'copy', pattern: '*.json'
 
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/fastp:0.23.4--h5f740d0_0' :
+        'biocontainers/fastp:0.23.4--h5f740d0_0' }"
+
     input:
     file raw_fastq 
     file adapter_report
