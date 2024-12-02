@@ -1,0 +1,12 @@
+name: ribometric
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - biopython
+  - pysam
+  - pip:
+    - git+https://github.com/JackCurragh/RiboMetric.git

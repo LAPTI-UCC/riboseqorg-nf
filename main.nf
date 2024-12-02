@@ -4,13 +4,14 @@
 nextflow.enable.dsl=2
 
 /// Import modules and subworkflows
-include { quality_control } from './subworkflows/local/quality_control.nf'
 include { fetch_data } from './subworkflows/local/fetch_data.nf'
-include { preprocessing } from './subworkflows/local/preprocessing.nf'
-include { trips_RiboSeq } from './subworkflows/local/trips.nf'
-include { gwips_RiboSeq } from './subworkflows/local/gwips.nf'
+include { STAR_ALIGN } from './modules/local/STAR/main.nf'
+include { RIBOMETRIC } from './modules/local/ribometric/main.nf'
+include { SAMTOOLS_COORD_SORT } from './modules/local/samtools/samtools_coord_sort/main.nf'
+include { SAMTOOLS_NAME_SORT } from './modules/local/samtools/samtools_name_sort/main.nf'
+include { BAM_TO_SQLITE } from './modules/local/bam_to_sqlite/main.nf'
 
-include { BOWTIE_RRNA } from './modules/local/bowtie.nf'
+// include { BOWTIE_RRNA } from './modules/local/bowtie.nf'
 
 // Log the parameters
 log.info """\
@@ -21,9 +22,9 @@ log.info """\
 ||  Parameters                                                             
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 ||  Sample Sheet    : ${params.sample_sheet}                                     
-||  outDir          : ${params.output_dir}                                        
+||  outDir          : ${params.outdir}                                        
 ||  workDir         : ${workflow.workDir}   
-||  study_dir       : ${params.study_dir}                                     
+||  outdir       : ${params.outdir}                                     
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 
 """
@@ -44,27 +45,37 @@ def help() {
 }
 
 workflow {
-    samples_ch  =   Channel
-                        .fromPath(params.sample_sheet)
-                        .splitCsv(header: true, sep: ',')
-                        .map { row -> tuple("${row.study_accession}", "${row.Run}", "${row.ScientificName}", "${row.LIBRARYTYPE}")}
-
-
+    samples_ch = Channel
+        .fromPath(params.sample_sheet)
+        .splitCsv(header: true, sep: ',')
+        .map { row -> 
+            def meta = [
+                id: row.Run,
+                study_accession: row.study_accession,
+            ]
+            [ meta, row.Run ]
+        }
     fetch_data_ch           =   fetch_data(samples_ch)
 
-    collapsed_fastq_ch      =   preprocessing(fetch_data_ch.fastq_ch, samples_ch)
-    // if ( params.skip_rRNA ) {
-    //     if ( params.skip_rRNA == false ) {
-    //         less_rRNA_ch          =   BOWTIE_RRNA     ( collapsed_fastq_ch )
-    //     }
-    // }
-    less_rRNA_ch          =   BOWTIE_RRNA     ( collapsed_fastq_ch )
-    if ( params.skip_gwips == false ) {
-        gwips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
-    }
-    if ( params.skip_trips == false ) {
-        trips_RiboSeq(less_rRNA_ch.fastq_less_rRNA)
-    }
+    STAR_ALIGN(
+        fetch_data_ch,
+        params.star_index,
+        params.gtf
+    )
+    SAMTOOLS_COORD_SORT(
+        STAR_ALIGN.out.transcriptome_bam,
+    )
+    RIBOMETRIC(
+        SAMTOOLS_COORD_SORT.out.bam,
+        params.ribometric_annotation
+    )
+
+    SAMTOOLS_NAME_SORT(STAR_ALIGN.out.transcriptome_bam)
+    BAM_TO_SQLITE(
+        SAMTOOLS_NAME_SORT.out.bam,
+        params.annotation_sqlite
+    )
+
 }
 
 workflow.onComplete {
