@@ -1,15 +1,33 @@
 
 
-// Include the necessary modules for this workflow
-include { FASTQC } from '../../modules/local/fastqc.nf'
+include { GET_RPF } from '../../modules/local/getRPF/main'
 
-workflow quality_control {
+workflow QUALITY_CONTROL {
     take:
-        fastq
+    samples
 
     main:
-        fastqc_ch   =   FASTQC(fastq)
+    GET_RPF(samples, params.collapsed_read_header_pattern)
     
+    GET_RPF.out.rpf_checks
+        .branch {
+            pass: !it[1].text.contains("[FAIL]")
+            fail: it[1].text.contains("[FAIL]")
+        }
+        .set { rpf_results }
+
+    rpf_results.fail
+        .map { meta, _rpf_checks -> 
+            log.warn("Sample ${meta.id} failed RPF checks. Skipping alignment.")
+            return meta.id
+        }
+        .set { failed_samples }
+
+    passed_samples = rpf_results.pass
+        .join(samples, by: [0])
+        .map { meta, _rpf_checks, input_file -> [meta, input_file] }
+
     emit:
-        fastqc_ch
+    passed_samples
+    failed_samples
 }

@@ -1,0 +1,11 @@
+name: getRPF
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - biopython
+  - pip:
+    - git+https://github.com/JackCurragh/get-RPF.git

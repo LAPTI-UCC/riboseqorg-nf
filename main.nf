@@ -3,14 +3,11 @@
 /// Specify to use Nextflow DSL version 2
 nextflow.enable.dsl=2
 
-/// Import modules and subworkflows
-include { fetch_data } from './subworkflows/local/fetch_data.nf'
-include { STAR_ALIGN } from './modules/local/STAR/main.nf'
-include { RIBOMETRIC } from './modules/local/ribometric/main.nf'
-include { SAMTOOLS_COORD_SORT } from './modules/local/samtools/samtools_coord_sort/main.nf'
-include { SAMTOOLS_NAME_SORT } from './modules/local/samtools/samtools_name_sort/main.nf'
-include { BAM_TO_SQLITE } from './modules/local/bam_to_sqlite/main.nf'
-
+include { DATA_ACQUISITION } from './subworkflows/local/data_acquisition'
+include { QUALITY_CONTROL } from './subworkflows/local/quality_control'
+include { ALIGNMENT } from './subworkflows/local/alignment'
+include { POST_PROCESSING } from './subworkflows/local/post_processing'
+include { ANALYSIS } from './subworkflows/local/analysis'
 // include { BOWTIE_RRNA } from './modules/local/bowtie.nf'
 
 // Log the parameters
@@ -44,38 +41,28 @@ def help() {
 """.stripIndent()
 }
 
+
 workflow {
-    samples_ch = Channel
-        .fromPath(params.sample_sheet)
-        .splitCsv(header: true, sep: ',')
-        .map { row -> 
-            def meta = [
-                id: row.Run,
-                study_accession: row.study_accession,
-            ]
-            [ meta, row.Run ]
-        }
-    fetch_data_ch           =   fetch_data(samples_ch)
+    // Data Acquisition
+    DATA_ACQUISITION(params.sample_sheet)
 
-    STAR_ALIGN(
-        fetch_data_ch,
-        params.star_index,
-        params.gtf
-    )
-    SAMTOOLS_COORD_SORT(
-        STAR_ALIGN.out.transcriptome_bam,
-    )
-    RIBOMETRIC(
-        SAMTOOLS_COORD_SORT.out.bam,
-        params.ribometric_annotation
+    // Quality Control
+    QUALITY_CONTROL(DATA_ACQUISITION.out.samples)
+
+    // Alignment (only for samples that passed QC)
+    ALIGNMENT(QUALITY_CONTROL.out.passed_samples, params.star_index, params.gtf)
+
+    // Post-processing
+    POST_PROCESSING(
+        ALIGNMENT.out.bams,
+        ALIGNMENT.out.genome_bam,
+        ALIGNMENT.out.bai,
+        params.annotation_sqlite,
+        params.chrom_sizes_file
     )
 
-    SAMTOOLS_NAME_SORT(STAR_ALIGN.out.transcriptome_bam)
-    BAM_TO_SQLITE(
-        SAMTOOLS_NAME_SORT.out.bam,
-        params.annotation_sqlite
-    )
-
+    // Analysis
+    ANALYSIS(ALIGNMENT.out.bams, params.ribometric_annotation)
 }
 
 workflow.onComplete {
