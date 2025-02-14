@@ -8,30 +8,45 @@ process FASTP {
 
     publishDir "${params.outdir}/fastp", mode: 'copy', pattern: '*.json'
     publishDir "${params.outdir}/fastp", mode: 'copy', pattern: '*.html'
-
+    publishDir "${params.outdir}/fastp", mode: 'copy', pattern: '*_clipped.fastq.gz'
 
     input:
     tuple val(meta), path(reads)
     tuple val(meta2), path(adapter_fasta)
 
     output:
-    tuple val(meta), path("*_clipped.fastq.gz"), emit: trimmed_fastq
-    tuple val(meta), path("*.json"), emit: json
-    tuple val(meta), path("*.html"), emit: html
+    tuple val(meta), path("*_clipped_provided.fastq.gz"), emit: trimmed_fastq_provided
+    tuple val(meta), path("*_clipped_final.fastq.gz"), emit: trimmed_fastq
+    tuple val(meta), path("*_provided_fastp.json"), emit: json_provided
+    tuple val(meta), path("*_auto_fastp.json"), emit: json_auto
+    tuple val(meta), path("*_provided_fastp.html"), emit: html_provided
+    tuple val(meta), path("*_auto_fastp.html"), emit: html_auto
     path "versions.yml", emit: versions
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
+    # Run with provided adapters
     fastp \\
         -i $reads \\
-        -o ${prefix}_clipped.fastq.gz \\
+        -o ${prefix}_clipped_provided.fastq.gz \\
         $args \\
         --length_required 20 \\
         --adapter_fasta $adapter_fasta \\
-        --json ${prefix}_fastp.json \\
-        --html ${prefix}_fastp.html \\
+        --json ${prefix}_provided_fastp.json \\
+        --html ${prefix}_provided_fastp.html \\
+        --thread $task.cpus
+
+    # Run with automatic adapter detection on the output of the first run
+    fastp \\
+        -i ${prefix}_clipped_provided.fastq.gz \\
+        -o ${prefix}_clipped_final.fastq.gz \\
+        $args \\
+        --length_required 20 \\
+        --detect_adapter_for_pe \\
+        --json ${prefix}_auto_fastp.json \\
+        --html ${prefix}_auto_fastp.html \\
         --thread $task.cpus
 
     cat <<-END_VERSIONS > versions.yml
@@ -43,9 +58,12 @@ process FASTP {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_clipped.fastq.gz
-    touch ${prefix}.json
-    touch ${prefix}.html
+    touch ${prefix}_clipped_provided.fastq.gz
+    touch ${prefix}_clipped_final.fastq.gz
+    touch ${prefix}_provided_fastp.json
+    touch ${prefix}_auto_fastp.json
+    touch ${prefix}_provided_fastp.html
+    touch ${prefix}_auto_fastp.html
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

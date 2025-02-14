@@ -3,11 +3,6 @@ process GET_RPF {
     label 'process_medium'
 
     publishDir "${params.outdir}/getRPF", mode: 'copy'
-    publishDir "${params.outdir}/failed_rpf_checks", mode: 'copy', pattern: '*_rpf_checks.txt', saveAs: { filename -> 
-        file(filename).text.contains("[FAIL]") ? filename : null 
-    }
-
-    conda "bioconda::getrf=1.3.0"  // Assuming getRPF is available in Bioconda
 
     input:
     tuple val(meta), path(input_file)

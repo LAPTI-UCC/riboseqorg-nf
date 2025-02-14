@@ -50,19 +50,18 @@ workflow {
     QUALITY_CONTROL(DATA_ACQUISITION.out.samples)
 
     // Alignment (only for samples that passed QC)
-    ALIGNMENT(QUALITY_CONTROL.out.passed_samples, params.star_index, params.gtf)
+    ALIGNMENT(QUALITY_CONTROL.out.passed_samples, params.star_index, params.bowtie_index, params.gtf)
 
     // Post-processing
     POST_PROCESSING(
-        ALIGNMENT.out.bams,
+        ALIGNMENT.out.transcriptome_bam,
         ALIGNMENT.out.genome_bam,
-        ALIGNMENT.out.bai,
         params.annotation_sqlite,
         params.chrom_sizes_file
     )
 
     // Analysis
-    ANALYSIS(ALIGNMENT.out.bams, params.ribometric_annotation)
+    ANALYSIS(ALIGNMENT.out.transcriptome_bam, params.ribometric_annotation)
 }
 
 workflow.onComplete {

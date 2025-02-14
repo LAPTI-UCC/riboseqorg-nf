@@ -1,5 +1,3 @@
-
-
 process BEDGRAPH_TO_BIGWIG {
     tag "${meta.id}"
     label 'process_medium'
@@ -19,7 +17,8 @@ process BEDGRAPH_TO_BIGWIG {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    // Remove '.sorted.bedgraph' from the input filename to create the prefix
+    def prefix = bedgraph.name.replaceFirst(/\.sorted\.bedgraph$/, '')
     """
     bedGraphToBigWig ${bedgraph} ${chrom_sizes} ${prefix}.bw
 
@@ -30,9 +29,10 @@ process BEDGRAPH_TO_BIGWIG {
     """
 
     stub:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    // Remove '.sorted.bedgraph' from the input filename to create the prefix
+    def prefix = bedgraph.name.replaceFirst(/\.sorted\.bedgraph$/, '')
     """
-    touch ${prefix}.coverage.bw
+    touch ${prefix}.bw
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

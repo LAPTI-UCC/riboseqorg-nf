@@ -20,9 +20,17 @@ workflow collapse {
 
         // Download FastQ files
         FASTQ_DL(sample_ch)
+        fastq_files = FASTQ_DL.out.fastq
+            .flatMap { meta, files ->
+                if (files instanceof Collection) {
+                    files.collect { file -> tuple(meta, file) }
+                } else {
+                    [tuple(meta, files)]
+                }
+            }
 
         // Run FastQC on downloaded FastQ files
-        FASTQC(FASTQ_DL.out.fastq, adapter_list)
+        FASTQC(fastq_files, adapter_list)
 
         FIND_ADAPTERS(FASTQ_DL.out.fastq, FASTQC.out.txt)
         // Run FastP for trimming
@@ -30,11 +38,11 @@ workflow collapse {
 
         multiqc_files = Channel.empty()
         multiqc_files = multiqc_files.mix(FASTQC.out.zip.map { meta, file -> file })
-        multiqc_files = multiqc_files.mix(FASTP.out.json.map { meta, file -> file })
+        multiqc_files = multiqc_files.mix(FASTP.out.json_provided.map { meta, file -> file })
     // Add other QC outputs as needed
 
         // Run MultiQC only if there are input files
-        MULTIQC(multiqc_files.collect())
+        // MULTIQC(multiqc_files.collect())
 
         // Collapse FastQ files
         COLLAPSE_FASTQ(FASTP.out.trimmed_fastq)
@@ -42,12 +50,12 @@ workflow collapse {
     emit:
         collapsed_fastq = COLLAPSE_FASTQ.out.collapsed_fastq
         fastqc_results  = FASTQC.out.html
-        fastp_results   = FASTP.out.json
-        multiqc_report  = MULTIQC.out.report
+        fastp_results   = FASTP.out.json_provided
+        // multiqc_report  = MULTIQC.out.report
         versions        = Channel.empty()
                             .mix(FASTQ_DL.out.versions)
                             .mix(FASTQC.out.versions)
                             .mix(FASTP.out.versions)
-                            .mix(MULTIQC.out.versions)
+                            // .mix(MULTIQC.out.versions)
                             .collect()
 }

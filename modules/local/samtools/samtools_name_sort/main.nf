@@ -8,7 +8,7 @@ process SAMTOOLS_NAME_SORT {
         'biocontainers/samtools:1.20--h50ea8bc_0' }"
 
     input:
-    tuple val(meta), path(transcriptome_alignments)
+    tuple val(meta), path(transcriptome_alignments), path(bai)
 
     output:
     tuple val(meta), path("*.name_sorted.bam"), emit: bam

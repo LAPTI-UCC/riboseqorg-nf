@@ -1,7 +1,3 @@
-
-
-import java.util.Random
-
 process FASTQ_DL {
     tag "${meta.id}"
 
@@ -11,6 +7,8 @@ process FASTQ_DL {
         'biocontainers/fastq-dl:2.0.1--pyhdfd78af_0' }"
 
     publishDir "${params.outdir}/fastq", mode: 'copy', pattern: '*.fastq.gz'
+
+    errorStrategy 'ignore'
 
     input:
     tuple val(meta), val(run), path(needs_processing)

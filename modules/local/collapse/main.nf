@@ -3,6 +3,8 @@ process COLLAPSE_FASTQ {
 
     conda "${projectDir}/modules/local/collapse/RDP-tools.yml"
 
+    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/rdp-tools:1.0.0--pyhdfd78af_0' :
         'biocontainers/rdp-tools:1.0.0--pyhdfd78af_0' }"
@@ -21,7 +23,7 @@ process COLLAPSE_FASTQ {
     """
     RDP-Tools collapse $args $fastq
     gzip *fastq.collapsed.fa
-    """
+    """ 
 
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
