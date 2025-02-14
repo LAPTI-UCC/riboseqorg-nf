@@ -1,0 +1,210 @@
+digraph "pipeline_dag" {
+v0 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.fromPath"];
+v1 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitCsv"];
+v0 -> v1;
+
+v1 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="splitCsv"];
+v2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v1 -> v2;
+
+v2 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v3 [label="DATA_ACQUISITION:fetch_data:LOCATE"];
+v2 -> v3 [label="samples_ch"];
+
+v3 [label="DATA_ACQUISITION:fetch_data:LOCATE"];
+v9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
+v3 -> v9 [label="collapsed_reads"];
+
+v3 [label="DATA_ACQUISITION:fetch_data:LOCATE"];
+v7 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="view"];
+v3 -> v7;
+
+v4 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
+v5 [shape=point];
+v4 -> v5 [label="needs_processing"];
+
+v6 [shape=point,label="",fixedsize=true,width=0.1,xlabel="Channel.empty"];
+v9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
+v6 -> v9 [label="newly_collapsed_reads"];
+
+v7 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="view"];
+v8 [shape=point];
+v7 -> v8;
+
+v9 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="mix"];
+v10 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
+v9 -> v10;
+
+v10 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="groupTuple"];
+v11 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v10 -> v11;
+
+v11 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v13 [label="QUALITY_CONTROL:GET_RPF"];
+v11 -> v13 [label="samples"];
+
+v12 [shape=point,label="",fixedsize=true,width=0.1];
+v13 [label="QUALITY_CONTROL:GET_RPF"];
+v12 -> v13 [label="count_pattern"];
+
+v13 [label="QUALITY_CONTROL:GET_RPF"];
+v15 [shape=point];
+v13 -> v15;
+
+v13 [label="QUALITY_CONTROL:GET_RPF"];
+v16 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
+v13 -> v16;
+
+v13 [label="QUALITY_CONTROL:GET_RPF"];
+v14 [shape=point];
+v13 -> v14;
+
+v16 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
+v19 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v16 -> v19;
+
+v16 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="branch"];
+v17 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v16 -> v17;
+
+v17 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v18 [shape=point];
+v17 -> v18 [label="failed_samples"];
+
+v11 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v19 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v11 -> v19 [label="samples"];
+
+v19 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v20 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v19 -> v20;
+
+v20 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="map"];
+v23 [label="ALIGNMENT:STAR_ALIGN"];
+v20 -> v23 [label="samples"];
+
+v21 [shape=point,label="",fixedsize=true,width=0.1];
+v23 [label="ALIGNMENT:STAR_ALIGN"];
+v21 -> v23 [label="index"];
+
+v22 [shape=point,label="",fixedsize=true,width=0.1];
+v23 [label="ALIGNMENT:STAR_ALIGN"];
+v22 -> v23 [label="gtf"];
+
+v23 [label="ALIGNMENT:STAR_ALIGN"];
+v28 [label="ALIGNMENT:SAMTOOLS_INDEX"];
+v23 -> v28 [label="genome_bam"];
+
+v23 [label="ALIGNMENT:STAR_ALIGN"];
+v26 [label="ALIGNMENT:SAMTOOLS_COORD_SORT"];
+v23 -> v26;
+
+v23 [label="ALIGNMENT:STAR_ALIGN"];
+v25 [shape=point];
+v23 -> v25;
+
+v23 [label="ALIGNMENT:STAR_ALIGN"];
+v24 [shape=point];
+v23 -> v24;
+
+v26 [label="ALIGNMENT:SAMTOOLS_COORD_SORT"];
+v31 [label="POST_PROCESSING:SAMTOOLS_NAME_SORT"];
+v26 -> v31 [label="processed_data"];
+
+v26 [label="ALIGNMENT:SAMTOOLS_COORD_SORT"];
+v27 [shape=point];
+v26 -> v27;
+
+v28 [label="ALIGNMENT:SAMTOOLS_INDEX"];
+v30 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v28 -> v30 [label="bam_indices"];
+
+v28 [label="ALIGNMENT:SAMTOOLS_INDEX"];
+v29 [shape=point];
+v28 -> v29;
+
+v23 [label="ALIGNMENT:STAR_ALIGN"];
+v30 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v23 -> v30 [label="genome_bam"];
+
+v30 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v38 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v30 -> v38 [label="sorted_bams_with_index"];
+
+v31 [label="POST_PROCESSING:SAMTOOLS_NAME_SORT"];
+v34 [label="POST_PROCESSING:BAM_TO_SQLITE"];
+v31 -> v34;
+
+v31 [label="POST_PROCESSING:SAMTOOLS_NAME_SORT"];
+v32 [shape=point];
+v31 -> v32;
+
+v33 [shape=point,label="",fixedsize=true,width=0.1];
+v34 [label="POST_PROCESSING:BAM_TO_SQLITE"];
+v33 -> v34 [label="annotation_sqlite"];
+
+v34 [label="POST_PROCESSING:BAM_TO_SQLITE"];
+v36 [label="POST_PROCESSING:EXTRACT_OFFSETS"];
+v34 -> v36 [label="sqlite_dbs"];
+
+v34 [label="POST_PROCESSING:BAM_TO_SQLITE"];
+v35 [shape=point];
+v34 -> v35;
+
+v36 [label="POST_PROCESSING:EXTRACT_OFFSETS"];
+v38 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v36 -> v38 [label="offsets"];
+
+v36 [label="POST_PROCESSING:EXTRACT_OFFSETS"];
+v37 [shape=point];
+v36 -> v37;
+
+v38 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="join"];
+v39 [label="POST_PROCESSING:BAM_TO_BED"];
+v38 -> v39 [label="bam_bai_and_offsets"];
+
+v39 [label="POST_PROCESSING:BAM_TO_BED"];
+v41 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="flatMap"];
+v39 -> v41 [label="bedgraphs"];
+
+v39 [label="POST_PROCESSING:BAM_TO_BED"];
+v40 [shape=point];
+v39 -> v40;
+
+v41 [shape=circle,label="",fixedsize=true,width=0.1,xlabel="flatMap"];
+v43 [label="POST_PROCESSING:BEDGRAPH_TO_BIGWIG"];
+v41 -> v43 [label="unpacked_bedgraphs"];
+
+v42 [shape=point,label="",fixedsize=true,width=0.1];
+v43 [label="POST_PROCESSING:BEDGRAPH_TO_BIGWIG"];
+v42 -> v43 [label="chrom_sizes"];
+
+v43 [label="POST_PROCESSING:BEDGRAPH_TO_BIGWIG"];
+v45 [shape=point];
+v43 -> v45;
+
+v43 [label="POST_PROCESSING:BEDGRAPH_TO_BIGWIG"];
+v44 [shape=point];
+v43 -> v44;
+
+v26 [label="ALIGNMENT:SAMTOOLS_COORD_SORT"];
+v47 [label="ANALYSIS:RIBOMETRIC"];
+v26 -> v47 [label="processed_data"];
+
+v46 [shape=point,label="",fixedsize=true,width=0.1];
+v47 [label="ANALYSIS:RIBOMETRIC"];
+v46 -> v47 [label="ribometric_annotation"];
+
+v47 [label="ANALYSIS:RIBOMETRIC"];
+v50 [shape=point];
+v47 -> v50 [label="ribometric_html"];
+
+v47 [label="ANALYSIS:RIBOMETRIC"];
+v49 [shape=point];
+v47 -> v49 [label="ribometric_json"];
+
+v47 [label="ANALYSIS:RIBOMETRIC"];
+v48 [shape=point];
+v47 -> v48 [label="ribometric_csv"];
+
+}
