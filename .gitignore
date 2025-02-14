@@ -197,3 +197,5 @@ old
 singularity/*
 data/
 work/
+
+conda_cache/
