@@ -8,7 +8,7 @@ include { BEDGRAPH_TO_BIGWIG } from '../../modules/local/bedGraphToBigWig/main'
 workflow POST_PROCESSING {
     take:
     transcriptome_bams 
-    genome_bam
+    genome_bams
     annotation_sqlite
     chrom_sizes
 
@@ -20,11 +20,14 @@ workflow POST_PROCESSING {
     EXTRACT_OFFSETS(BAM_TO_SQLITE.out.sqlite)
 
     // Join coordinate-sorted BAMs (with index) and offsets
-    bam_bai_and_offsets = transcriptome_bams
+    transcriptome_bam_bai_and_offsets = transcriptome_bams
+        .join(EXTRACT_OFFSETS.out.offsets, by: [0])
+
+    genome_bam_bai_and_offsets = genome_bams
         .join(EXTRACT_OFFSETS.out.offsets, by: [0])
 
     // Run BAM_TO_BED
-    BAM_TO_BED(bam_bai_and_offsets)
+    BAM_TO_BED(genome_bam_bai_and_offsets)
 
     unpacked_bedgraphs = BAM_TO_BED.out.bedgraph
         .flatMap { meta, bedgraphs ->

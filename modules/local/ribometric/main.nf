@@ -10,7 +10,7 @@ process RIBOMETRIC {
     maxRetries 1
 
     input:
-    tuple val(meta), path(transcriptome_bam)
+    tuple val(meta), path(transcriptome_bam), path(transcriptome_bam_index)
     path ribometric_annotation
 
     output:

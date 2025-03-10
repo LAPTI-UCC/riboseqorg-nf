@@ -61,7 +61,7 @@ workflow {
     )
 
     // Analysis
-    ANALYSIS(ALIGNMENT.out.transcriptome_bam, params.ribometric_annotation)
+    // ANALYSIS(ALIGNMENT.out.transcriptome_bam, params.ribometric_annotation)
 }
 
 workflow.onComplete {

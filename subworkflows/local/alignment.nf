@@ -19,6 +19,6 @@ workflow ALIGNMENT {
 
     emit:
     transcriptome_bam = BOWTIE_ALIGN_SORT.out.bam
-    genome_bam = STAR_ALIGN.out.bam
+    genome_bam = SAMTOOLS_INDEX.out.bam_and_bai
 
 }

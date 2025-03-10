@@ -35,37 +35,22 @@ process STAR_ALIGN {
     def output_transcriptome_bam = params.save_star_transcriptome_bam ? "--quantMode TranscriptomeSAM" : ""
 
     """
-    STAR \\
-        --genomeDir $index \\
-        --readFilesIn $reads \\
-        --runThreadN ${task.cpus} \\
-        --outFileNamePrefix ${prefix}. \\
-        --outSAMtype BAM SortedByCoordinate \\
-        --outFilterMultimapNmax ${params.max_multimap} \\
-        --outFilterMismatchNmax ${params.mismatches} \\
-        $output_transcriptome_bam \\
-        $alignment_type \\
-        $allow_introns \\
-        $trim_front \\
-        --readFilesCommand $unzip_command \\
-        --sjdbGTFfile $gtf \\
+    STAR \
+        --genomeDir $index \
+        --readFilesIn $reads \
+        --runThreadN ${task.cpus} \
+        --outFileNamePrefix ${prefix}. \
+        --outSAMtype BAM SortedByCoordinate \
+        --outFilterMultimapNmax ${params.max_multimap} \
+        --outFilterMismatchNmax ${params.mismatches} \
+        $output_transcriptome_bam \
+        $alignment_type \
+        $allow_introns \
+        $trim_front \
+        --readFilesCommand $unzip_command \
+        --sjdbGTFfile $gtf \
         $args
-        STAR \
-     --genomeDir /path/to/star_index \          # Directory containing STAR genome index \
-     --readFilesIn sample_R1.fastq.gz \         # Input fastq file \
-     --readFilesCommand zcat \                  # Command to unzip input files on the fly \
-     --runThreadN 8 \                           # Number of threads to use \
-     --alignEndsType EndToEnd \                 # Force end-to-end read mapping, no soft-clipping \
-     --outFilterMismatchNmax 2 \                # Maximum number of mismatches per read \
-     --outFilterMultimapNmax 20 \               # Report up to 20 multimappings per read \
-     --winAnchorMultimapNmax 50 \               # Maximum number of loci anchors are allowed to map to \
-     --seedSearchStartLmax 30 \                 # Maximum length of the seed region \
-     --alignSJoverhangMin 4 \                   # Minimum overhang for splice junctions \
-     --alignSJDBoverhangMin 1 \                 # Minimum overhang for annotated splice junctions \
-     --alignIntronMin 20 \                      # Minimum intron size \
-     --alignIntronMax 100000 \                  # Maximum intron size \
-     --outSAMtype BAM SortedByCoordinate \      # Output sorted BAM file \
-     --outFileNamePrefix sample_ \              # Prefix for output files \
+
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

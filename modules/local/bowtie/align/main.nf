@@ -37,8 +37,7 @@ process BOWTIE_ALIGN_SORT {
         -v 3 \
         --seedlen 25 \
         -x \$INDEX \
-        -f ${reads} \
-        | samtools view -bS - | samtools sort -@ ${task.cpus} -o ${prefix}.bam
+        -f ${reads} 2> ${meta.id}_bowtie_alignment_stats.log | samtools view -bS - | samtools sort -@ ${task.cpus} -o ${prefix}.bam
 
 
     samtools index ${prefix}.bam
