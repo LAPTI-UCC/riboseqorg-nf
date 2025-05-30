@@ -198,9 +198,7 @@ This step validates the reads are suitable for Ribo-seq analysis.
   
   # The process validates:
   # 1. Read length distribution (typically 26-34nt for RPFs)
-  # 2. 3-nucleotide periodicity characteristic of translating ribosomes
-  # 3. Codon usage bias within open reading frames
-  # 4. 5' and 3' nucleotide preferences
+  # 2. 5' and 3' nucleotide preferences
   ```
 
 **Parameters**:
