@@ -50,7 +50,13 @@ workflow {
     QUALITY_CONTROL(DATA_ACQUISITION.out.samples)
 
     // Alignment (only for samples that passed QC)
-    ALIGNMENT(QUALITY_CONTROL.out.passed_samples, params.star_index, params.bowtie_index, params.gtf)
+    ALIGNMENT(
+        QUALITY_CONTROL.out.passed_samples,
+        params.star_index,
+        params.bowtie_index,
+        params.rRNA_index,
+        params.gtf
+        )
 
     // Post-processing
     POST_PROCESSING(

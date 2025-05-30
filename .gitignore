@@ -199,3 +199,4 @@ data/
 work/
 
 conda_cache/
+*-reports.tsv

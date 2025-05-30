@@ -39,17 +39,18 @@ process STAR_ALIGN {
         --genomeDir $index \
         --readFilesIn $reads \
         --runThreadN ${task.cpus} \
-        --outFileNamePrefix ${prefix}. \
         --outSAMtype BAM SortedByCoordinate \
-        --outFilterMultimapNmax ${params.max_multimap} \
+        --outSAMattributes NH HI AS nM \
+        --outFilterMultimapNmax 10 \
         --outFilterMismatchNmax ${params.mismatches} \
+        --readFilesCommand $unzip_command \
         $output_transcriptome_bam \
         $alignment_type \
         $allow_introns \
         $trim_front \
-        --readFilesCommand $unzip_command \
+        $args \
+        --outFileNamePrefix ${prefix}. \
         --sjdbGTFfile $gtf \
-        $args
 
 
     cat <<-END_VERSIONS > versions.yml
@@ -57,7 +58,5 @@ process STAR_ALIGN {
         star: \$(STAR --version | sed -e "s/STAR_//g")
     END_VERSIONS
     """
-
-    
 }
 

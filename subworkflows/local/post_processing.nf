@@ -1,8 +1,10 @@
 include { SAMTOOLS_NAME_SORT } from '../../modules/local/samtools/samtools_name_sort/main'
+include { SAMTOOLS_INDEX } from '../../modules/local/samtools/samtools_index/main'
 include { BAM_TO_SQLITE } from '../../modules/local/bam_to_sqlite/main'
 include { EXTRACT_OFFSETS } from '../../modules/local/extract_offsets/main'
 include { BAM_TO_BED } from '../../modules/local/bam_to_bed/main'
 include { BEDGRAPH_TO_BIGWIG } from '../../modules/local/bedGraphToBigWig/main'
+include { FILTER_BAM } from '../../modules/local/filter_bam/main'
 
 
 workflow POST_PROCESSING {
@@ -23,8 +25,20 @@ workflow POST_PROCESSING {
     transcriptome_bam_bai_and_offsets = transcriptome_bams
         .join(EXTRACT_OFFSETS.out.offsets, by: [0])
 
-    genome_bam_bai_and_offsets = genome_bams
-        .join(EXTRACT_OFFSETS.out.offsets, by: [0])
+    // Run FILTER_BAM
+    FILTER_BAM(genome_bams)
+
+    genome_bams_filtered = FILTER_BAM.out.all_bams
+        .flatMap { meta, bams ->
+            bams.collect { bam ->
+                [meta, bam]
+            }
+        }.view()
+    
+    // Run SAMTOOLS_INDEX
+    SAMTOOLS_INDEX(genome_bams_filtered)
+    genome_bam_bai_and_offsets = genome_bams_filtered
+        .join(SAMTOOLS_INDEX.out.bam_and_bai, by: [0]).view()
 
     // Run BAM_TO_BED
     BAM_TO_BED(genome_bam_bai_and_offsets)
