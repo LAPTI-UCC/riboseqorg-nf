@@ -55,10 +55,10 @@ workflow fetch_data {
             newly_collapsed_reads = Channel.empty()
             collapsed_reads = LOCATE.out.collapsed_reads
             
-            // Warn about skipped runs that need processing
-            LOCATE.out.needs_processing.view { run -> 
-                log.warn "Run $run needs processing but fetch is set to false. This run will be skipped."
-            }
+            // // Warn about skipped runs that need processing
+            // LOCATE.out.needs_processing.view { run -> 
+            //     log.warn "Run $run needs processing but fetch is set to false. This run will be skipped."
+            // }
         }
 
         // Combine existing collapsed reads with newly processed ones

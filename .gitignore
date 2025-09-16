@@ -200,3 +200,5 @@ work/
 
 conda_cache/
 *-reports.tsv
+
+ignore_file

@@ -51,7 +51,7 @@ workflow {
 
     // Alignment (only for samples that passed QC)
     ALIGNMENT(
-        QUALITY_CONTROL.out.passed_samples,
+        QUALITY_CONTROL.out.clean_samples,
         params.star_index,
         params.bowtie_index,
         params.rRNA_index,

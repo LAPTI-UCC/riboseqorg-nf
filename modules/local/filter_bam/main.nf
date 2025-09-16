@@ -19,7 +19,7 @@ process FILTER_BAM {
     tuple val(meta), path("${prefix}.unique_non_juntion_mapped.bam"),   emit: unique_non_juntion_mapped
     tuple val(meta), path("${prefix}.max_10mm_juntion_mapped.bam"),          emit: max_10mm_juntion_mapped
     tuple val(meta), path("${prefix}.max_10mm_non_juntion_mapped.bam"),      emit: max_10mm_non_juntion_mapped
-    tuple val(meta), path("${prefix}*.bam"),                 emit: max_10mm_bams
+    tuple val(meta), path("${prefix}*.bam"),                 emit: all_bams
     path "versions.yml",                                     emit: versions
 
     when:

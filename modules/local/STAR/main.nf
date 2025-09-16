@@ -4,10 +4,14 @@ process STAR_ALIGN {
     tag "$meta.id"
     label 'high'
 
+    errorStrategy { task.attempt <= 3 ? 'retry' : 'ignore' }
+    maxRetries 3
+    maxForks 10
+
     conda "bioconda::star=2.7.10a"
 
     // Add publishing directives
-    publishDir path: "${params.outdir}/star_align", mode: 'link', saveAs: { 
+    publishDir path: "${params.outdir}/star_align", mode: 'copy', saveAs: { 
         filename -> if (filename.endsWith('toTranscriptome.out.bam')) return "transcriptome_bam/$filename" 
         else if  (filename.endsWith('.bam')) return "bam/$filename"
         else if (filename.endsWith('.out')) return "logs/$filename" else null 

@@ -44,7 +44,6 @@ process FASTP {
         -o ${prefix}_clipped_final.fastq.gz \\
         $args \\
         --length_required 20 \\
-        --auto_detect_adapter \\
         --json ${prefix}_auto_fastp.json \\
         --html ${prefix}_auto_fastp.html \\
         --thread $task.cpus

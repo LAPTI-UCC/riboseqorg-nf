@@ -1,8 +1,10 @@
-process GET_RPF {
+process CHECK_CLEANLINESS {
     tag "${meta.id}"
     label 'process_medium'
 
-    publishDir "${params.outdir}/getRPF", mode: 'copy'
+    publishDir "${params.outdir}/getRPF/check", mode: 'copy'
+
+    // errorStrategy 'ignore' 
 
     input:
     tuple val(meta), path(input_file)
@@ -17,14 +19,11 @@ process GET_RPF {
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    getRPF check ${input_file} \\
+    getRPF check-cleanliness ${input_file} \\
         --format collapsed \\
-        --output ${prefix}_report.txt \\
-        --count-pattern "${count_pattern}" \\
+        --output . \\
         $args
 
-    # Assuming getRPF writes the RPF check results to a file named ${prefix}_rpf_checks.txt
-    # If not, you may need to modify this part based on how getRPF actually outputs this information
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
