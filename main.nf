@@ -8,7 +8,6 @@ include { QUALITY_CONTROL } from './subworkflows/local/quality_control'
 include { ALIGNMENT } from './subworkflows/local/alignment'
 include { POST_PROCESSING } from './subworkflows/local/post_processing'
 include { ANALYSIS } from './subworkflows/local/analysis'
-// include { BOWTIE_RRNA } from './modules/local/bowtie.nf'
 
 // Log the parameters
 log.info """\
@@ -20,8 +19,7 @@ log.info """\
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 ||  Sample Sheet    : ${params.sample_sheet}                                     
 ||  outDir          : ${params.outdir}                                        
-||  workDir         : ${workflow.workDir}   
-||  outdir       : ${params.outdir}                                     
+||  workDir         : ${workflow.workDir}                             
 =+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
 
 """
@@ -67,7 +65,7 @@ workflow {
     )
 
     // Analysis
-    // ANALYSIS(ALIGNMENT.out.transcriptome_bam, params.ribometric_annotation)
+    ANALYSIS(ALIGNMENT.out.transcriptome_bam, params.ribometric_annotation)
 }
 
 workflow.onComplete {
