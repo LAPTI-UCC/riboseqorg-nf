@@ -42,4 +42,16 @@ process BOWTIE_REMOVE {
         bowtie: \$(echo \$(bowtie --version 2>&1) | sed 's/^.*bowtie-align-s version //; s/ .*\$//')
     END_VERSIONS
     """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    touch ${prefix}_lessrRNA.fq
+    touch ${prefix}_bowtie_alignment_stats.log
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        bowtie: 1.3.1
+    END_VERSIONS
+    """
 }

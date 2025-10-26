@@ -1,0 +1,37 @@
+params {
+    // Output directory
+    outdir = "./results"
+
+    // Reference genome paths (update these to your local paths)
+    star_index = null
+    bowtie_index = null
+    rRNA_index = null
+    gtf = null
+    genome_fasta = null
+    chrom_sizes_file = null
+    ribometric_annotation = null
+    annotation_sqlite = null
+
+    // Alignment parameters
+    mismatches = 3
+    alignment_type = "EndToEnd"
+    allow_introns = true
+
+    // Sample sheet (use test data by default)
+    sample_sheet = "${projectDir}/test-data/test-sample-sheet.csv"
+
+    // Adapter finding
+    use_architecture_detection = false  // Enable to use getRPF architecture detection
+
+    // Data fetching
+    fetch = false
+    force_fetch = false
+    collapsed_read_path = null
+    collapsed_read_header_pattern = 'seq{id}_x{count}'
+
+    // Output options
+    save_star_transcriptome_bam = false
+
+    // Trimming
+    trim_front = 0  // Number of bases to trim from 5' end
+}

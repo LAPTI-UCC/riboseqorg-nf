@@ -1,7 +1,7 @@
 process COLLAPSE_FASTQ {
     tag "$meta.id"
 
-    conda "${projectDir}/modules/local/collapse/RDP-tools.yml"
+    conda "${projectDir}/conda/RDP-tools.yml"
 
     errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
@@ -28,6 +28,6 @@ process COLLAPSE_FASTQ {
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_collapsed.fastq.gz 
+    touch ${prefix}_collapsed.fa.gz
     """
 }

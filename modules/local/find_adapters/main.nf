@@ -24,7 +24,7 @@ process FIND_ADAPTERS {
     """
     python3 $projectDir/bin/get_adapters.py \\
         -i $fastqc_data \\
-        -a $projectDir/scripts/adapter_list.tsv \\
+        -a $projectDir/resources/adapter_list.tsv \\
         -o "${prefix}_adapter_report.fa" \\
         $args
 

@@ -1,7 +1,0 @@
-name: fastq_dl
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - python >=3.7,<3.11
-  - fastq-dl

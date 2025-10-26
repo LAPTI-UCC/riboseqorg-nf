@@ -2,7 +2,6 @@ name: riboseq-env
 channels:
   - conda-forge
   - bioconda
-  - defaults
 dependencies:
   - python=3.10.13
   - pip

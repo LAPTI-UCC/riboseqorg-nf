@@ -1,6 +1,0 @@
-name: ucsc
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-- ucsc-bedgraphtobigwig

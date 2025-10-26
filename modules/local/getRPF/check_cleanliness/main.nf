@@ -2,6 +2,8 @@ process CHECK_CLEANLINESS {
     tag "${meta.id}"
     label 'process_medium'
 
+    conda "${projectDir}/conda/getRPF.yml"
+
     publishDir "${params.outdir}/getRPF/check", mode: 'copy'
 
     // errorStrategy 'ignore' 

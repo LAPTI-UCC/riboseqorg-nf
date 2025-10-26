@@ -1,6 +1,0 @@
-#!/bin/bash
-#
-# Usage: bash clean
-#
-
-rm -rf .nextflow* report.html* trace*

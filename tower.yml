@@ -1,4 +1,0 @@
-
-reports:
-    "*fastqc.html":
-        display: FastQC

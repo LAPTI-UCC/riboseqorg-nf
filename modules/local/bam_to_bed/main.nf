@@ -2,6 +2,8 @@ process BAM_TO_BED {
     tag "${meta.id}"
     label 'process_high'
 
+    conda "conda-forge::python=3.9 bioconda::pysam bioconda::samtools conda-forge::biopython"
+
     publishDir "$params.outdir/bedgraphs", mode: 'copy'
 
     input:

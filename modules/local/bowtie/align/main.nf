@@ -48,4 +48,18 @@ process BOWTIE_ALIGN_SORT {
         samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
     END_VERSIONS
     """
+
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    """
+    touch ${prefix}.bam
+    touch ${prefix}.bam.bai
+    touch ${meta.id}_bowtie_alignment_stats.log
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        bowtie: 1.3.1
+        samtools: 1.21
+    END_VERSIONS
+    """
 }

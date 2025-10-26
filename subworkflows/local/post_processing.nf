@@ -42,7 +42,7 @@ workflow POST_PROCESSING {
         .combine(EXTRACT_OFFSETS.out.offsets.map { meta, offsets -> offsets })
         .map { bam_meta, bam, bai, offsets -> 
             [bam_meta, bam, bai, offsets] 
-        }.view()
+        }
     // Run BAM_TO_BED
     BAM_TO_BED(genome_bam_bai_and_offsets)
 

@@ -4,6 +4,8 @@ process RIBOMETRIC {
     tag "${meta.id}"
     label 'process_medium'
 
+    conda "${projectDir}/conda/ribometric.yml"
+
 	publishDir "$params.outdir/RiboMetric", mode: 'copy'
 
     errorStrategy { task.attempt <= 1 ? 'retry' : 'ignore' }

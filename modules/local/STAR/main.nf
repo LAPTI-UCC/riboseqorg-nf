@@ -8,7 +8,7 @@ process STAR_ALIGN {
     maxRetries 3
     maxForks 10
 
-    conda "bioconda::star=2.7.10a"
+    conda "bioconda::star=2.7.11b"
 
     // Add publishing directives
     publishDir path: "${params.outdir}/star_align", mode: 'copy', saveAs: { 
@@ -45,7 +45,7 @@ process STAR_ALIGN {
         --runThreadN ${task.cpus} \
         --outSAMtype BAM SortedByCoordinate \
         --outSAMattributes NH HI AS nM \
-        --outFilterMultimapNmax 10 \
+        --outFilterMultimapNmax ${params.max_multimappers} \
         --outFilterMismatchNmax ${params.mismatches} \
         --readFilesCommand $unzip_command \
         $output_transcriptome_bam \
@@ -62,5 +62,18 @@ process STAR_ALIGN {
         star: \$(STAR --version | sed -e "s/STAR_//g")
     END_VERSIONS
     """
-}
 
+    stub:
+    def prefix = task.ext.prefix ?: "${meta.id}"
+    def output_transcriptome = params.save_star_transcriptome_bam ? "touch ${prefix}.Aligned.toTranscriptome.out.bam" : ""
+    """
+    touch ${prefix}.Aligned.sortedByCoord.out.bam
+    ${output_transcriptome}
+    touch ${prefix}.Log.final.out
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        star: 2.7.10a
+    END_VERSIONS
+    """
+}

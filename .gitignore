@@ -202,3 +202,15 @@ conda_cache/
 *-reports.tsv
 
 ignore_file
+
+# Implementation docs (not user documentation)
+docs/
+
+# Test output from stub runs
+test_output/
+
+# Test FASTQ data for getRPF/seqspec testing
+test-data/test_data/
+
+# User-specific params (use params.config.template as starting point)
+params.config

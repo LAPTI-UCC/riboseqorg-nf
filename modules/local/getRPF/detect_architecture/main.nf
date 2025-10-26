@@ -2,6 +2,8 @@
       tag "${meta.id}"
       label 'process_medium'
 
+      conda "${projectDir}/conda/getRPF.yml"
+
       publishDir "${params.outdir}/getRPF/detect", mode: 'copy'
 
     //   errorStrategy 'ignore'
