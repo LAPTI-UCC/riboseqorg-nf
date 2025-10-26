@@ -39,7 +39,7 @@ workflow POST_PROCESSING {
     SAMTOOLS_INDEX(genome_bams_filtered)
 
     genome_bam_bai_and_offsets = SAMTOOLS_INDEX.out.bam_and_bai
-        .combine(EXTRACT_OFFSETS.out.offsets.map { meta, offsets -> offsets })
+        .join(EXTRACT_OFFSETS.out.offsets.map { meta, offsets -> offsets })
         .map { bam_meta, bam, bai, offsets -> 
             [bam_meta, bam, bai, offsets] 
         }
