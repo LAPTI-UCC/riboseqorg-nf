@@ -214,3 +214,5 @@ test-data/test_data/
 
 # User-specific params (use params.config.template as starting point)
 params.config
+
+results/

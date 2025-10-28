@@ -34,7 +34,7 @@ workflow collapse {
             }
 
         // Run FastQC on downloaded FastQ files (always run for QC purposes)
-        FASTQC(fastq_files, adapter_list)
+        FASTQC(fastq_files, params.adapter_list)
 
         // Branch workflow based on architecture detection setting
         use_arch_detect = params.use_architecture_detection ?: false
@@ -75,8 +75,9 @@ workflow collapse {
             FASTP(FASTQ_DL.out.fastq, FIND_ADAPTERS.out.adapter_report)
 
             // Collapse FastQ files
-            final_collapsed = COLLAPSE_FASTQ(FASTP.out.trimmed_fastq).out.collapsed_fastq
-
+            COLLAPSE_FASTQ(FASTP.out.trimmed_fastq)
+            final_collapsed = COLLAPSE_FASTQ.out.collapsed_fastq
+            
             multiqc_files = Channel.empty()
                 .mix(FASTQC.out.zip.map { meta, file -> file })
                 .mix(FASTP.out.json_provided.map { meta, file -> file })
