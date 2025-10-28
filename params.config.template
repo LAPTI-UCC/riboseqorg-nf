@@ -6,6 +6,8 @@ params {
     star_index = null
     bowtie_index = null
     rRNA_index = null
+    rrna_removal_method = 'bowtie' // Options: 'bowtie' or 'ribodetector'
+    ribodetector_args = ''
     gtf = null
     genome_fasta = null
     chrom_sizes_file = null

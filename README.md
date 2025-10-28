@@ -247,6 +247,14 @@ This step aligns reads to the transcriptome and genome.
   # --sjdbGTFfile: Gene annotation GTF file
   ```
 
+- `rRNA removal`: Filter reads mapping to rRNA using Bowtie or RiboDetector
+  - Selection: set `params.rrna_removal_method` to `bowtie` (default) or `ribodetector`.
+  - Input reference: provide `params.rRNA_index`.
+    - For `bowtie`, this should be a Bowtie1 index directory (e.g., files like `*.ebwt`).
+    - For `ribodetector`, this should be an rRNA FASTA file, or a directory containing one.
+  - Outputs: `*_lessrRNA.fq` and a method-specific log under `results/bowtie_remove` or `results/ribodetector_remove`.
+  - Optional: pass extra CLI flags to RiboDetector via `params.ribodetector_args`.
+
 - `BOWTIE_ALIGN_SORT`: Aligns reads to reference using Bowtie
   ```bash
   # Command:
@@ -1042,4 +1050,3 @@ chr1        1001   1002 18
 
 #### BigWig Files (`.bw`)
 Binary compressed format of the BedGraph data for efficient genome browser visualization.
-

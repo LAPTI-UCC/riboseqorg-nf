@@ -149,7 +149,6 @@ work/*
 nextflow.eml
 nextflow.iml
 Vagrantfile
-resources/*
 test/*
 tools/*
 tests_other
