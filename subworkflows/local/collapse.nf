@@ -45,9 +45,11 @@ workflow collapse {
 
             // Step 2: Detect architecture on collapsed reads
             DETECT_ARCHITECTURE(COLLAPSE_FASTQ_RAW.out.collapsed_fastq)
-
+            
+            fastq_with_adapters = FASTQ_DL.out.fastq
+                .join(DETECT_ARCHITECTURE.out.adapters, by: 0)
             // Step 4: Use FASTP with seqspec-derived adapters (same as traditional workflow!)
-            FASTP(FASTQ_DL.out.fastq, DETECT_ARCHITECTURE.out.adapters)
+            FASTP(fastq_with_adapters)
 
             // Step 5: Collapse the trimmed reads for final output
             COLLAPSE_FASTQ_TRIMMED(FASTP.out.trimmed_fastq)
