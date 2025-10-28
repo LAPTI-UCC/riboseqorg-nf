@@ -11,8 +11,7 @@ process FASTP {
     publishDir "${params.outdir}/fastp", mode: 'copy', pattern: '*_clipped.fastq.gz'
 
     input:
-    tuple val(meta), path(reads)
-    tuple val(meta2), path(adapter_fasta)
+    tuple val(meta), path(reads), path(adapter_fasta)
 
     output:
     tuple val(meta), path("*_clipped_provided.fastq.gz"), emit: trimmed_fastq_provided

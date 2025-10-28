@@ -50,8 +50,9 @@ workflow collapse {
             // Step 3: Process seqspec to extract adapter FASTA
             PROCESS_SEQSPEC(DETECT_ARCHITECTURE.out.seqspec)
 
+            fastq_with_adapters = FASTQ_DL.out.fastq.join(PROCESS_SEQSPEC.out.adapter_fasta, by: 0)
             // Step 4: Use FASTP with seqspec-derived adapters (same as traditional workflow!)
-            FASTP(FASTQ_DL.out.fastq, PROCESS_SEQSPEC.out.adapter_fasta)
+            FASTP(fastq_with_adapters)
 
             // Step 5: Collapse the trimmed reads for final output
             COLLAPSE_FASTQ_TRIMMED(FASTP.out.trimmed_fastq)
@@ -71,8 +72,11 @@ workflow collapse {
             // Traditional adapter finding workflow
             FIND_ADAPTERS(FASTQ_DL.out.fastq, FASTQC.out.txt)
 
+            fastq_with_adapters = FASTQ_DL.out.fastq
+                .join(FIND_ADAPTERS.out.adapter_report, by: 0)
+
             // Run FastP for trimming
-            FASTP(FASTQ_DL.out.fastq, FIND_ADAPTERS.out.adapter_report)
+            FASTP(fastq_with_adapters)
 
             // Collapse FastQ files
             COLLAPSE_FASTQ(FASTP.out.trimmed_fastq)
