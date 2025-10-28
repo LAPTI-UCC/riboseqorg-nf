@@ -13,6 +13,7 @@
 
       output:
       tuple val(meta), path("*.seqspec.yaml")           , emit: seqspec
+      tuple val(meta), path("*.adapters.fa")            , emit: adapters
       tuple val(meta), path("*.extraction_report.json") , emit: report
       tuple val(meta), path("*_rpfs.fastq")             , emit: rpfs, optional: true
       path "versions.yml"                               , emit: versions

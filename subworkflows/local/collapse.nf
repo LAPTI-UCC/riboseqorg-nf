@@ -11,7 +11,6 @@ include { COLLAPSE_FASTQ as COLLAPSE_FASTQ_RAW } from '../../modules/local/colla
 include { COLLAPSE_FASTQ as COLLAPSE_FASTQ_TRIMMED } from '../../modules/local/collapse/main.nf'
 include { FIND_ADAPTERS } from '../../modules/local/find_adapters/main.nf'
 include { DETECT_ARCHITECTURE } from '../../modules/local/getRPF/detect_architecture/main.nf'
-include { PROCESS_SEQSPEC } from '../../modules/local/getRPF/process_seqspec/main.nf'
 
 workflow collapse {
     take:
@@ -47,12 +46,9 @@ workflow collapse {
             // Step 2: Detect architecture on collapsed reads
             DETECT_ARCHITECTURE(COLLAPSE_FASTQ_RAW.out.collapsed_fastq)
 
-            // Step 3: Process seqspec to extract adapter FASTA
-            PROCESS_SEQSPEC(DETECT_ARCHITECTURE.out.seqspec)
-
             fastq_with_adapters = FASTQ_DL.out.fastq.join(PROCESS_SEQSPEC.out.adapter_fasta, by: 0)
             // Step 4: Use FASTP with seqspec-derived adapters (same as traditional workflow!)
-            FASTP(fastq_with_adapters)
+            FASTP(FASTQ_DL.out.fastq, DETECT_ARCHITECTURE.out.adapters)
 
             // Step 5: Collapse the trimmed reads for final output
             COLLAPSE_FASTQ_TRIMMED(FASTP.out.trimmed_fastq)

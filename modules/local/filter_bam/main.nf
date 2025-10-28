@@ -4,7 +4,7 @@ process FILTER_BAM {
     tag "$meta.id"
     label 'process_medium'
 
-    conda "bioconda::pysam=0.22.0"
+    conda "bioconda::pysam=0.23.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/pysam:0.22.0--py39h2e05bfa_0' :
         'biocontainers/pysam:0.22.0--py39h2e05bfa_0' }"
