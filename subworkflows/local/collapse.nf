@@ -46,7 +46,6 @@ workflow collapse {
             // Step 2: Detect architecture on collapsed reads
             DETECT_ARCHITECTURE(COLLAPSE_FASTQ_RAW.out.collapsed_fastq)
 
-            fastq_with_adapters = FASTQ_DL.out.fastq.join(PROCESS_SEQSPEC.out.adapter_fasta, by: 0)
             // Step 4: Use FASTP with seqspec-derived adapters (same as traditional workflow!)
             FASTP(FASTQ_DL.out.fastq, DETECT_ARCHITECTURE.out.adapters)
 
@@ -62,7 +61,6 @@ workflow collapse {
                 .mix(FASTQ_DL.out.versions)
                 .mix(FASTQC.out.versions)
                 .mix(DETECT_ARCHITECTURE.out.versions)
-                .mix(PROCESS_SEQSPEC.out.versions)
                 .mix(FASTP.out.versions)
         } else {
             // Traditional adapter finding workflow
