@@ -6,7 +6,7 @@ process BAM_TO_SQLITE {
 
 	publishDir "$params.outdir/sqlites", mode: 'copy'
 
-    conda "bioconda::pysam=0.23.3 conda-forge::sqlite=3.39.3"
+    conda "bioconda::pysam=0.23.3 conda-forge::sqlite=3.39.3 conda-forge::sqlitedict=2.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mulled-v2-9adca5a7d3b24119897cfc20386da6c7fa47bdab:77c1885b47edc369acef7665b99911ea8ddb73d4-0' :
         'quay.io/biocontainers/mulled-v2-9adca5a7d3b24119897cfc20386da6c7fa47bdab:77c1885b47edc369acef7665b99911ea8ddb73d4-0' }"

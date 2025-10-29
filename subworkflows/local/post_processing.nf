@@ -41,9 +41,9 @@ workflow POST_PROCESSING {
     EXTRACT_OFFSETS.out.offsets.view()
     
     genome_bam_bai_and_offsets = SAMTOOLS_INDEX.out.bam_and_bai
-        .join(EXTRACT_OFFSETS.out.offsets.map { meta, offsets -> offsets })
-        .map { bam_meta, bam, bai, offsets -> 
-            [bam_meta, bam, bai, offsets] 
+        .join(EXTRACT_OFFSETS.out.offsets, by: [0])
+        .map { meta, bam, bai, offsets -> 
+            [meta, bam, bai, offsets] 
         }
     // Run BAM_TO_BED
     BAM_TO_BED(genome_bam_bai_and_offsets)

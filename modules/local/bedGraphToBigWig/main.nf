@@ -4,6 +4,8 @@ process BEDGRAPH_TO_BIGWIG {
 
     publishDir "$params.outdir/bigwigs", mode: 'copy'
 
+    conda "bioconda::ucsc-bedgraphtobigwig"
+
     input:
     tuple val(meta), path(bedgraph)
     path chrom_sizes
