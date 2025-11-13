@@ -4,7 +4,7 @@ process COLLAPSE_FASTQ {
     conda "${projectDir}/conda/RDP-tools.yml"
     container "ghcr.io/lapti-ucc/riboseqorg-nf-rdp-tools:latest"
 
-    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+    label 'process_high'
 
     publishDir "${params.outdir}/collapsed_fa", mode: 'copy'
 

@@ -3,7 +3,7 @@
 
 process BOWTIE_ALIGN_SORT {
     tag "$meta.id"
-    label 'high'
+    label 'process_high'
 
     conda "bioconda::bowtie=1.3.1 bioconda::samtools=1.21"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
