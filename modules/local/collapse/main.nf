@@ -3,7 +3,7 @@ process COLLAPSE_FASTQ {
 
     conda "${projectDir}/conda/RDP-tools.yml"
 
-    errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
+    label 'process_high'
 
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/rdp-tools:1.0.0--pyhdfd78af_0' :

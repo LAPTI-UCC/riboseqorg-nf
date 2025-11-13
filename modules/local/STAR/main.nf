@@ -2,11 +2,7 @@
 
 process STAR_ALIGN {
     tag "$meta.id"
-    label 'high'
-
-    errorStrategy { task.attempt <= 3 ? 'retry' : 'ignore' }
-    maxRetries 3
-    maxForks 10
+    label 'process_high'
 
     conda "bioconda::star=2.7.11b"
 

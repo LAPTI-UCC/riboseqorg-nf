@@ -1,7 +1,7 @@
 process FIND_ADAPTERS {
     tag "$meta.id"
 
-    conda "conda-forge::python=3.9 conda-forge::biopython=1.79"
+    conda "conda-forge::python=3.9 conda-forge::biopython=1.79 conda-forge::pandas=1.3.3 conda-forge::numpy=1.21.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/python:3.9--1' :
         'biocontainers/python:3.9--1' }"

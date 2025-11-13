@@ -2,7 +2,7 @@
 
 process BOWTIE_REMOVE {
     tag "$meta.id"
-    label 'high'
+    label 'process_high'
 
     conda "bioconda::bowtie=1.3.1 bioconda::samtools=1.21"
 
