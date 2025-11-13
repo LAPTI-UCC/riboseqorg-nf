@@ -18,7 +18,8 @@ process BAM_TO_BED {
 
     script:
     def args = task.ext.args ?: ''
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    // Use BAM filename (without .bam extension) as prefix to preserve filtering type names
+    def prefix = task.ext.prefix ?: "${bam.baseName}"
     def is_stranded = args.contains('--stranded')
     """
     python3 $projectDir/bin/bam_to_bed.py \\
@@ -46,7 +47,8 @@ process BAM_TO_BED {
     """
 
     stub:
-    def prefix = task.ext.prefix ?: "${meta.id}"
+    // Use BAM filename (without .bam extension) as prefix to preserve filtering type names
+    def prefix = task.ext.prefix ?: "${bam.baseName}"
     def is_stranded = task.ext.args?.contains('--stranded') ?: false
     """
     if [ $is_stranded ]; then

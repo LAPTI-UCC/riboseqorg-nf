@@ -193,6 +193,12 @@ def filter_bam(input_bam: str,
     """
     Filter BAM file into 4 categories based on mapping and junction status.
 
+    Outputs are cumulative/hierarchical:
+    - unique_no_junction.bam: Most restrictive (NH=1, no junction)
+    - unique_with_junction.bam: Includes above + unique with junctions
+    - multi_no_junction.bam: Includes unique_no_junction + multi-mappers without junctions
+    - multi_with_junction.bam: Includes all reads (least restrictive)
+
     Args:
         input_bam: Path to input BAM file
         output_prefix: Prefix for output files
@@ -210,7 +216,7 @@ def filter_bam(input_bam: str,
     # Open output BAMs
     outputs = open_output_bams(output_prefix, inbam.header)
 
-    # Statistics
+    # Statistics (count unique reads per category)
     stats = defaultdict(int)
     stats['total'] = 0
 
@@ -226,11 +232,35 @@ def filter_bam(input_bam: str,
         # Classify read
         category = classify_read(read, max_multimappers)
 
-        if category:
-            outputs[category].write(read)
-            stats[category] += 1
-        else:
+        if not category:
             stats['skipped'] += 1
+            continue
+
+        # Write to appropriate output files based on cumulative hierarchy
+        if category == 'unique_no_junction':
+            # Most restrictive - write to all files
+            outputs['unique_no_junction'].write(read)
+            outputs['unique_with_junction'].write(read)
+            outputs['multi_no_junction'].write(read)
+            outputs['multi_with_junction'].write(read)
+            stats['unique_no_junction'] += 1
+
+        elif category == 'unique_with_junction':
+            # Write to files that allow junctions
+            outputs['unique_with_junction'].write(read)
+            outputs['multi_with_junction'].write(read)
+            stats['unique_with_junction'] += 1
+
+        elif category == 'multi_no_junction':
+            # Write to files that allow multi-mapping
+            outputs['multi_no_junction'].write(read)
+            outputs['multi_with_junction'].write(read)
+            stats['multi_no_junction'] += 1
+
+        elif category == 'multi_with_junction':
+            # Least restrictive - only write to multi_with_junction
+            outputs['multi_with_junction'].write(read)
+            stats['multi_with_junction'] += 1
 
     # Close files
     inbam.close()

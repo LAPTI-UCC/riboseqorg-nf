@@ -25,8 +25,11 @@ def tran_to_genome(tran, pos, transcriptome_info_dict):
 	Returns:
 		chrom: chromosome
 		genomic_pos: genomic position
+		or None if transcript not found
 
 	'''
+	if tran not in transcriptome_info_dict:
+		return None
 	traninfo = transcriptome_info_dict[tran]
 	chrom = traninfo["chrom"]
 	strand = traninfo["strand"]
@@ -70,21 +73,21 @@ def get_read_count(readname):
         return 1
 
 
-def processor(process_chunk, master_read_dict, transcriptome_info_dict, master_dict, readseq, unambig_read_length_dict):
+def processor(process_chunk, master_read_dict, transcriptome_info_dict, master_dict, readseq, unambig_read_length_dict, missing_transcripts):
     '''
     Takes a dictionary with a readname as key and a list of lists as value,
     each sub list has consists of two elements a transcript and the position
-    the read aligns to in the transcript. This function will count the number 
-    of genes that the transcripts correspond to and if less than or equal 
+    the read aligns to in the transcript. This function will count the number
+    of genes that the transcripts correspond to and if less than or equal
     to 3 will add the relevant value to transcript_counts_dict
     '''
     readlen = len(readseq)
     ambiguously_mapped_reads = 0
     read = list(process_chunk)[0]
-    
+
     # Get count for collapsed reads
     read_count = get_read_count(read)
-    
+
     read_list = process_chunk[read]
     genomic_positions = []
 
@@ -92,23 +95,32 @@ def processor(process_chunk, master_read_dict, transcriptome_info_dict, master_d
         tran = listname[0].replace("-","_").replace("(","").replace(")","")
         pos = int(listname[1])
         genomic_pos = tran_to_genome(tran, pos, transcriptome_info_dict)
+        if genomic_pos is None:
+            if tran not in missing_transcripts:
+                missing_transcripts.add(tran)
+            continue
         if genomic_pos not in genomic_positions:
             genomic_positions.append(genomic_pos)
 
     if len(genomic_positions) == 1:
         if readlen not in unambig_read_length_dict:
-            unambig_read_length_dict[readlen] = 0 
+            unambig_read_length_dict[readlen] = 0
         unambig_read_length_dict[readlen] += read_count
         coding = False
 
         for listname in process_chunk[read]:
             tran = listname[0].replace("-","_").replace("(","").replace(")","")
+            # Skip if transcript not in annotation
+            if tran not in transcriptome_info_dict:
+                if tran not in missing_transcripts:
+                    missing_transcripts.add(tran)
+                continue
             if tran not in master_read_dict:
                 master_read_dict[tran] = {"ambig":{}, "unambig":{}, "mismatches":{}, "seq":{}}
             pos = int(listname[1])
             read_tags = listname[2]
             nm_tag = 0
-        
+
             for tag in read_tags:
                 if tag[0] == "NM":
                     nm_tag = int(tag[1])
@@ -116,9 +128,9 @@ def processor(process_chunk, master_read_dict, transcriptome_info_dict, master_d
                 md_tag = ""
                 for tag in read_tags:
                     if tag[0] == "MD":
-                        md_tag = tag[1] 
+                        md_tag = tag[1]
                 pos_modifier, readlen_modifier, mismatches = get_mismatch_pos(md_tag, pos, readlen, master_read_dict, tran, readseq)
-                
+
                 for mismatch in mismatches:
                     if mismatch != 0:
                         char = mismatches[mismatch]
@@ -132,7 +144,7 @@ def processor(process_chunk, master_read_dict, transcriptome_info_dict, master_d
             try:
                 cds_start = transcriptome_info_dict[tran]["cds_start"]
                 cds_stop = transcriptome_info_dict[tran]["cds_stop"]
-                
+
                 if pos >= cds_start and pos <= cds_stop:
                     coding = True
             except:
@@ -155,6 +167,11 @@ def processor(process_chunk, master_read_dict, transcriptome_info_dict, master_d
         ambiguously_mapped_reads += read_count
         for listname in process_chunk[read]:
             tran = listname[0].replace("-","_").replace("(","").replace(")","")
+            # Skip if transcript not in annotation
+            if tran not in transcriptome_info_dict:
+                if tran not in missing_transcripts:
+                    missing_transcripts.add(tran)
+                continue
             if tran not in master_read_dict:
                 master_read_dict[tran] = {"ambig":{}, "unambig":{}, "mismatches":{}, "seq":{}}
             pos = int(listname[1])
@@ -300,6 +317,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_trip_dict = {"fiveprime":{}, "threeprime":{}}
 	master_offset_dict = {"fiveprime":{}, "threeprime":{}}
 	master_metagene_stop_dict = {"fiveprime":{}, "threeprime":{}}
+	missing_transcripts = set()
 
 	pysam.set_verbosity(0)
 	infile = pysam.Samfile(bam_filepath, "rb")
@@ -369,7 +387,7 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 						if dist not in threeprime_nuc_count_dict["mapped"][readlen]:
 							threeprime_nuc_count_dict["mapped"][readlen][dist] = {"A":0, "T":0, "G":0, "C":0, "N":0}
 						threeprime_nuc_count_dict["mapped"][readlen][dist][seq[dist]] += read_count
-					ambiguously_mapped_reads += processor(process_chunk, master_read_dict, transcriptome_info_dict,master_dict,prev_seq, unambig_read_length_dict)
+					ambiguously_mapped_reads += processor(process_chunk, master_read_dict, transcriptome_info_dict,master_dict,prev_seq, unambig_read_length_dict, missing_transcripts)
 				process_chunk = {readname:[[tran, pos, read_tags]]}
 				prev_seq = read.seq
 		else:
@@ -405,7 +423,12 @@ def process_bam(bam_filepath, transcriptome_info_dict_path,outputfile):
 	master_dict["mapped_reads"] = mapped_reads
 	master_dict["unmapped_reads"] = unmapped_reads
 	master_dict["ambiguously_mapped_reads"] = ambiguously_mapped_reads
-	
+
+	# Warn about missing transcripts
+	if missing_transcripts:
+		print(f"WARNING: {len(missing_transcripts)} transcript(s) found in BAM file but not in annotation database.")
+		print(f"These transcripts were skipped. First 10 examples: {sorted(list(missing_transcripts))[:10]}")
+
 	if "read_name" in master_read_dict:
 		del master_read_dict["read_name"]
 
