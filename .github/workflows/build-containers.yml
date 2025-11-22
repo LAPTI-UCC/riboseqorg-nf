@@ -26,7 +26,7 @@ jobs:
 
     strategy:
       matrix:
-        container: [getRPF, RiboMetric, RDP-tools, bam-to-sqlite, python-pandas-sqlite]
+        container: [getRPF, RiboMetric, RDP-tools, bam-to-sqlite, python-pandas-sqlite, bam-to-bed]
 
     steps:
       - name: Checkout repository
@@ -141,6 +141,7 @@ jobs:
             - `${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-rdp-tools:latest`
             - `${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-bam-to-sqlite:latest`
             - `${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-python-pandas-sqlite:latest`
+            - `${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-bam-to-bed:latest`
 
             ## Singularity Images
             Download the `.sif` files from the release assets below.

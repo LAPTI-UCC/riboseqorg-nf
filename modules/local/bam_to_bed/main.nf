@@ -2,10 +2,10 @@ process BAM_TO_BED {
     tag "${meta.id}"
     label 'process_high'
 
-    conda "conda-forge::python=3.9 bioconda::pysam bioconda::samtools conda-forge::biopython conda-forge::numpy"
+    conda "conda-forge::python=3.9 bioconda::pysam=0.23.3 bioconda::samtools=1.20 conda-forge::biopython conda-forge::numpy"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-708d403ee924b0b5423ad00c984dd8f8c3207a0e:2d9f51fa62ab0d8d3e9e07e35e1cc47e7f97e0f3-0' :
-        'biocontainers/mulled-v2-708d403ee924b0b5423ad00c984dd8f8c3207a0e:2d9f51fa62ab0d8d3e9e07e35e1cc47e7f97e0f3-0' }"
+        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/bam-to-bed.sif' :
+        'ghcr.io/jackcurragh/riboseqorg-nf-bam-to-bed:latest' }"
 
     publishDir "$params.outdir/bedgraphs", mode: 'copy'
 
