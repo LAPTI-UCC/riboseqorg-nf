@@ -5,6 +5,9 @@ process EXTRACT_OFFSETS {
     label 'process_medium'
 
     conda "conda-forge::python=3.9 conda-forge::sqlite=3.39.3 conda-forge::pandas conda-forge::sqlitedict=2.1.0"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/python:3.9' :
+        'biocontainers/python:3.9' }"
 
     publishDir "$params.outdir/offsets", mode: 'copy'
 

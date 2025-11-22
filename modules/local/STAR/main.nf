@@ -9,6 +9,9 @@ process STAR_ALIGN {
     maxForks 10
 
     conda "bioconda::star=2.7.11b"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/star:2.7.11b--h43eeafb_1' :
+        'biocontainers/star:2.7.11b--h43eeafb_1' }"
 
     // Add publishing directives
     publishDir path: "${params.outdir}/star_align", mode: 'copy', saveAs: { 
