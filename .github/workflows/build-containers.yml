@@ -16,7 +16,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ${{ github.repository_owner }}/riboseqorg-nf
 
 jobs:
   build-and-push:
@@ -33,6 +32,18 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      #######################################################################
+      # Lowercase the GitHub repository owner (avoids OCI reference errors)
+      #######################################################################
+      - name: Lowercase owner
+        id: owner
+        run: |
+          OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "owner=${OWNER_LOWER}" >> $GITHUB_OUTPUT
+
+      #######################################################################
+      # Lowercase container name
+      #######################################################################
       - name: Generate lowercase container name
         id: lowercase
         run: |
@@ -49,11 +60,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      #######################################################################
+      # Metadata for Docker images
+      #######################################################################
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ steps.lowercase.outputs.name }}
+          images: ${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-${{ steps.lowercase.outputs.name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -62,6 +76,9 @@ jobs:
             type=sha,prefix={{branch}}-
             type=raw,value=latest,enable={{is_default_branch}}
 
+      #######################################################################
+      # Build + push Docker image
+      #######################################################################
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -73,25 +90,32 @@ jobs:
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
 
+      #######################################################################
+      # Install Singularity/Apptainer
+      #######################################################################
       - name: Install Singularity
         uses: eWaterCycle/setup-singularity@v7
         with:
           singularity-version: 3.8.7
 
+      #######################################################################
+      # Build Singularity image from the Docker image (lowercase safe)
+      #######################################################################
       - name: Build Singularity image
         run: |
-          # Get the main image tag (latest or branch name) - must be lowercase
-          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ steps.lowercase.outputs.name }}:latest"
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-${{ steps.lowercase.outputs.name }}:latest"
 
-          # Pull the Docker image
           singularity pull docker://${IMAGE_TAG}
 
-          # Rename to standardized name
-          mv riboseqorg-nf-${{ steps.lowercase.outputs.name }}_latest.sif ${{ matrix.container }}.sif
+          mv riboseqorg-nf-${{ steps.lowercase.outputs.name }}_latest.sif \
+             ${{ matrix.container }}.sif
 
           echo "Built Singularity image: ${{ matrix.container }}.sif"
           ls -lh ${{ matrix.container }}.sif
 
+      #######################################################################
+      # Upload Singularity image as CI artifact
+      #######################################################################
       - name: Upload Singularity image as artifact
         uses: actions/upload-artifact@v4
         with:
@@ -99,6 +123,9 @@ jobs:
           path: ${{ matrix.container }}.sif
           retention-days: 90
 
+      #######################################################################
+      # Release the Singularity images on main branch
+      #######################################################################
       - name: Create release and upload Singularity images
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v1
@@ -108,30 +135,18 @@ jobs:
           body: |
             Automated build of container images for riboseqorg-nf
 
-            ## Available Containers
+            ## Docker Images (multi-arch: amd64, arm64)
+            - `${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-getrpf:latest`
+            - `${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-ribometric:latest`
+            - `${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-rdp-tools:latest`
+            - `${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-bam-to-sqlite:latest`
 
-            ### Docker Images (multi-arch: amd64, arm64)
-            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-getrpf:latest`
-            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-ribometric:latest`
-            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-rdp-tools:latest`
-            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-bam-to-sqlite:latest`
-
-            ### Singularity Images
+            ## Singularity Images
             Download the `.sif` files from the release assets below.
-
-            ## Usage with Nextflow
-
-            Add to your `nextflow.config`:
-            ```
-            singularity.enabled = true
-            singularity.cacheDir = './singularity'
-            ```
 
             Commit: ${{ github.sha }}
             Date: ${{ github.event.head_commit.timestamp }}
           files: |
             ${{ matrix.container }}.sif
-          draft: false
-          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
