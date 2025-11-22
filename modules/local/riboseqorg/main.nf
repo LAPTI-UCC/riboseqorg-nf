@@ -23,10 +23,10 @@ process BAM_TO_SQLITE {
 
 process GWIPS_INSERTS {
 
-	conda "conda-forge::python=3.9"
+	conda "conda-forge::python=3.9 conda-forge::pandas conda-forge::sqlite"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.9' :
-        'biocontainers/python:3.9' }"
+        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/python-pandas-sqlite.sif' :
+        'ghcr.io/jackcurragh/riboseqorg-nf-python-pandas-sqlite:latest' }"
 
 	publishDir "$params.outdir/gwips_inserts", mode: 'copy', pattern: '*.sql'
 
@@ -45,10 +45,10 @@ process GWIPS_INSERTS {
 
 process TRIPS_INSERTS {
 
-	conda "conda-forge::python=3.9"
+	conda "conda-forge::python=3.9 conda-forge::pandas conda-forge::sqlite"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.9' :
-        'biocontainers/python:3.9' }"
+        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/python-pandas-sqlite.sif' :
+        'ghcr.io/jackcurragh/riboseqorg-nf-python-pandas-sqlite:latest' }"
 
 	publishDir "$params.outdir/trips_inserts", mode: 'copy', pattern: '*.sql'
 

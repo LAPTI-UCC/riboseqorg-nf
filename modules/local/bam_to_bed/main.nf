@@ -2,10 +2,10 @@ process BAM_TO_BED {
     tag "${meta.id}"
     label 'process_high'
 
-    conda "conda-forge::python=3.9 bioconda::pysam bioconda::samtools conda-forge::biopython"
+    conda "conda-forge::python=3.9 bioconda::pysam bioconda::samtools conda-forge::biopython conda-forge::numpy"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3:c84c7c55c45af231883d9ff4fe706ac44c479c36-0' :
-        'biocontainers/mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3:c84c7c55c45af231883d9ff4fe706ac44c479c36-0' }"
+        'https://depot.galaxyproject.org/singularity/mulled-v2-708d403ee924b0b5423ad00c984dd8f8c3207a0e:2d9f51fa62ab0d8d3e9e07e35e1cc47e7f97e0f3-0' :
+        'biocontainers/mulled-v2-708d403ee924b0b5423ad00c984dd8f8c3207a0e:2d9f51fa62ab0d8d3e9e07e35e1cc47e7f97e0f3-0' }"
 
     publishDir "$params.outdir/bedgraphs", mode: 'copy'
 
