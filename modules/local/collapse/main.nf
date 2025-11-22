@@ -3,8 +3,8 @@ process COLLAPSE_FASTQ {
 
     conda "${projectDir}/conda/RDP-tools.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/RDP-tools.sif' :
-        'ghcr.io/jackcurragh/riboseqorg-nf-rdp-tools:latest' }"
+        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/RDP-tools.sif' :
+        'ghcr.io/lapti-ucc/riboseqorg-nf-rdp-tools:latest' }"
 
     errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 

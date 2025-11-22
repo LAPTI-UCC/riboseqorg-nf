@@ -265,19 +265,19 @@ echo "----------------------------"
 # Test custom containers with Docker
 if [ "$HAS_DOCKER" = true ]; then
     # These might fail if not built yet - don't count as failures
-    if ! test_docker_container "ghcr.io/jackcurragh/riboseqorg-nf-getrpf:latest" "getRPF" 2>/dev/null; then
+    if ! test_docker_container "ghcr.io/lapti-ucc/riboseqorg-nf-getrpf:latest" "getRPF" 2>/dev/null; then
         echo -e "${YELLOW}  Note: getRPF container not found. Build it first with GitHub Actions.${NC}"
         ((FAILED--))  # Don't count this as a failure
         ((SKIPPED++))
     fi
 
-    if ! test_docker_container "ghcr.io/jackcurragh/riboseqorg-nf-ribometric:latest" "RiboMetric" 2>/dev/null; then
+    if ! test_docker_container "ghcr.io/lapti-ucc/riboseqorg-nf-ribometric:latest" "RiboMetric" 2>/dev/null; then
         echo -e "${YELLOW}  Note: RiboMetric container not found. Build it first with GitHub Actions.${NC}"
         ((FAILED--))
         ((SKIPPED++))
     fi
 
-    if ! test_docker_container "ghcr.io/jackcurragh/riboseqorg-nf-rdp-tools:latest" "RDP-tools" 2>/dev/null; then
+    if ! test_docker_container "ghcr.io/lapti-ucc/riboseqorg-nf-rdp-tools:latest" "RDP-tools" 2>/dev/null; then
         echo -e "${YELLOW}  Note: RDP-tools container not found. Build it first with GitHub Actions.${NC}"
         ((FAILED--))
         ((SKIPPED++))

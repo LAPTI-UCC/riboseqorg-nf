@@ -6,8 +6,8 @@ process RIBOMETRIC {
 
     conda "${projectDir}/conda/ribometric.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/RiboMetric.sif' :
-        'ghcr.io/jackcurragh/riboseqorg-nf-ribometric:latest' }"
+        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/RiboMetric.sif' :
+        'ghcr.io/lapti-ucc/riboseqorg-nf-ribometric:latest' }"
 
 	publishDir "$params.outdir/RiboMetric", mode: 'copy'
 

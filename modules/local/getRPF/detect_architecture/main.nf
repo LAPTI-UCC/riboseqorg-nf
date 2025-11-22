@@ -4,8 +4,8 @@
 
       conda "${projectDir}/conda/getRPF.yml"
       container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-          'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/getRPF.sif' :
-          'ghcr.io/jackcurragh/riboseqorg-nf-getrpf:latest' }"
+          'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/getRPF.sif' :
+          'ghcr.io/lapti-ucc/riboseqorg-nf-getrpf:latest' }"
 
       publishDir "${params.outdir}/getRPF/detect", mode: 'copy'
 

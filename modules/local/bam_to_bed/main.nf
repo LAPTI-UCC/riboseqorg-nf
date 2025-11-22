@@ -4,8 +4,8 @@ process BAM_TO_BED {
 
     conda "conda-forge::python=3.9 bioconda::pysam=0.23.3 bioconda::samtools=1.20 conda-forge::biopython conda-forge::numpy"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/bam-to-bed.sif' :
-        'ghcr.io/jackcurragh/riboseqorg-nf-bam-to-bed:latest' }"
+        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/bam-to-bed.sif' :
+        'ghcr.io/lapti-ucc/riboseqorg-nf-bam-to-bed:latest' }"
 
     publishDir "$params.outdir/bedgraphs", mode: 'copy'
 

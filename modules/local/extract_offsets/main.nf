@@ -6,8 +6,8 @@ process EXTRACT_OFFSETS {
 
     conda "conda-forge::python=3.9 conda-forge::sqlite=3.39.3 conda-forge::pandas conda-forge::sqlitedict=2.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/python-pandas-sqlite.sif' :
-        'ghcr.io/jackcurragh/riboseqorg-nf-python-pandas-sqlite:latest' }"
+        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/python-pandas-sqlite.sif' :
+        'ghcr.io/lapti-ucc/riboseqorg-nf-python-pandas-sqlite:latest' }"
 
     publishDir "$params.outdir/offsets", mode: 'copy'
 

@@ -8,8 +8,8 @@ process BAM_TO_SQLITE {
 
     conda "bioconda::pysam=0.23.3 conda-forge::sqlite=3.39.3 conda-forge::sqlitedict=2.1.0"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/bam-to-sqlite.sif' :
-        'ghcr.io/jackcurragh/riboseqorg-nf-bam-to-sqlite:latest' }"
+        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/bam-to-sqlite.sif' :
+        'ghcr.io/lapti-ucc/riboseqorg-nf-bam-to-sqlite:latest' }"
 
     input:
     tuple val(meta), path(sorted_bam)
