@@ -6,7 +6,7 @@ LABEL description="BAM to BED converter with pysam, samtools, numpy, and biopyth
 
 # Install required packages
 RUN mamba install -y -c conda-forge -c bioconda \
-    python=3.9 \
+    python=3.11 \
     pysam=0.23.3 \
     samtools=1.20 \
     numpy \
