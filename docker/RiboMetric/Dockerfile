@@ -4,12 +4,13 @@ LABEL description="RiboMetric container for ribosome profiling QC" \
       author="Jack Curragh" \
       version="1.0"
 
-# Install conda packages
+# Install conda packages (includes pre-compiled binaries to avoid build issues)
 RUN mamba install -y -c conda-forge -c bioconda \
     python=3.10 \
     pip \
     biopython \
-    pysam && \
+    pysam \
+    git && \
     mamba clean -a -y
 
 # Install RiboMetric from GitHub

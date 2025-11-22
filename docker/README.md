@@ -169,9 +169,13 @@ Check the GitHub Actions logs:
 3. Expand the failed step to see error messages
 
 Common issues:
+- **"gcc not found" or compilation errors**: Install dependencies via conda instead of pip (see [TROUBLESHOOTING.md](TROUBLESHOOTING.md#issue-arm64-build-fails-with-gcc-not-found))
 - **Pip install fails**: The GitHub repository might be unavailable or have breaking changes
 - **Conda package conflicts**: Adjust package versions in the Dockerfile
 - **Docker build timeout**: The base image or packages are too large
+- **ARM64 build fails**: Use conda packages which provide pre-compiled binaries for all architectures
+
+**Pro tip:** See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed solutions to common build issues.
 
 ### Container Pull Fails in Pipeline
 
