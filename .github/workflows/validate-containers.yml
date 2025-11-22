@@ -33,12 +33,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract container URLs from modules
+      - name: Extract container URLs from modules (Quay only)
         id: extract
         run: |
           echo "Extracting BioContainers..."
+
+          # Find occurrences like: biocontainers/fastp:0.23.4--h1234
+          # Rewrite to quay.io/biocontainers/fastp:0.23.4--h1234
           biocontainers=$(grep -r "biocontainers/" modules/ | \
-            grep -o "biocontainers/[^'\"]*" | sort -u | jq -R -s -c 'split("\n")[:-1]')
+            grep -o "biocontainers/[^'\"]*" | sort -u | \
+            sed 's|^|quay.io/|' | jq -R -s -c 'split("\n")[:-1]')
+
           echo "biocontainers=$biocontainers" >> $GITHUB_OUTPUT
 
           echo "Extracting custom Docker containers..."
@@ -51,52 +56,9 @@ jobs:
             grep -o "https://github.com/[^'\"]*\.sif" | sort -u | jq -R -s -c 'split("\n")[:-1]')
           echo "custom_singularity=$custom_singularity" >> $GITHUB_OUTPUT
 
-  validate-biocontainers:
-    name: Validate BioContainers
-    needs: extract-containers
-    runs-on: ubuntu-latest
-    if: needs.extract-containers.outputs.biocontainers != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        container: ${{ fromJson(needs.extract-containers.outputs.biocontainers) }}
-
-    steps:
-      - name: Pull Docker container
-        run: |
-          echo "Testing: docker://${{ matrix.container }}"
-          docker pull ${{ matrix.container }}
-
-      - name: Test container runs
-        run: |
-          TOOL=$(echo "${{ matrix.container }}" | cut -d'/' -f2 | cut -d':' -f1)
-          echo "Testing tool: $TOOL"
-
-          case $TOOL in
-            samtools|bowtie|fastp|fastqc|star|multiqc)
-              docker run --rm ${{ matrix.container }} $TOOL --version || \
-              docker run --rm ${{ matrix.container }} $TOOL -v || \
-              docker run --rm ${{ matrix.container }} $TOOL --help
-              ;;
-            fastq-dl)
-              docker run --rm ${{ matrix.container }} fastq-dl --version
-              ;;
-            pysam)
-              docker run --rm ${{ matrix.container }} python -c "import pysam; print(pysam.__version__)"
-              ;;
-            ribodetector)
-              docker run --rm ${{ matrix.container }} ribodetector --help
-              ;;
-            ucsc-bedgraphtobigwig)
-              docker run --rm ${{ matrix.container }} bedGraphToBigWig 2>&1 | head -5
-              ;;
-            *)
-              docker run --rm ${{ matrix.container }} echo "Container runs successfully"
-              ;;
-          esac
 
   validate-biocontainers-singularity:
-    name: Validate BioContainers (Singularity)
+    name: Validate BioContainers (Singularity, Quay only)
     needs: extract-containers
     runs-on: ubuntu-latest
     if: needs.extract-containers.outputs.biocontainers != '[]'
@@ -111,12 +73,13 @@ jobs:
         with:
           singularity-version: ${{ env.SINGULARITY_VERSION }}
 
-      - name: Pull and test Singularity container
+      - name: Pull and test Singularity container from Quay
         run: |
+          echo "Pulling docker://${{ matrix.container }}"
           singularity pull test-container.sif docker://${{ matrix.container }}
 
-          TOOL=$(echo "${{ matrix.container }}" | cut -d'/' -f2 | cut -d':' -f1)
-          echo "Testing $TOOL"
+          TOOL=$(basename "${{ matrix.container }}" | cut -d':' -f1)
+          echo "Testing tool: $TOOL"
 
           case $TOOL in
             samtools|bowtie|fastp|fastqc|star|multiqc)
@@ -141,6 +104,7 @@ jobs:
               ;;
           esac
 
+
   validate-custom-docker:
     name: Validate Custom Docker Containers
     needs: extract-containers
@@ -160,8 +124,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull Docker container
-        run: |
-          docker pull ${{ matrix.container }}
+        run: docker pull ${{ matrix.container }}
 
       - name: Test custom container
         run: |
@@ -173,6 +136,7 @@ jobs:
             docker run --rm ${{ matrix.container }} RDP-Tools --version || \
             docker run --rm ${{ matrix.container }} python -c "import RDP_Tools"
           fi
+
 
   validate-custom-singularity:
     name: Validate Custom Singularity Containers
@@ -211,19 +175,17 @@ jobs:
             singularity exec test-container.sif python -c "import RDP_Tools"
           fi
 
+
   validate-container-definitions:
     name: Validate Container Definitions in Modules
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Check all modules have container directives
         run: |
-          echo "Checking for container directives..."
           MISSING=()
-
           for module in $(find modules/local -name "main.nf"); do
             if grep -q "^process " "$module"; then
               if ! grep -q "^\s*container\s*\"" "$module"; then
@@ -233,42 +195,35 @@ jobs:
             fi
           done
 
-          if [ ${#MISSING[@]} -ne 0 ]; then
-            printf '%s\n' "${MISSING[@]}"
-            exit 1
-          fi
-
-          echo "All modules have container directives."
+          [[ ${#MISSING[@]} -eq 0 ]] || exit 1
 
       - name: Validate container URL formats
         run: |
-          echo "Validating container URL formats..."
+          echo "Validating container URLs..."
+
           INVALID=()
 
           for module in $(find modules/local -name "main.nf"); do
-            # Accept only: container "<something>"
-            if grep -E '^\s*container\s+"[^"]+"' "$module" > /dev/null; then
-              continue
-            fi
-
-            # If a container directive exists but doesn't match valid pattern → flag it
             if grep -q "^\s*container\s" "$module"; then
-              echo "❌ Malformed container directive: $module"
-              INVALID+=("$module")
+
+              # Valid patterns:
+              #   container "docker://quay.io/biocontainers/<tool>:<tag>"
+              #   container "<any other quoted URL>"
+              if ! grep -E '^\s*container\s+"(docker://quay\.io/biocontainers/[^"]+|[^"]+)"' "$module" > /dev/null; then
+                echo "❌ Malformed container directive: $module"
+                INVALID+=("$module")
+              fi
             fi
           done
 
-          if [ ${#INVALID[@]} -ne 0 ]; then
-            printf '%s\n' "${INVALID[@]}"
-            exit 1
-          fi
+          [[ ${#INVALID[@]} -eq 0 ]] || exit 1
 
-          echo "All container URL formats are valid!"
+          echo "All container definitions are valid!"
+
 
   summary:
     name: Validation Summary
     needs: [
-      validate-biocontainers,
       validate-biocontainers-singularity,
       validate-custom-docker,
       validate-custom-singularity,
@@ -278,12 +233,11 @@ jobs:
     if: always()
 
     steps:
-      - name: Report results
+      - name: Summarise results
         run: |
           echo "## Container Validation Summary" >> $GITHUB_STEP_SUMMARY
 
           declare -A JOBS=(
-            ["BioContainers (Docker)"]="${{ needs.validate-biocontainers.result }}"
             ["BioContainers (Singularity)"]="${{ needs.validate-biocontainers-singularity.result }}"
             ["Custom Docker"]="${{ needs.validate-custom-docker.result }}"
             ["Custom Singularity"]="${{ needs.validate-custom-singularity.result }}"
@@ -292,13 +246,11 @@ jobs:
 
           for label in "${!JOBS[@]}"; do
             result=${JOBS[$label]}
-            if [ "$result" == "success" ]; then
+            if [[ "$result" == "success" ]]; then
               echo "✅ $label: PASSED" >> $GITHUB_STEP_SUMMARY
-            elif [ "$result" == "skipped" ]; then
+            elif [[ "$result" == "skipped" ]]; then
               echo "⏭️ $label: SKIPPED" >> $GITHUB_STEP_SUMMARY
             else
               echo "❌ $label: FAILED" >> $GITHUB_STEP_SUMMARY
             fi
           done
-
-          echo "See job logs for details." >> $GITHUB_STEP_SUMMARY
