@@ -1,10 +1,10 @@
 process FIND_ADAPTERS {
     tag "$meta.id"
 
-    conda "conda-forge::python=3.9 conda-forge::biopython=1.79"
+    conda "conda-forge::python=3.11 conda-forge::biopython conda-forge::pandas"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/python:3.9--1' :
-        'biocontainers/python:3.9--1' }"
+        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/python-pandas-sqlite.sif' :
+        'ghcr.io/jackcurragh/riboseqorg-nf-python-pandas-sqlite:latest' }"
 
     publishDir "${params.outdir}/adapter_reports", mode: 'copy'
     
