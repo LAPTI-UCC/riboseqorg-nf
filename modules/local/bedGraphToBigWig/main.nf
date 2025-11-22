@@ -4,10 +4,10 @@ process BEDGRAPH_TO_BIGWIG {
 
     publishDir "$params.outdir/bigwigs", mode: 'copy'
 
-    conda "bioconda::ucsc-bedgraphtobigwig"
+    conda "bioconda::ucsc-bedgraphtobigwig=469"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/ucsc-bedgraphtobigwig:469--h2a80c09_0' :
-        'biocontainers/ucsc-bedgraphtobigwig:469--h2a80c09_0' }"
+        'https://depot.galaxyproject.org/singularity/ucsc-bedgraphtobigwig:469--h9b8f530_0' :
+        'biocontainers/ucsc-bedgraphtobigwig:469--h9b8f530_0' }"
 
     input:
     tuple val(meta), path(bedgraph)

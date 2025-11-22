@@ -3,10 +3,10 @@
 process CUTADAPT {
 	publishDir "${params.outdir}/trimmed", mode: 'copy'
 
-    conda "bioconda::cutadapt=4.9"
+    conda "bioconda::cutadapt=5.2"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/cutadapt:4.9--py39hf95cd2a_1' :
-        'biocontainers/cutadapt:4.9--py39hf95cd2a_1' }"
+        'https://depot.galaxyproject.org/singularity/cutadapt:5.2--py39hbcbf7aa_0' :
+        'biocontainers/cutadapt:5.2--py39hbcbf7aa_0' }"
 
     errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
 
