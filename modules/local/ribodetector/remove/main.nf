@@ -4,6 +4,9 @@ process RIBODETECTOR_REMOVE {
 
     // Provide a minimal Python + pip env; users can pin/override via profiles
     conda "bioconda::ribodetector"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/ribodetector:0.3.2--pyhdfd78af_0' :
+        'biocontainers/ribodetector:0.3.2--pyhdfd78af_0' }"
 
     publishDir path: "${params.outdir}/ribodetector_remove", mode: 'link', saveAs: {
         filename -> if (filename.endsWith('.fq')) return "fastq/$filename"

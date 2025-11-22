@@ -4,6 +4,11 @@
 process LOCATE {
     tag "$run"
 
+    // This process only does file checks and symlinks, minimal bash container
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/ubuntu:22.04' :
+        'ubuntu:22.04' }"
+
     input:
     tuple val(meta), val(run)
 
