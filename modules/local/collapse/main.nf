@@ -2,12 +2,11 @@ process COLLAPSE_FASTQ {
     tag "$meta.id"
 
     conda "${projectDir}/conda/RDP-tools.yml"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://github.com/JackCurragh/riboseqorg-nf/releases/download/containers-latest/RDP-tools.sif' :
+        'ghcr.io/jackcurragh/riboseqorg-nf-rdp-tools:latest' }"
 
     errorStrategy  { task.attempt <= maxRetries  ? 'retry' :  'ignore' }
-
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/rdp-tools:1.0.0--pyhdfd78af_0' :
-        'biocontainers/rdp-tools:1.0.0--pyhdfd78af_0' }"
 
     publishDir "${params.outdir}/collapsed_fa", mode: 'copy'
 

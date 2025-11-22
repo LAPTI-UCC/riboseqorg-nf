@@ -1,0 +1,130 @@
+name: Build and Push Containers
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docker/**'
+      - '.github/workflows/build-containers.yml'
+  workflow_dispatch:
+    inputs:
+      container:
+        description: 'Specific container to build (getRPF, RiboMetric, RDP-tools, or all)'
+        required: false
+        default: 'all'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository_owner }}/riboseqorg-nf
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        container: [getRPF, RiboMetric, RDP-tools]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.container }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./docker/${{ matrix.container }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Install Singularity
+        uses: eWaterCycle/setup-singularity@v7
+        with:
+          singularity-version: 3.8.7
+
+      - name: Build Singularity image
+        run: |
+          # Get the main image tag (latest or branch name)
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.container }}:latest"
+
+          # Pull the Docker image
+          singularity pull docker://${IMAGE_TAG}
+
+          # Rename to standardized name
+          mv riboseqorg-nf-${{ matrix.container }}_latest.sif ${{ matrix.container }}.sif
+
+          echo "Built Singularity image: ${{ matrix.container }}.sif"
+          ls -lh ${{ matrix.container }}.sif
+
+      - name: Upload Singularity image as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.container }}-singularity
+          path: ${{ matrix.container }}.sif
+          retention-days: 90
+
+      - name: Create release and upload Singularity images
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: containers-${{ github.sha }}
+          name: Container Images - ${{ github.sha }}
+          body: |
+            Automated build of container images for riboseqorg-nf
+
+            ## Available Containers
+
+            ### Docker Images (multi-arch: amd64, arm64)
+            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-getRPF:latest`
+            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-RiboMetric:latest`
+            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-RDP-tools:latest`
+
+            ### Singularity Images
+            Download the `.sif` files from the release assets below.
+
+            ## Usage with Nextflow
+
+            Add to your `nextflow.config`:
+            ```
+            singularity.enabled = true
+            singularity.cacheDir = './singularity'
+            ```
+
+            Commit: ${{ github.sha }}
+            Date: ${{ github.event.head_commit.timestamp }}
+          files: |
+            ${{ matrix.container }}.sif
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
