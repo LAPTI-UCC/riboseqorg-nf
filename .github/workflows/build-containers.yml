@@ -27,11 +27,17 @@ jobs:
 
     strategy:
       matrix:
-        container: [getRPF, RiboMetric, RDP-tools]
+        container: [getRPF, RiboMetric, RDP-tools, bam-to-sqlite]
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Generate lowercase container name
+        id: lowercase
+        run: |
+          CONTAINER_LOWER=$(echo "${{ matrix.container }}" | tr '[:upper:]' '[:lower:]')
+          echo "name=${CONTAINER_LOWER}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -47,7 +53,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.container }}
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ steps.lowercase.outputs.name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -74,14 +80,14 @@ jobs:
 
       - name: Build Singularity image
         run: |
-          # Get the main image tag (latest or branch name)
-          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ matrix.container }}:latest"
+          # Get the main image tag (latest or branch name) - must be lowercase
+          IMAGE_TAG="${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ steps.lowercase.outputs.name }}:latest"
 
           # Pull the Docker image
           singularity pull docker://${IMAGE_TAG}
 
           # Rename to standardized name
-          mv riboseqorg-nf-${{ matrix.container }}_latest.sif ${{ matrix.container }}.sif
+          mv riboseqorg-nf-${{ steps.lowercase.outputs.name }}_latest.sif ${{ matrix.container }}.sif
 
           echo "Built Singularity image: ${{ matrix.container }}.sif"
           ls -lh ${{ matrix.container }}.sif
@@ -105,9 +111,10 @@ jobs:
             ## Available Containers
 
             ### Docker Images (multi-arch: amd64, arm64)
-            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-getRPF:latest`
-            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-RiboMetric:latest`
-            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-RDP-tools:latest`
+            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-getrpf:latest`
+            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-ribometric:latest`
+            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-rdp-tools:latest`
+            - `${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-bam-to-sqlite:latest`
 
             ### Singularity Images
             Download the `.sif` files from the release assets below.

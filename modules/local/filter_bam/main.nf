@@ -6,8 +6,8 @@ process FILTER_BAM {
 
     conda "bioconda::pysam=0.23.3"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/pysam:0.22.0--py39h2e05bfa_0' :
-        'biocontainers/pysam:0.22.0--py39h2e05bfa_0' }"
+        'https://depot.galaxyproject.org/singularity/pysam:0.23.3--py39hdd5828d_0' :
+        'biocontainers/pysam:0.23.3--py39hdd5828d_0' }"
 
     publishDir "${params.outdir}/filtered_bams", mode: 'copy'
 
