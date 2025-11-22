@@ -2,9 +2,7 @@ process FIND_ADAPTERS {
     tag "$meta.id"
 
     conda "conda-forge::python=3.11 conda-forge::biopython conda-forge::pandas"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/python-pandas-sqlite.sif' :
-        'ghcr.io/lapti-ucc/riboseqorg-nf-python-pandas-sqlite:latest' }"
+    container "ghcr.io/lapti-ucc/riboseqorg-nf-python-pandas-sqlite:latest"
 
     publishDir "${params.outdir}/adapter_reports", mode: 'copy'
     

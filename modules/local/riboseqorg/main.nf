@@ -3,9 +3,7 @@
 process BAM_TO_SQLITE {
 
 	conda "bioconda::pysam=0.23.3 conda-forge::sqlite=3.39.3 conda-forge::sqlitedict=2.1.0"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/bam-to-sqlite.sif' :
-        'ghcr.io/lapti-ucc/riboseqorg-nf-bam-to-sqlite:latest' }"
+    container "ghcr.io/lapti-ucc/riboseqorg-nf-bam-to-sqlite:latest"
 
 	publishDir "$params.outdir/sqlites", mode: 'copy', pattern: '*.sqlite'
 
@@ -24,9 +22,7 @@ process BAM_TO_SQLITE {
 process GWIPS_INSERTS {
 
 	conda "conda-forge::python=3.9 conda-forge::pandas conda-forge::sqlite"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/python-pandas-sqlite.sif' :
-        'ghcr.io/lapti-ucc/riboseqorg-nf-python-pandas-sqlite:latest' }"
+    container "ghcr.io/lapti-ucc/riboseqorg-nf-python-pandas-sqlite:latest"
 
 	publishDir "$params.outdir/gwips_inserts", mode: 'copy', pattern: '*.sql'
 
@@ -46,9 +42,7 @@ process GWIPS_INSERTS {
 process TRIPS_INSERTS {
 
 	conda "conda-forge::python=3.9 conda-forge::pandas conda-forge::sqlite"
-    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://github.com/lapti-ucc/riboseqorg-nf/releases/download/containers-latest/python-pandas-sqlite.sif' :
-        'ghcr.io/lapti-ucc/riboseqorg-nf-python-pandas-sqlite:latest' }"
+    container "ghcr.io/lapti-ucc/riboseqorg-nf-python-pandas-sqlite:latest"
 
 	publishDir "$params.outdir/trips_inserts", mode: 'copy', pattern: '*.sql'
 
