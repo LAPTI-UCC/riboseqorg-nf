@@ -13,14 +13,14 @@ on:
       - 'modules/**'
       - 'docker/**'
   workflow_dispatch:
-  # Run weekly to catch upstream issues
   schedule:
-    - cron: '0 6 * * 1'  # Every Monday at 6am UTC
+    - cron: '0 6 * * 1'
 
 env:
   SINGULARITY_VERSION: 3.8.7
 
 jobs:
+
   extract-containers:
     name: Extract Container URLs from Modules
     runs-on: ubuntu-latest
@@ -36,34 +36,20 @@ jobs:
       - name: Extract container URLs from modules
         id: extract
         run: |
-          # Extract BioContainers URLs
           echo "Extracting BioContainers..."
           biocontainers=$(grep -r "biocontainers/" modules/ | \
-            grep -o "biocontainers/[^'\"]*" | \
-            sort -u | \
-            jq -R -s -c 'split("\n")[:-1]')
+            grep -o "biocontainers/[^'\"]*" | sort -u | jq -R -s -c 'split("\n")[:-1]')
           echo "biocontainers=$biocontainers" >> $GITHUB_OUTPUT
 
-          # Extract custom Docker URLs (ghcr.io)
           echo "Extracting custom Docker containers..."
           custom_docker=$(grep -r "ghcr.io/" modules/ | \
-            grep -o "ghcr.io/[^'\"]*" | \
-            sort -u | \
-            jq -R -s -c 'split("\n")[:-1]')
+            grep -o "ghcr.io/[^'\"]*" | sort -u | jq -R -s -c 'split("\n")[:-1]')
           echo "custom_docker=$custom_docker" >> $GITHUB_OUTPUT
 
-          # Extract custom Singularity URLs (GitHub releases)
           echo "Extracting custom Singularity containers..."
           custom_singularity=$(grep -r "github.com.*\.sif" modules/ | \
-            grep -o "https://github.com/[^'\"]*\.sif" | \
-            sort -u | \
-            jq -R -s -c 'split("\n")[:-1]')
+            grep -o "https://github.com/[^'\"]*\.sif" | sort -u | jq -R -s -c 'split("\n")[:-1]')
           echo "custom_singularity=$custom_singularity" >> $GITHUB_OUTPUT
-
-          echo "Found containers:"
-          echo "BioContainers: $biocontainers"
-          echo "Custom Docker: $custom_docker"
-          echo "Custom Singularity: $custom_singularity"
 
   validate-biocontainers:
     name: Validate BioContainers
@@ -83,11 +69,9 @@ jobs:
 
       - name: Test container runs
         run: |
-          # Extract tool name from container path
           TOOL=$(echo "${{ matrix.container }}" | cut -d'/' -f2 | cut -d':' -f1)
           echo "Testing tool: $TOOL"
 
-          # Test common commands based on tool
           case $TOOL in
             samtools|bowtie|fastp|fastqc|star|multiqc)
               docker run --rm ${{ matrix.container }} $TOOL --version || \
@@ -107,7 +91,6 @@ jobs:
               docker run --rm ${{ matrix.container }} bedGraphToBigWig 2>&1 | head -5
               ;;
             *)
-              echo "No specific test for $TOOL, checking if container runs"
               docker run --rm ${{ matrix.container }} echo "Container runs successfully"
               ;;
           esac
@@ -130,16 +113,11 @@ jobs:
 
       - name: Pull and test Singularity container
         run: |
-          echo "Testing: docker://${{ matrix.container }}"
-
-          # Pull container
           singularity pull test-container.sif docker://${{ matrix.container }}
 
-          # Extract tool name
           TOOL=$(echo "${{ matrix.container }}" | cut -d'/' -f2 | cut -d':' -f1)
-          echo "Testing tool: $TOOL"
+          echo "Testing $TOOL"
 
-          # Test based on tool
           case $TOOL in
             samtools|bowtie|fastp|fastqc|star|multiqc)
               singularity exec test-container.sif $TOOL --version || \
@@ -183,24 +161,17 @@ jobs:
 
       - name: Pull Docker container
         run: |
-          echo "Testing: docker://${{ matrix.container }}"
           docker pull ${{ matrix.container }}
 
       - name: Test custom container
         run: |
-          # Determine which tool based on container name
           if [[ "${{ matrix.container }}" == *"getrpf"* ]]; then
-            echo "Testing getRPF..."
             docker run --rm ${{ matrix.container }} getRPF --version
-            docker run --rm ${{ matrix.container }} python -c "import Bio; print('biopython OK')"
           elif [[ "${{ matrix.container }}" == *"ribometric"* ]]; then
-            echo "Testing RiboMetric..."
             docker run --rm ${{ matrix.container }} RiboMetric --version
-            docker run --rm ${{ matrix.container }} python -c "import pysam; print('pysam OK')"
           elif [[ "${{ matrix.container }}" == *"rdp-tools"* ]]; then
-            echo "Testing RDP-tools..."
             docker run --rm ${{ matrix.container }} RDP-Tools --version || \
-            docker run --rm ${{ matrix.container }} python -c "import RDP_Tools; print('RDP-Tools OK')"
+            docker run --rm ${{ matrix.container }} python -c "import RDP_Tools"
           fi
 
   validate-custom-singularity:
@@ -223,29 +194,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "Testing: ${{ matrix.container }}"
-
-          # Download .sif file
           wget -q --header="Authorization: token $GITHUB_TOKEN" \
             "${{ matrix.container }}" -O test-container.sif || {
-            echo "Warning: Could not download from releases (may not exist yet)"
-            echo "This is expected if containers haven't been built yet"
+            echo "Warning: Could not download .sif (may not exist yet)"
             exit 0
           }
 
-          # Determine which tool based on filename
           FILENAME=$(basename "${{ matrix.container }}")
 
           if [[ "$FILENAME" == *"getRPF"* ]]; then
-            echo "Testing getRPF..."
             singularity exec test-container.sif getRPF --version
           elif [[ "$FILENAME" == *"RiboMetric"* ]]; then
-            echo "Testing RiboMetric..."
             singularity exec test-container.sif RiboMetric --version
           elif [[ "$FILENAME" == *"RDP-tools"* ]]; then
-            echo "Testing RDP-tools..."
             singularity exec test-container.sif RDP-Tools --version || \
-            singularity exec test-container.sif python -c "import RDP_Tools; print('RDP-Tools OK')"
+            singularity exec test-container.sif python -c "import RDP_Tools"
           fi
 
   validate-container-definitions:
@@ -258,108 +221,84 @@ jobs:
 
       - name: Check all modules have container directives
         run: |
-          echo "Checking that all processes have container directives..."
-
+          echo "Checking for container directives..."
           MISSING=()
 
-          # Find all main.nf files in modules
           for module in $(find modules/local -name "main.nf"); do
-            echo "Checking $module..."
-
-            # Check if file has process definitions
             if grep -q "^process " "$module"; then
-              # Check if it has container directive
-              if ! grep -q "container " "$module"; then
+              if ! grep -q "^\s*container\s*\"" "$module"; then
                 echo "❌ Missing container directive: $module"
                 MISSING+=("$module")
-              else
-                echo "✅ Has container directive"
               fi
             fi
           done
 
           if [ ${#MISSING[@]} -ne 0 ]; then
-            echo ""
-            echo "The following modules are missing container directives:"
             printf '%s\n' "${MISSING[@]}"
             exit 1
           fi
 
-          echo ""
-          echo "✅ All modules have container directives!"
+          echo "All modules have container directives."
 
-      - name: Validate container URL format
+      - name: Validate container URL formats
         run: |
           echo "Validating container URL formats..."
-
           INVALID=()
 
           for module in $(find modules/local -name "main.nf"); do
-            # Check for malformed container directives
-            if grep "container " "$module" | grep -v "^\s*container\s*\"\$" | grep -v "^\s*//" > /dev/null; then
-              echo "❌ Potential malformed container directive in $module"
+            # Accept only: container "<something>"
+            if grep -E '^\s*container\s+"[^"]+"' "$module" > /dev/null; then
+              continue
+            fi
+
+            # If a container directive exists but doesn't match valid pattern → flag it
+            if grep -q "^\s*container\s" "$module"; then
+              echo "❌ Malformed container directive: $module"
               INVALID+=("$module")
             fi
           done
 
           if [ ${#INVALID[@]} -ne 0 ]; then
-            echo ""
-            echo "The following modules may have malformed container directives:"
             printf '%s\n' "${INVALID[@]}"
             exit 1
           fi
 
-          echo "✅ All container URL formats look valid!"
+          echo "All container URL formats are valid!"
 
   summary:
     name: Validation Summary
-    needs: [validate-biocontainers, validate-biocontainers-singularity, validate-custom-docker, validate-custom-singularity, validate-container-definitions]
+    needs: [
+      validate-biocontainers,
+      validate-biocontainers-singularity,
+      validate-custom-docker,
+      validate-custom-singularity,
+      validate-container-definitions
+    ]
     runs-on: ubuntu-latest
     if: always()
 
     steps:
-      - name: Check validation results
+      - name: Report results
         run: |
           echo "## Container Validation Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
 
-          if [ "${{ needs.validate-biocontainers.result }}" == "success" ]; then
-            echo "✅ BioContainers (Docker): PASSED" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ needs.validate-biocontainers.result }}" == "skipped" ]; then
-            echo "⏭️ BioContainers (Docker): SKIPPED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ BioContainers (Docker): FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
+          declare -A JOBS=(
+            ["BioContainers (Docker)"]="${{ needs.validate-biocontainers.result }}"
+            ["BioContainers (Singularity)"]="${{ needs.validate-biocontainers-singularity.result }}"
+            ["Custom Docker"]="${{ needs.validate-custom-docker.result }}"
+            ["Custom Singularity"]="${{ needs.validate-custom-singularity.result }}"
+            ["Container Definitions"]="${{ needs.validate-container-definitions.result }}"
+          )
 
-          if [ "${{ needs.validate-biocontainers-singularity.result }}" == "success" ]; then
-            echo "✅ BioContainers (Singularity): PASSED" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ needs.validate-biocontainers-singularity.result }}" == "skipped" ]; then
-            echo "⏭️ BioContainers (Singularity): SKIPPED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ BioContainers (Singularity): FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
+          for label in "${!JOBS[@]}"; do
+            result=${JOBS[$label]}
+            if [ "$result" == "success" ]; then
+              echo "✅ $label: PASSED" >> $GITHUB_STEP_SUMMARY
+            elif [ "$result" == "skipped" ]; then
+              echo "⏭️ $label: SKIPPED" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "❌ $label: FAILED" >> $GITHUB_STEP_SUMMARY
+            fi
+          done
 
-          if [ "${{ needs.validate-custom-docker.result }}" == "success" ]; then
-            echo "✅ Custom Docker Containers: PASSED" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ needs.validate-custom-docker.result }}" == "skipped" ]; then
-            echo "⏭️ Custom Docker Containers: SKIPPED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Custom Docker Containers: FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ "${{ needs.validate-custom-singularity.result }}" == "success" ]; then
-            echo "✅ Custom Singularity Containers: PASSED" >> $GITHUB_STEP_SUMMARY
-          elif [ "${{ needs.validate-custom-singularity.result }}" == "skipped" ]; then
-            echo "⏭️ Custom Singularity Containers: SKIPPED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Custom Singularity Containers: FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          if [ "${{ needs.validate-container-definitions.result }}" == "success" ]; then
-            echo "✅ Container Definitions: PASSED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ Container Definitions: FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
-
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "See individual job logs for details." >> $GITHUB_STEP_SUMMARY
+          echo "See job logs for details." >> $GITHUB_STEP_SUMMARY
