@@ -6,11 +6,11 @@ LABEL description="BAM to SQLite converter with pysam and sqlitedict" \
 
 # Install required packages
 RUN mamba install -y -c conda-forge -c bioconda \
-    python=3.9 \
+    python=3.11 \
     pysam=0.23.3 \
-    sqlite=3.39.3 \
-    sqlitedict=2.1.0 && \
-    mamba clean -a -y
+    sqlite \
+    sqlitedict \
+ && mamba clean -a -y
 
 # Set working directory
 WORKDIR /data
