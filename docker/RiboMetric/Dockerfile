@@ -15,7 +15,7 @@ RUN mamba install -y -c conda-forge -c bioconda \
  && mamba clean -a -y
 
 # Install RiboMetric from GitHub safely
-RUN pip install --no-cache-dir --no-deps \
+RUN pip install \
     git+https://github.com/JackCurragh/RiboMetric.git
 
 WORKDIR /data
