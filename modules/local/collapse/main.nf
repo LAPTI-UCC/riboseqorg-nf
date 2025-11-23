@@ -12,19 +12,18 @@ process COLLAPSE_FASTQ {
     tuple val(meta), path(fastq)
 
     output:
-    tuple val(meta), path("*collapsed.fa.gz"), emit: collapsed_fastq
+    tuple val(meta), path("*collapsed.fa"), emit: collapsed_fasta
 
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
     RDP-Tools collapse $args $fastq
-    gzip *fastq.collapsed.fa
     """ 
 
     stub:
     def prefix = task.ext.prefix ?: "${meta.id}"
     """
-    touch ${prefix}_collapsed.fa.gz
+    touch ${prefix}_collapsed.fa
     """
 }

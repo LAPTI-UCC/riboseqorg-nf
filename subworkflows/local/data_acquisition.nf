@@ -53,7 +53,7 @@ workflow DATA_ACQUISITION {
         
         // Run the collapse workflow
         collapse(needs_processing)
-        newly_collapsed_reads = collapse.out.collapsed_fastq
+        newly_collapsed_reads = collapse.out.collapsed_fasta
     } else {
         if (params.force_fetch) {
             // fetch = false, force_fetch = true

@@ -12,6 +12,7 @@ RUN mamba install -y -c conda-forge -c bioconda \
     psutil \
     pysam \
     click \
+    rich \
  && mamba clean -a -y
 
 # Install RiboSeq-DP-Tools from PyPI (use --no-deps, avoid pip overriding conda libs)

@@ -44,7 +44,7 @@ workflow collapse {
             COLLAPSE_FASTQ_RAW(FASTQ_DL.out.fastq)
 
             // Step 2: Detect architecture on collapsed reads
-            DETECT_ARCHITECTURE(COLLAPSE_FASTQ_RAW.out.collapsed_fastq)
+            DETECT_ARCHITECTURE(COLLAPSE_FASTQ_RAW.out.collapsed_fasta)
             
             fastq_with_adapters = FASTQ_DL.out.fastq
                 .join(DETECT_ARCHITECTURE.out.adapters, by: 0)
@@ -53,7 +53,7 @@ workflow collapse {
 
             // Step 5: Collapse the trimmed reads for final output
             COLLAPSE_FASTQ_TRIMMED(FASTP.out.trimmed_fastq)
-            final_collapsed = COLLAPSE_FASTQ_TRIMMED.out.collapsed_fastq
+            final_collapsed = COLLAPSE_FASTQ_TRIMMED.out.collapsed_fasta
 
             multiqc_files = Channel.empty()
                 .mix(FASTQC.out.zip.map { meta, file -> file })
@@ -76,7 +76,7 @@ workflow collapse {
 
             // Collapse FastQ files
             COLLAPSE_FASTQ(FASTP.out.trimmed_fastq)
-            final_collapsed = COLLAPSE_FASTQ.out.collapsed_fastq
+            final_collapsed = COLLAPSE_FASTQ.out.collapsed_fasta
             
             multiqc_files = Channel.empty()
                 .mix(FASTQC.out.zip.map { meta, file -> file })
@@ -92,7 +92,7 @@ workflow collapse {
         // MULTIQC(multiqc_files.collect())
 
     emit:
-        collapsed_fastq = final_collapsed
+        collapsed_fasta = final_collapsed
         fastqc_results  = FASTQC.out.html
         // multiqc_report  = MULTIQC.out.report
         versions        = versions_ch.collect()
