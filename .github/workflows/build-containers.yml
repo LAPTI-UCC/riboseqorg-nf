@@ -29,13 +29,26 @@ jobs:
         container: [getRPF, RiboMetric, RDP-tools, bam-to-sqlite, python-pandas-sqlite, bam-to-bed]
 
     steps:
+      - name: Check if container should be built
+        id: should_build
+        run: |
+          if [[ "${{ github.event_name }}" != "workflow_dispatch" ]] || \
+             [[ "${{ github.event.inputs.container }}" == "all" ]] || \
+             [[ "${{ github.event.inputs.container }}" == "${{ matrix.container }}" ]]; then
+            echo "build=true" >> $GITHUB_OUTPUT
+          else
+            echo "build=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Checkout repository
+        if: steps.should_build.outputs.build == 'true'
         uses: actions/checkout@v4
 
       #######################################################################
       # Lowercase the GitHub repository owner (avoids OCI reference errors)
       #######################################################################
       - name: Lowercase owner
+        if: steps.should_build.outputs.build == 'true'
         id: owner
         run: |
           OWNER_LOWER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
@@ -45,15 +58,18 @@ jobs:
       # Lowercase container name
       #######################################################################
       - name: Generate lowercase container name
+        if: steps.should_build.outputs.build == 'true'
         id: lowercase
         run: |
           CONTAINER_LOWER=$(echo "${{ matrix.container }}" | tr '[:upper:]' '[:lower:]')
           echo "name=${CONTAINER_LOWER}" >> $GITHUB_OUTPUT
 
       - name: Set up Docker Buildx
+        if: steps.should_build.outputs.build == 'true'
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to GitHub Container Registry
+        if: steps.should_build.outputs.build == 'true'
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
@@ -64,6 +80,7 @@ jobs:
       # Metadata for Docker images
       #######################################################################
       - name: Extract metadata for Docker
+        if: steps.should_build.outputs.build == 'true'
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -80,6 +97,7 @@ jobs:
       # Build + push Docker image
       #######################################################################
       - name: Build and push Docker image
+        if: steps.should_build.outputs.build == 'true'
         uses: docker/build-push-action@v5
         with:
           context: ./docker/${{ matrix.container }}
@@ -94,6 +112,7 @@ jobs:
       # Install Singularity/Apptainer
       #######################################################################
       - name: Install Singularity
+        if: steps.should_build.outputs.build == 'true'
         uses: eWaterCycle/setup-singularity@v7
         with:
           singularity-version: 3.8.7
@@ -102,6 +121,7 @@ jobs:
       # Build Singularity image from the Docker image (lowercase safe)
       #######################################################################
       - name: Build Singularity image
+        if: steps.should_build.outputs.build == 'true'
         run: |
           IMAGE_TAG="${{ env.REGISTRY }}/${{ steps.owner.outputs.owner }}/riboseqorg-nf-${{ steps.lowercase.outputs.name }}:latest"
 
@@ -117,6 +137,7 @@ jobs:
       # Upload Singularity image as CI artifact
       #######################################################################
       - name: Upload Singularity image as artifact
+        if: steps.should_build.outputs.build == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.container }}-singularity
@@ -127,7 +148,7 @@ jobs:
       # Release the Singularity images on main branch
       #######################################################################
       - name: Create release and upload Singularity images
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: steps.should_build.outputs.build == 'true' && github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v1
         with:
           tag_name: containers-${{ github.sha }}
