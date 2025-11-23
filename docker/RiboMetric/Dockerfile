@@ -5,6 +5,7 @@ LABEL description="RiboMetric container for ribosome profiling QC" \
       version="1.0"
 
 # Install conda packages (precompiled, avoids compilation issues)
+# Install pyarrow from conda-forge to get proper shared libraries
 RUN mamba install -y -c conda-forge -c bioconda \
     python=3.10 \
     pip \
@@ -12,10 +13,12 @@ RUN mamba install -y -c conda-forge -c bioconda \
     pysam \
     git \
     rich \
+    pyarrow \
  && mamba clean -a -y
 
 # Install RiboMetric from GitHub safely
-RUN pip install \
+# Use --no-deps for packages already installed via conda to avoid conflicts
+RUN pip install --no-build-isolation \
     git+https://github.com/JackCurragh/RiboMetric.git
 
 WORKDIR /data
