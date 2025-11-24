@@ -14,6 +14,7 @@ RUN mamba install -y -c conda-forge -c bioconda \
     git \
     rich \
     pyarrow \
+    samtools \
  && mamba clean -a -y
 
 # Install RiboMetric from GitHub safely
