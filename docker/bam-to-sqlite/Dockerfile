@@ -1,19 +1,19 @@
-FROM condaforge/mambaforge:latest
+FROM condaforge/mambaforge:23.11.0-0  # pin this
 
 LABEL description="BAM to SQLite converter with pysam and sqlitedict" \
       author="Jack Curragh" \
       version="1.0"
 
-# Install required packages
-RUN mamba install -y -c conda-forge -c bioconda \
+# Create isolated env
+RUN mamba create -y -n app \
+    -c conda-forge -c bioconda \
     python=3.11 \
     pysam=0.23.3 \
     sqlite \
     sqlitedict \
  && mamba clean -a -y
 
-# Set working directory
-WORKDIR /data
+ENV PATH=/opt/conda/envs/app/bin:$PATH
 
-# Default command
+WORKDIR /data
 CMD ["/bin/bash"]
