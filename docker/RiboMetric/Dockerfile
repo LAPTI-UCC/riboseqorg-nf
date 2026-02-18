@@ -22,6 +22,6 @@ RUN mamba install -y -c conda-forge -c bioconda \
 RUN pip install --no-build-isolation \
     git+https://github.com/JackCurragh/RiboMetric.git
 
-WORKDIR /data
+WORKDIR /data 
 
 CMD ["/bin/bash"]
