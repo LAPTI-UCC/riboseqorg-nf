@@ -42,7 +42,7 @@ process CHECK_CLEANLINESS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        getrf: 1.3.0
+          getrf: 0.5.0
     END_VERSIONS
     """
 }

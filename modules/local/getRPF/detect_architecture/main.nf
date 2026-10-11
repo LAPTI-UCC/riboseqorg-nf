@@ -46,7 +46,7 @@
 
       cat <<-END_VERSIONS > versions.yml
       "${task.process}":
-          getrpf: 1.3.0
+          getrpf: 0.5.0
       END_VERSIONS
       """
   }

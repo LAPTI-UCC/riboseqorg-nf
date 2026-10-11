@@ -21,7 +21,7 @@ docker/
 - **Purpose**: RNA structure detection and RPF extraction
 - **Base**: condaforge/mambaforge
 - **Key packages**: Python 3.10, biopython
-- **Pip install**: git+https://github.com/JackCurragh/get-RPF.git
+- **Pip install**: git+https://github.com/JackCurragh/get-RPF.git@v0.5.0
 
 ### RiboMetric
 - **Purpose**: Ribosome profiling quality control metrics

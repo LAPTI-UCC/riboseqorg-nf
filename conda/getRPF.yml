@@ -7,4 +7,4 @@ dependencies:
   - pip
   - biopython
   - pip:
-    - git+https://github.com/JackCurragh/get-RPF.git
+    - git+https://github.com/JackCurragh/get-RPF.git@v0.5.0

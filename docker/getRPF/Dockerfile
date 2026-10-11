@@ -11,7 +11,7 @@ RUN mamba install -y -c conda-forge -c bioconda \
  && mamba clean -a -y
 
 # Install getRPF (pure Python → safe with pip)
-RUN pip install --no-cache-dir git+https://github.com/JackCurragh/get-RPF.git
+RUN pip install --no-cache-dir git+https://github.com/JackCurragh/get-RPF.git@v0.5.0
 
 WORKDIR /data
 
